@@ -8,10 +8,6 @@ public class CameraFollow : MonoBehaviour {
 
     private void Start() => offset = transform.position - target.position;
 
-    private void LateUpdate() {
+    private void LateUpdate() => transform.SetPositionAndRotation(target.position + offset, target.rotation);
 
-        transform.position = target.position + offset;
-        transform.rotation = target.rotation;
-
-    }
 }
