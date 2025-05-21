@@ -31,8 +31,8 @@ public class HotbarSlot : MonoBehaviour {
 
         isSelected = selected;
 
-        if (selectCoroutine != null) StopCoroutine(selectCoroutine); // stop any active color fades
-        selectCoroutine = StartCoroutine(HandleColorFade(isSelected ? selectedColor : startColor)); // start a new color fade coroutine
+        if (selectCoroutine != null) StopCoroutine(selectCoroutine); // stop any active fade coroutines
+        selectCoroutine = StartCoroutine(HandleColorFade(isSelected ? selectedColor : startColor));
 
     }
 

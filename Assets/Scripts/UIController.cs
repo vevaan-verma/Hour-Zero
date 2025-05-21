@@ -3,61 +3,21 @@ using UnityEngine;
 
 public class UIController : MonoBehaviour {
 
+    [Header("References")]
+    private TimeManager timeManager;
+
     [Header("UI References")]
     [SerializeField] private TMP_Text timeText;
 
-    [Header("Time")]
-    [SerializeField, Tooltip("How many real seconds per in-game minute. 1 = real time, 0.5 = 2x speed, etc."), Min(0.01f)] private float realSecondsPerGameMinute;
-    private int hour;
-    private int minute;
-    private bool isAM;
-    private float timer;
-
     private void Start() {
 
-        // start the time at 12:00 AM
-        hour = 12;
-        isAM = true;
-
-        UpdateTimeText();
+        timeManager = FindFirstObjectByType<TimeManager>();
+        UpdateTimeText(timeManager.GetHour(), timeManager.GetMinute(), timeManager.IsAM());
 
     }
 
-    private void Update() {
+    private void Update() => UpdateTimeText(timeManager.GetHour(), timeManager.GetMinute(), timeManager.IsAM());
 
-        timer += Time.deltaTime;
+    private void UpdateTimeText(int hour, int minute, bool isAM) => timeText.text = $"{hour:00}:{minute:00} " + (isAM ? "AM" : "PM");
 
-        while (timer >= realSecondsPerGameMinute) {
-
-            timer -= realSecondsPerGameMinute;
-            UpdateTime();
-            UpdateTimeText();
-
-        }
-    }
-
-    private void UpdateTime() {
-
-        minute++;
-
-        if (minute >= 60f) {
-
-            minute = 0;
-            hour++;
-
-            if (hour > 12f)
-                hour = 1;
-
-            if (hour == 12f)
-                isAM = !isAM;
-
-        }
-    }
-
-    private void UpdateTimeText() {
-
-        string ampm = isAM ? "AM" : "PM";
-        timeText.text = $"{hour:00}:{minute:00} {ampm}";
-
-    }
 }
