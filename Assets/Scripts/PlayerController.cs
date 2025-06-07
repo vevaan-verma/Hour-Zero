@@ -85,7 +85,7 @@ public class PlayerController : MonoBehaviour {
         horizontalInput = Input.GetAxisRaw("Horizontal");
         verticalInput = Input.GetAxisRaw("Vertical");
 
-        moveSpeed = Input.GetKey(KeyCode.LeftShift) ? sprintSpeed : walkSpeed; // set move speed
+        moveSpeed = Input.GetKey(KeyCode.LeftShift) && verticalInput > 0f ? sprintSpeed : walkSpeed; // set move speed to sprint speed if shift is held and player has a forward movement component, otherwise set to walk speed
         #endregion
 
         #region LOOKING
@@ -112,15 +112,15 @@ public class PlayerController : MonoBehaviour {
         HandleHeadbob();
         #endregion
 
-        #region HOTBAR
-        if (Input.mouseScrollDelta.y != 0f)
-            hotbar.CycleSlot(Input.mouseScrollDelta.y < 0f ? 1 : -1);
+        //#region HOTBAR
+        //if (Input.mouseScrollDelta.y != 0f)
+        //    hotbar.CycleSlot(Input.mouseScrollDelta.y < 0f ? 1 : -1);
 
-        // assign each hotbar slot to a number key
-        for (int i = 0; i < hotbar.GetSlotCount(); i++)
-            if (Input.GetKeyDown((i + 1).ToString()))
-                hotbar.SelectSlot(i);
-        #endregion
+        //// assign each hotbar slot to a number key
+        //for (int i = 0; i < hotbar.GetSlotCount(); i++)
+        //    if (Input.GetKeyDown((i + 1).ToString()))
+        //        hotbar.SelectSlot(i);
+        //#endregion
 
         #region INTERACTING
         RaycastHit hit;

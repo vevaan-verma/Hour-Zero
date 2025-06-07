@@ -87,8 +87,8 @@ public class TimeManager : MonoBehaviour {
 public class TimePreset {
 
     [Header("Settings")]
-    [SerializeField] private int hour;
-    [SerializeField] private int minute;
+    [SerializeField, Range(1, 12)] private int hour;
+    [SerializeField, Range(0, 59)] private int minute;
     [SerializeField] private bool isAM;
 
     public int GetHour() => hour;
