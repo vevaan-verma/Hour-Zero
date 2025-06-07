@@ -5,6 +5,7 @@ public class PlayerController : MonoBehaviour {
 
     [Header("References")]
     [SerializeField] private Transform cameraPos;
+    private UIController uiController;
     private Rigidbody rb;
 
     [Header("Movement")]
@@ -57,17 +58,13 @@ public class PlayerController : MonoBehaviour {
     [SerializeField] private float groundDrag;
     [SerializeField] private float airDrag;
 
-    [Header("Hotbar")]
-    private Hotbar hotbar;
+    [Header("Backpack")]
+    [SerializeField] private KeyCode backpackKey;
 
     private void Start() {
 
-        // hide cursor
-        Cursor.lockState = CursorLockMode.Locked;
-        Cursor.visible = false;
-
+        uiController = FindFirstObjectByType<UIController>();
         rb = GetComponent<Rigidbody>();
-        hotbar = FindFirstObjectByType<Hotbar>();
 
         defaultCrosshair = crosshair.sprite;
 
@@ -77,11 +74,19 @@ public class PlayerController : MonoBehaviour {
 
     private void Update() {
 
+        // backpack is checked first to ensure backpack can be opened/closed at any time; when backpack is open, other inputs may be ignored
+        #region BACKPACK
+        if (Input.GetKeyDown(backpackKey))
+            uiController.ToggleBackpack(); // toggle backpack UI
+        #endregion
+
+        if (uiController.IsBackpackOpen()) return; // if backpack is open, ignore other inputs
+
         #region GROUND CHECK
         isGrounded = Physics.CheckSphere(feet.position, groundCheckRadius, environmentMask);
         #endregion
 
-        #region INPUT
+        #region MOVEMENT INPUT
         horizontalInput = Input.GetAxisRaw("Horizontal");
         verticalInput = Input.GetAxisRaw("Vertical");
 
