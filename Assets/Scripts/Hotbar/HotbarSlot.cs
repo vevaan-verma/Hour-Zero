@@ -5,12 +5,14 @@ using UnityEngine.UI;
 public class HotbarSlot : MonoBehaviour {
 
     [Header("References")]
-    [SerializeField] private Image fillImage;
-    [SerializeField] private Image icon;
     private Coroutine selectCoroutine;
 
+    [Header("UI References")]
+    [SerializeField] private Image fillImage;
+    [SerializeField] private Image icon;
+
     [Header("Slot")]
-    private ItemProperties slotItem;
+    private Item slotItem;
 
     [Header("Selection")]
     [SerializeField] private Color selectedColor;
@@ -20,7 +22,7 @@ public class HotbarSlot : MonoBehaviour {
 
     private void Awake() => startColor = fillImage.color;
 
-    public void SetSlotItem(ItemProperties item) {
+    public void SetSlotItem(Item item) {
 
         slotItem = item;
         icon.sprite = item.GetIcon();
@@ -55,6 +57,6 @@ public class HotbarSlot : MonoBehaviour {
 
     public bool IsEmpty() => slotItem == null;
 
-    public ItemProperties GetItem() => slotItem;
+    public Item GetItem() => slotItem;
 
 }

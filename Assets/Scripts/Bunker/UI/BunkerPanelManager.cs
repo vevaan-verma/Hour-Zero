@@ -4,7 +4,7 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class BunkerPanelController : MonoBehaviour {
+public class BunkerPanelManager : MonoBehaviour {
 
     [Header("References")]
     [SerializeField] private BunkerSystem[] bunkerSystems;

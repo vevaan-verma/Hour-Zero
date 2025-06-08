@@ -6,7 +6,7 @@ using UnityEngine.UI;
 public class BunkerSystemUI : MonoBehaviour {
 
     [Header("References")]
-    private BunkerPanelController bunkerPanelController;
+    private BunkerPanelManager bunkerPanelManager;
     private Coroutine sliderLerpCoroutine;
 
     [Header("UI References")]
@@ -18,9 +18,9 @@ public class BunkerSystemUI : MonoBehaviour {
     [SerializeField] private BunkerSystemType systemType;
     [SerializeField] private float sliderLerpDuration;
 
-    public void Initialize(BunkerPanelController bunkerPanelController, BunkerSystem bunkerSystem) {
+    public void Initialize(BunkerPanelManager bunkerPanelController, BunkerSystem bunkerSystem) {
 
-        this.bunkerPanelController = bunkerPanelController;
+        this.bunkerPanelManager = bunkerPanelController;
 
         // min and max are 0 and 100 respectively since durability is a percentage
         durabilitySlider.minValue = 0f;
@@ -34,7 +34,7 @@ public class BunkerSystemUI : MonoBehaviour {
         if (sliderLerpCoroutine != null) StopCoroutine(sliderLerpCoroutine); // stop any existing lerp coroutine
         sliderLerpCoroutine = StartCoroutine(HandleSliderLerp(durability));
 
-        BunkerSystemStatusProperties systemStatusProperties = bunkerPanelController.GetSystemStatusFromDurability(durability);
+        BunkerSystemStatusProperties systemStatusProperties = bunkerPanelManager.GetSystemStatusFromDurability(durability);
         statusText.text = systemStatusProperties.GetStatus().ToString(); // update the status text based on the status
         statusText.color = systemStatusProperties.GetColor(); // update the text color based on the status
 

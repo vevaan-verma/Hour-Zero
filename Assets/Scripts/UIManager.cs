@@ -3,7 +3,7 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class UIController : MonoBehaviour {
+public class UIManager : MonoBehaviour {
 
     [Header("References")]
     private TimeManager timeManager;

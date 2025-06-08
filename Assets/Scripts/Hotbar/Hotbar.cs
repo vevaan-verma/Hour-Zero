@@ -41,13 +41,13 @@ public class Hotbar : MonoBehaviour {
 
     }
 
-    public void AddItem(ItemProperties itemProperties) {
+    public void AddItem(Item item) {
 
         for (int i = 0; i < slots.Length; i++) {
 
             if (slots[i].IsEmpty()) {
 
-                slots[i].SetSlotItem(itemProperties);
+                slots[i].SetSlotItem(item);
                 SelectSlot(currSlotIndex); // reselect the current slot to update the holding item
                 return;
 
@@ -55,7 +55,7 @@ public class Hotbar : MonoBehaviour {
         }
 
         // if all slots are full, replace the current slot with the new item
-        slots[currSlotIndex].SetSlotItem(itemProperties);
+        slots[currSlotIndex].SetSlotItem(item);
         SelectSlot(currSlotIndex); // reselect the current slot to update the holding item
 
         // TODO: drop the replaced item

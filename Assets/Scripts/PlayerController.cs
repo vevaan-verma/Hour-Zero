@@ -5,7 +5,7 @@ public class PlayerController : MonoBehaviour {
 
     [Header("References")]
     [SerializeField] private Transform cameraPos;
-    private UIController uiController;
+    private UIManager uiManager;
     private Rigidbody rb;
 
     [Header("Movement")]
@@ -37,10 +37,6 @@ public class PlayerController : MonoBehaviour {
     private float defaultYPos;
     private float timer;
 
-    [Header("Holding")]
-    [SerializeField] private Transform holdPos;
-    private GameObject holdingItem;
-
     [Header("Interacting")]
     // TODO: move crosshair to UI controller/manager
     [SerializeField] private Image crosshair;
@@ -63,7 +59,7 @@ public class PlayerController : MonoBehaviour {
 
     private void Start() {
 
-        uiController = FindFirstObjectByType<UIController>();
+        uiManager = FindFirstObjectByType<UIManager>();
         rb = GetComponent<Rigidbody>();
 
         defaultCrosshair = crosshair.sprite;
@@ -77,10 +73,10 @@ public class PlayerController : MonoBehaviour {
         // backpack is checked first to ensure backpack can be opened/closed at any time; when backpack is open, other inputs may be ignored
         #region BACKPACK
         if (Input.GetKeyDown(backpackKey))
-            uiController.ToggleBackpack(); // toggle backpack UI
+            uiManager.ToggleBackpack(); // toggle backpack UI
         #endregion
 
-        if (uiController.IsBackpackOpen()) return; // if backpack is open, ignore other inputs
+        if (uiManager.IsBackpackOpen()) return; // if backpack is open, ignore other inputs
 
         #region GROUND CHECK
         isGrounded = Physics.CheckSphere(feet.position, groundCheckRadius, environmentMask);
@@ -198,14 +194,5 @@ public class PlayerController : MonoBehaviour {
             cameraPos.localPosition = new Vector3(cameraPos.localPosition.x, Mathf.Lerp(cameraPos.localPosition.y, defaultYPos, Time.deltaTime * (moveSpeed == walkSpeed ? walkBobSpeed : sprintBobSpeed)), cameraPos.localPosition.z);
 
         }
-    }
-
-    public void SetHoldingItem(ItemProperties item) => holdingItem = Instantiate(item.GetHeldItemPrefab(), holdPos.position, cameraPos.rotation, holdPos);
-
-    public void RemoveHoldingItem() {
-
-        if (holdingItem)
-            Destroy(holdingItem);
-
     }
 }
