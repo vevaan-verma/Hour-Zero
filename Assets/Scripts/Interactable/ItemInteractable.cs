@@ -16,6 +16,7 @@ public class ItemInteractable : Interactable {
     private new void Start() {
 
         base.Start();
+
         backpack = FindFirstObjectByType<Backpack>(FindObjectsInactive.Include);
         currCount = itemCount;
 

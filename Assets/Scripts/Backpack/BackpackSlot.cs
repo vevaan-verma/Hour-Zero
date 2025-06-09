@@ -62,20 +62,25 @@ public class BackpackSlot : MonoBehaviour, IDropHandler {
 
     }
 
-    public void RemoveItem(Item item, int count) {
+    // returns the amount of items that were removed from the slot
+    public int RemoveItem(Item item, int count) {
 
-        if (itemHolder.GetItem() != item) {
+        if (itemHolder.GetItem() == null || itemHolder.GetItem() != item) {
 
-            Debug.LogWarning("Cannot remove item: " + item.GetName() + " from slot: " + gameObject.name + " because it does not match the current item: " + itemHolder.GetItem()?.GetName());
-            return; // if the item in this slot is not the same as the one to remove, do nothing
+            Debug.LogWarning("Cannot remove item: " + item.GetName() + " from slot: " + gameObject.name + " because it does not contain this item.");
+            return 0;
 
         }
 
-        itemHolder.RemoveItem(item, count); // remove the item and count from the current slot item holder
+        int removedCount = Mathf.Min(count, itemHolder.GetCount()); // get the minimum of the count to remove and the current count in the slot (this prevents removing more than available)
+        itemHolder.RemoveItem(item, removedCount); // remove the item and count from the current slot item holder
+
+        if (itemHolder.GetCount() <= 0) // if the count is 0 or less, set the slot to empty
+            itemHolder.SetItem(null, 0);
+
+        return removedCount;
 
     }
-
-    public void ClearItems() => RemoveItem(itemHolder.GetItem(), itemHolder.GetCount()); // remove all of othe item from the current slot item holder
 
     public Item GetItem() => itemHolder.GetItem();
 

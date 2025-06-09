@@ -3,9 +3,6 @@ using UnityEngine;
 
 public class BunkerSystem : MonoBehaviour {
 
-    [Header("References")]
-    private Coroutine durabilityCoroutine;
-
     [Header("Settings")]
     [SerializeField] private BunkerSystemType systemType;
     [SerializeField][Range(0, 100)] private int initialDurability;
@@ -18,9 +15,11 @@ public class BunkerSystem : MonoBehaviour {
     private void Awake() {
 
         currDurability = initialDurability;
-        durabilityCoroutine = StartCoroutine(HandleDurabilityLoss());
+        StartCoroutine(HandleDurabilityLoss());
 
     }
+
+    public void Repair(int repairAmount) => currDurability = Mathf.Clamp(currDurability + repairAmount, 0, initialDurability); // ensure current durability does not exceed initial durability (clamp it between 0 and initialDurability)
 
     private IEnumerator HandleDurabilityLoss() {
 
@@ -38,7 +37,6 @@ public class BunkerSystem : MonoBehaviour {
         }
 
         // TODO: handle system failure
-        durabilityCoroutine = null;
 
     }
 

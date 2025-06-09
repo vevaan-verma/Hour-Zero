@@ -6,7 +6,7 @@ public class Backpack : MonoBehaviour {
     [SerializeField] private BackpackSlot slotPrefab;
     [SerializeField] private Transform backpackContents;
     private BackpackSlot[] backpackSlots;
-    private UIManager uiManager;
+    private AlertManager alertManager;
 
     [Header("Settings")]
     [SerializeField] private int initialBackpackCapacity;
@@ -14,7 +14,7 @@ public class Backpack : MonoBehaviour {
 
     private void Start() {
 
-        uiManager = FindFirstObjectByType<UIManager>();
+        alertManager = FindFirstObjectByType<AlertManager>();
         backpackSlots = new BackpackSlot[initialBackpackCapacity];
 
         currBackpackCapacity = initialBackpackCapacity;
@@ -84,26 +84,51 @@ public class Backpack : MonoBehaviour {
 
         // if we reach here, it means no slots were available or the item could not be fully added
 
-        uiManager.SendAlert($"Backpack is full! Could not add {count}x {item.GetName()} to backpack."); // send alert to UI manager
+        alertManager.SendAlert(new Alert($"Backpack is full! Could not add {count}x {item.GetName()} to backpack", AlertType.Failure)); // send alert to UI manager
         return count; // return the count of items that could not be added
 
     }
 
-    public void RemoveItem(Item item, int count) {
+    // returns the amount of items that were removed from the backpack
+    public int RemoveItem(Item item, int count) {
 
-        // find the slot containing the item to remove
-        for (int i = 0; i < backpackSlots.Length; i++) {
+        int removedCount = 0; // initialize the count of removed items
 
-            if (backpackSlots[i].HasItem() && backpackSlots[i].GetItem() == item) {
+        // try to remove the item from the later slots first
+        for (int i = backpackSlots.Length - 1; i >= 0; i--) {
 
-                Destroy(backpackSlots[i].gameObject); // destroy the slot item holder
-                backpackSlots[i] = null; // set the slot to null to indicate it's now empty
-                return; // item removed successfully, exit the method
+            BackpackSlot slot = backpackSlots[i];
+
+            if (slot.HasItem() && slot.GetItem().Equals(item)) {
+
+                removedCount += slot.RemoveItem(item, count - removedCount); // remove the remaining count from the slot
+                if (count <= 0) return removedCount; // if all items were removed, exit the method
 
             }
         }
 
-        Debug.LogWarning("Item not found in backpack: " + item.GetName()); // log a warning if the item is not found
+        return removedCount; // return the total count of items that were removed
+
+    }
+
+    public bool ContainsItems(Item item, int count) {
+
+        int totalCount = 0;
+
+        // check if the item exists in the backpack and has enough count
+        foreach (BackpackSlot slot in backpackSlots) {
+
+            if (slot.HasItem() && slot.GetItem().Equals(item)) {
+
+                totalCount += slot.GetCount();
+
+                if (totalCount >= count) // if the total count is greater than or equal to the requested count, exit early (optimization)
+                    return true; // return true as we have enough items
+
+            }
+        }
+
+        return false; // return false if we did not find enough items in the backpack
 
     }
 }
