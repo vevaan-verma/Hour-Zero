@@ -3,9 +3,9 @@ using UnityEngine;
 public class Backpack : MonoBehaviour {
 
     [Header("References")]
-    [SerializeField] private BackpackSlot slotPrefab;
+    [SerializeField] private Slot slotPrefab;
     [SerializeField] private Transform backpackContents;
-    private BackpackSlot[] backpackSlots;
+    private Slot[] backpackSlots;
     private AlertManager alertManager;
 
     [Header("Settings")]
@@ -15,7 +15,7 @@ public class Backpack : MonoBehaviour {
     private void Start() {
 
         alertManager = FindFirstObjectByType<AlertManager>();
-        backpackSlots = new BackpackSlot[initialBackpackCapacity];
+        backpackSlots = new Slot[initialBackpackCapacity];
 
         currBackpackCapacity = initialBackpackCapacity;
         InitializeBackpack();
@@ -31,7 +31,7 @@ public class Backpack : MonoBehaviour {
         // instantiate the initial number of backpack slots
         for (int i = 0; i < currBackpackCapacity; i++) {
 
-            BackpackSlot slot = Instantiate(slotPrefab, backpackContents);
+            Slot slot = Instantiate(slotPrefab, backpackContents);
             slot.transform.name = $"Slot{i + 1}";
             slot.Initialize(); // initialize the slot
             backpackSlots[i] = slot; // store the slot in the array for later reference
@@ -57,7 +57,7 @@ public class Backpack : MonoBehaviour {
         }
 
         // check if the item is already in the backpack, if so, stack it as much as possible
-        foreach (BackpackSlot slot in backpackSlots) {
+        foreach (Slot slot in backpackSlots) {
 
             if (slot.HasItem() && slot.GetItem().Equals(item)) {
 
@@ -97,7 +97,7 @@ public class Backpack : MonoBehaviour {
         // try to remove the item from the later slots first
         for (int i = backpackSlots.Length - 1; i >= 0; i--) {
 
-            BackpackSlot slot = backpackSlots[i];
+            Slot slot = backpackSlots[i];
 
             if (slot.HasItem() && slot.GetItem().Equals(item)) {
 
@@ -116,7 +116,7 @@ public class Backpack : MonoBehaviour {
         int totalCount = 0;
 
         // check if the item exists in the backpack and has enough count
-        foreach (BackpackSlot slot in backpackSlots) {
+        foreach (Slot slot in backpackSlots) {
 
             if (slot.HasItem() && slot.GetItem().Equals(item)) {
 

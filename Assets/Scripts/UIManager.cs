@@ -70,7 +70,7 @@ public class UIManager : MonoBehaviour {
             closeBackpackButton.interactable = false; // disable close button to prevent multiple clicks (as this could mess with the toggle logic)
             backpackUI.gameObject.SetActive(true); // ensure UI is active before fading
 
-            animator.SetTrigger("closeBackpack"); // trigger close animation
+            animator.SetTrigger("closeBackpackCenter"); // trigger center close animation
 
             Cursor.lockState = CursorLockMode.Locked; // lock cursor
             Cursor.visible = false; // hide cursor
@@ -85,7 +85,7 @@ public class UIManager : MonoBehaviour {
             closeBackpackButton.interactable = true; // enable close button to allow closing backpack
             backpackUI.gameObject.SetActive(true); // ensure UI is active before fading
 
-            animator.SetTrigger("openBackpack"); // trigger open animation
+            animator.SetTrigger("openBackpackCenter"); // trigger center open animation
 
             Cursor.lockState = CursorLockMode.None; // unlock cursor
             Cursor.visible = true; // make cursor visible
