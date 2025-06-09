@@ -54,9 +54,6 @@ public class PlayerController : MonoBehaviour {
     [SerializeField] private float groundDrag;
     [SerializeField] private float airDrag;
 
-    [Header("Backpack")]
-    [SerializeField] private KeyCode backpackKey;
-
     private void Start() {
 
         uiManager = FindFirstObjectByType<UIManager>();
@@ -71,12 +68,7 @@ public class PlayerController : MonoBehaviour {
     private void Update() {
 
         // backpack is checked first to ensure backpack can be opened/closed at any time; when backpack is open, other inputs may be ignored
-        #region BACKPACK
-        if (Input.GetKeyDown(backpackKey))
-            uiManager.ToggleBackpack(); // toggle backpack UI
-        #endregion
-
-        if (uiManager.IsBackpackOpen()) return; // if backpack is open, ignore other inputs
+        if (uiManager.IsBackpackOpen()) return;
 
         #region GROUND CHECK
         isGrounded = Physics.CheckSphere(feet.position, groundCheckRadius, environmentMask);
@@ -112,16 +104,6 @@ public class PlayerController : MonoBehaviour {
         #region HEADBOB
         HandleHeadbob();
         #endregion
-
-        //#region HOTBAR
-        //if (Input.mouseScrollDelta.y != 0f)
-        //    hotbar.CycleSlot(Input.mouseScrollDelta.y < 0f ? 1 : -1);
-
-        //// assign each hotbar slot to a number key
-        //for (int i = 0; i < hotbar.GetSlotCount(); i++)
-        //    if (Input.GetKeyDown((i + 1).ToString()))
-        //        hotbar.SelectSlot(i);
-        //#endregion
 
         #region INTERACTING
         RaycastHit hit;

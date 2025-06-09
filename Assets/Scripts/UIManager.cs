@@ -7,20 +7,27 @@ public class UIManager : MonoBehaviour {
 
     [Header("References")]
     private TimeManager timeManager;
-    private Coroutine fadeCoroutine;
     private Animator animator;
 
     [Header("UI References")]
     [SerializeField] private TMP_Text timeText;
 
-    [Header("Backpack UI")]
+    [Header("Backpack")]
     [SerializeField] private CanvasGroup backpackUI;
     [SerializeField] private Button closeBackpackButton;
     private Coroutine backpackCoroutine;
     private bool isBackpackOpen;
 
+    [Header("Alert")]
+    [SerializeField] private TMP_Text alertText;
+    [SerializeField, Tooltip("The amount of characters to type per second in the alert text")] private int charactersPerSecond;
+    [SerializeField, Tooltip("Duration for the alert text to stay visible after fully typing but before fading out")] private float alertDuration;
+    [SerializeField, Tooltip("Duration for the alert text to fade out")] private float alertFadeDuration;
+    private Coroutine alertCoroutine;
+
     [Header("Settings")]
     [SerializeField] private float backpackFadeDuration;
+    [SerializeField] private KeyCode backpackKey;
 
     private void Start() {
 
@@ -36,9 +43,23 @@ public class UIManager : MonoBehaviour {
         backpackUI.gameObject.SetActive(false); // ensure backpack UI is inactive at start
         closeBackpackButton.onClick.AddListener(ToggleBackpack); // add listener to close backpack button (toggle can be used since the button can only be clicked when backpack is open)
 
+        alertText.gameObject.SetActive(false); // ensure alert text is inactive at start
+
     }
 
-    private void Update() => UpdateTimeText(timeManager.GetHour(), timeManager.GetMinute(), timeManager.IsAM());
+    private void Update() {
+
+        UpdateTimeText(timeManager.GetHour(), timeManager.GetMinute(), timeManager.IsAM());
+
+        // toggle backpack UI
+        if (Input.GetKeyDown(backpackKey))
+            ToggleBackpack();
+
+        // close backpack if escape is pressed and backpack is open
+        if (Input.GetKeyDown(KeyCode.Escape) && isBackpackOpen)
+            ToggleBackpack();
+
+    }
 
     private void UpdateTimeText(int hour, int minute, bool isAM) => timeText.text = $"{hour:00}:{minute:00} " + (isAM ? "AM" : "PM");
 
@@ -81,28 +102,58 @@ public class UIManager : MonoBehaviour {
         }
     }
 
+    public void SendAlert(string line) {
+
+        if (alertCoroutine != null) StopCoroutine(alertCoroutine); // stop any existing alert coroutine
+        alertCoroutine = StartCoroutine(HandleAlert(line)); // start typing the new alert text
+
+    }
+
+    private IEnumerator HandleAlert(string line) {
+
+        // ensure alert text is fully visible
+        alertText.gameObject.SetActive(true);
+        CanvasGroup canvasGroup = alertText.GetComponent<CanvasGroup>();
+        canvasGroup.alpha = 1f;
+
+        string textBuffer = null;
+        alertText.text = ""; // clear previous alert text
+
+        foreach (char c in line) {
+
+            textBuffer += c;
+            alertText.text = textBuffer;
+            yield return new WaitForSeconds(1 / charactersPerSecond);
+
+        }
+
+        yield return new WaitForSeconds(alertDuration); // wait for the alert to stay visible after typing
+        yield return Fade(canvasGroup, 0f, alertFadeDuration); // fade out the alert text
+
+        alertCoroutine = null;
+
+    }
+
     private IEnumerator Fade(CanvasGroup ui, float targetAlpha, float duration) {
 
-        float startAlpha = backpackUI.alpha;
         float currentTime = 0f;
+        float startAlpha = ui.alpha;
 
         ui.gameObject.SetActive(true); // ensure UI is active before fading
 
         while (currentTime < duration) {
 
             currentTime += Time.deltaTime;
-            backpackUI.alpha = Mathf.Lerp(startAlpha, targetAlpha, currentTime / duration);
+            ui.alpha = Mathf.Lerp(startAlpha, targetAlpha, currentTime / duration);
             yield return null;
 
         }
 
-        backpackUI.alpha = targetAlpha; // ensure final alpha is set
+        ui.alpha = targetAlpha; // ensure final alpha is set
 
         // if the target alpha is 0, disable the UI
         if (targetAlpha == 0f)
             ui.gameObject.SetActive(false);
-
-        fadeCoroutine = null; // reset coroutine reference
 
     }
 
