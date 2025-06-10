@@ -29,7 +29,7 @@ public class BackpackUI : MonoBehaviour {
 
     }
 
-    private void RefreshBackpack() {
+    public void RefreshBackpack() {
 
         // delete all existing slots in the backpack contents
         foreach (Transform child in backpackContents)
@@ -40,7 +40,7 @@ public class BackpackUI : MonoBehaviour {
 
             Slot slot = Instantiate(slotPrefab, backpackContents);
             slot.transform.name = $"Slot{i + 1}";
-            slot.Initialize(); // initialize the slot
+            slot.Initialize(this); // initialize the slot
             slot.SetItem(backpack.GetItemStack(i).GetItem(), backpack.GetItemStack(i).GetCount()); // set the item and count in the slot
             backpackSlots[i] = slot; // store the slot in the array for later reference
 

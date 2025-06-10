@@ -70,6 +70,7 @@ public class ItemHolder : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDr
         if (eventData.pointerCurrentRaycast.gameObject == null || eventData.pointerCurrentRaycast.gameObject.GetComponent<Slot>() == null)
             initialSlot.SetItem(item, count); // reset the item and count in the initial slot
 
+        transform.SetParent(initialSlot.transform); // reset the parent to the initial slot (prevents the item from being orphaned if not dropped, which creates an error)
         image.color = initialColor; // reset the image color when dragging ends
         image.raycastTarget = true; // re-enable raycast target
 

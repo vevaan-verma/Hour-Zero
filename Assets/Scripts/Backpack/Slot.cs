@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 using UnityEngine.EventSystems;
 
@@ -5,19 +6,24 @@ public class Slot : MonoBehaviour, IDropHandler {
 
     [Header("References")]
     private ItemHolder itemHolder;
+    private BackpackUI backpackUI;
     private Backpack backpack;
     private bool initialized;
 
     [Header("Settings")]
     [SerializeField][Tooltip("The maximum number of items that can be held in this slot. If set to 0, it will either use the item's stack limit, or if that is set to 0, an infinite limit")][Min(0)] private int slotStackLimit;
+    private string guid; // unique identifier for the slot, can be used to identify the slot
 
-    public void Initialize() {
+    public void Initialize(BackpackUI backpackUI) {
 
+        this.backpackUI = backpackUI;
         itemHolder = GetComponentInChildren<ItemHolder>();
         backpack = FindFirstObjectByType<Backpack>();
 
         itemHolder.Initialize(); // initialize the item holder
         SetItem(null, 0); // initialize the slot with no item and count 0
+        guid = Guid.NewGuid().ToString(); // generate a unique identifier for the slot
+
         initialized = true;
 
     }
@@ -26,46 +32,66 @@ public class Slot : MonoBehaviour, IDropHandler {
 
         // initialize the slot if not already initialized
         if (!initialized)
-            Initialize();
+            Initialize(null);
 
     }
 
     public void OnDrop(PointerEventData eventData) {
 
         ItemHolder droppedItemHolder = eventData.pointerDrag.GetComponent<ItemHolder>();
+
         int fromIndex = droppedItemHolder.GetInitialSlot().GetSlotIndex();
         int toIndex = GetSlotIndex();
 
         Item itemToDrop = droppedItemHolder.GetItem();
         int countToDrop = droppedItemHolder.GetCount();
 
-        // use Backpack to add items, not Slot's own AddItem/SetItem, since it handles stacking and limits
+        if (GetItem() != null && GetItem() == itemToDrop) { // check if the item in this slot is the same as the one being dropped, which would allow stacking
 
-        if (GetItem() != null && GetItem() == itemToDrop) { // check if the item in this slot is the same as the one being dropped, which, if they are, allows us to stack them
+            int stackLimit = GetStackLimit();
+            int currentCount = GetCount();
+            int canAdd = Mathf.Min(stackLimit - currentCount, countToDrop); // this is how many items we can add to this stack
 
-            int remainder = backpack.AddItem(itemToDrop, countToDrop); // try to add the item to this slot using Backpack's AddItem method and store the remainder of items that could not be added
+            if (canAdd > 0) { // if we can add some items to this stack
 
-            if (remainder > 0) // if there are items that could not be stacked, put them back in the slot that was dragged from
-                droppedItemHolder.GetInitialSlot().SetItem(itemToDrop, remainder);
-            else // if all the items were able to be stacked, set the contents of the slot that was dragged from to null
-                droppedItemHolder.GetInitialSlot().SetItem(null, 0);
+                backpack.GetItemStack(toIndex).AddItem(canAdd); // add what we can to the target slot in Backpack
+                backpack.GetItemStack(fromIndex).RemoveItem(canAdd); // remove from the source slot in Backpack
 
-            return; // return early since we handled the stacking
+                // refresh the backpack UI if it exists
+                if (backpackUI != null)
+                    backpackUI.RefreshBackpack();
+
+            } else {
+
+                // the target slot is full, so we need to swap the items instead
+
+                if (fromIndex != toIndex) { // if the source and target slots are different
+
+                    backpack.SwapItemStacks(fromIndex, toIndex); // swap the item stacks in Backpack
+
+                    // refresh the backpack UI if it exists
+                    if (backpackUI != null)
+                        backpackUI.RefreshBackpack();
+
+                }
+            }
+
+            // TODO: think about if theres a remainder
+            return; // exit early since we handled the stacking case
 
         }
 
-        // if the origin and destination slots are not the same, swap the items in the Backpack
-        if (fromIndex != toIndex)
+        // if the target and source slots aren't the same, we can swap the items because, at this point, we know the items are different, so they can't stack
+        if (fromIndex != toIndex) {
+
+            print("swap");
             backpack.SwapItemStacks(fromIndex, toIndex);
 
-        // get the swapped items from the Backpack
-        ItemStack stackA = backpack.GetItemStack(fromIndex);
-        ItemStack stackB = backpack.GetItemStack(toIndex);
+            // refresh the backpack UI if it exists
+            if (backpackUI != null)
+                backpackUI.RefreshBackpack();
 
-        // set the items in the slots based on the swapped stacks
-        droppedItemHolder.GetInitialSlot().SetItem(stackA.GetItem(), stackA.GetCount());
-        SetItem(stackB.GetItem(), stackB.GetCount());
-
+        }
     }
 
     public void SetItem(Item item, int count) {
@@ -84,7 +110,5 @@ public class Slot : MonoBehaviour, IDropHandler {
     public int GetCount() => itemHolder.GetCount();
 
     public int GetStackLimit() => slotStackLimit;
-
-    public int GetSlotIndex() => transform.GetSiblingIndex(); // Returns the index of the slot in its parent
 
 }
