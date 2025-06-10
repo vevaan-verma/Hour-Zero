@@ -7,6 +7,7 @@ public class BunkerSystem : MonoBehaviour {
     [SerializeField] private BunkerSystemType systemType;
     [SerializeField][Range(0, 100)] private int initialDurability;
     [SerializeField][Tooltip("The interval in seconds between each 1% durability loss tick")] private float durabilityLossInterval = 60f;
+    [SerializeField] private Item[] repairItems;
     private int currDurability;
 
     [Header("Debug")]

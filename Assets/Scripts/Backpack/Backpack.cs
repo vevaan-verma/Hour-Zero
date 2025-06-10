@@ -1,113 +1,114 @@
+using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 public class Backpack : MonoBehaviour {
 
     [Header("References")]
-    [SerializeField] private Slot slotPrefab;
-    [SerializeField] private Transform backpackContents;
-    private Slot[] backpackSlots;
     private AlertManager alertManager;
 
+    [Header("UI References")]
+    [SerializeField] private Slot backpackSlot; // used to get the slot stack limit
+    private int slotStackLimit;
+
     [Header("Settings")]
-    [SerializeField] private int initialBackpackCapacity;
-    private int currBackpackCapacity;
+    [SerializeField] private int initialCapacity;
+    private int currCapacity;
+
+    [Header("Data")]
+    private List<ItemStack> contents;
 
     private void Start() {
 
         alertManager = FindFirstObjectByType<AlertManager>();
-        backpackSlots = new Slot[initialBackpackCapacity];
+        contents = new List<ItemStack>(currCapacity);
+        slotStackLimit = backpackSlot.GetStackLimit();
+        currCapacity = initialCapacity;
 
-        currBackpackCapacity = initialBackpackCapacity;
-        InitializeBackpack();
+        for (int i = 0; i < currCapacity; i++)
+            contents.Add(new ItemStack(null, 0));
 
-    }
-
-    private void InitializeBackpack() {
-
-        // delete all existing slots in the backpack contents
-        foreach (Transform child in backpackContents)
-            Destroy(child.gameObject);
-
-        // instantiate the initial number of backpack slots
-        for (int i = 0; i < currBackpackCapacity; i++) {
-
-            Slot slot = Instantiate(slotPrefab, backpackContents);
-            slot.transform.name = $"Slot{i + 1}";
-            slot.Initialize(); // initialize the slot
-            backpackSlots[i] = slot; // store the slot in the array for later reference
-
-        }
     }
 
     // returns the amount of items that could not be added to the backpack
     public int AddItem(Item item, int count) {
 
-        if (item == null) {
+        int stackLimit = GetEffectiveStackLimit(item);
 
-            Debug.LogWarning("Cannot add null item to backpack."); // log a warning if the item is null
-            return 0; // return 0 to prevent adding null items
+        // first, try to stack into existing stacks
+        for (int i = 0; i < contents.Count; i++) {
 
-        }
+            ItemStack stack = contents[i];
 
-        if (count <= 0) {
+            if (stack.GetItem() != null && stack.GetItem().Equals(item)) { // if the stack already contains the item
 
-            Debug.LogWarning("Count must be greater than zero for adding to backpack."); // log a warning if the count is less than or equal to zero
-            return 0; // return 0 to prevent adding invalid counts
+                int currentCount = stack.GetCount();
+                int toAdd = Math.Min(stackLimit - currentCount, count); // how many can we add to this stack
 
-        }
+                if (toAdd > 0) {
 
-        // check if the item is already in the backpack, if so, stack it as much as possible
-        foreach (Slot slot in backpackSlots) {
+                    stack.AddItem(toAdd); // add the items to the stack
+                    count -= toAdd; // reduce the count of items to add
 
-            if (slot.HasItem() && slot.GetItem().Equals(item)) {
+                }
 
-                int remainder = slot.AddItem(item, count);
-                if (remainder == 0) return 0; // item added successfully, exit the method and return that 0 items could not be added
-
-                count = remainder; // update the count to the remainder that could not be added
+                if (count <= 0)
+                    return 0; // return 0 since all items were added
 
             }
         }
 
-        // find first available slot in the backpack
-        for (int i = 0; i < backpackSlots.Length; i++) {
+        // then, try to add to empty slots
+        for (int i = 0; i < contents.Count; i++) {
 
-            if (!backpackSlots[i].HasItem()) {
+            ItemStack stack = contents[i];
 
-                int remainder = backpackSlots[i].SetItem(item, count);
-                if (remainder == 0) return 0; // item added successfully, exit the method and return that 0 items could not be added
+            if (stack.GetItem() == null || stack.GetCount() == 0) { // check if the slot is empty
 
-                count = remainder; // update the count to the remainder that could not be added
+                int toAdd = Math.Min(stackLimit, count);
+                contents[i] = new ItemStack(item, toAdd);
+                count -= toAdd;
+
+                if (count <= 0)
+                    return 0; // return 0 since all items were added
 
             }
         }
 
-        // if we reach here, it means no slots were available or the item could not be fully added
-
-        alertManager.SendAlert(new Alert($"Backpack is full! Could not add {count}x {item.GetName()} to backpack", AlertType.Failure)); // send alert to UI manager
-        return count; // return the count of items that could not be added
+        // if we reach here, not all items could be added
+        alertManager.SendAlert(new Alert($"Backpack is full! Could not add {count}x {item.GetName()} to backpack", AlertType.Failure));
+        return count;
 
     }
 
     // returns the amount of items that were removed from the backpack
     public int RemoveItem(Item item, int count) {
 
-        int removedCount = 0; // initialize the count of removed items
+        int removed = 0;
 
-        // try to remove the item from the later slots first
-        for (int i = backpackSlots.Length - 1; i >= 0; i--) {
+        // remove from the last slots first
+        for (int i = contents.Count - 1; i >= 0; i--) {
 
-            Slot slot = backpackSlots[i];
+            ItemStack stack = contents[i];
 
-            if (slot.HasItem() && slot.GetItem().Equals(item)) {
+            if (stack.GetItem() != null && stack.GetItem().Equals(item) && stack.GetCount() > 0) {
 
-                removedCount += slot.RemoveItem(item, count - removedCount); // remove the remaining count from the slot
-                if (count <= 0) return removedCount; // if all items were removed, exit the method
+                int toRemove = Math.Min(stack.GetCount(), count - removed);
+                stack.RemoveItem(toRemove); // remove the items from the stack
+                removed += toRemove;
+
+                // if the stack is now empty, set it to null
+                if (stack.GetCount() == 0)
+                    contents[i] = new ItemStack(null, 0);
+
+                // if we have removed enough items, return the count of removed items
+                if (removed >= count)
+                    return removed;
 
             }
         }
 
-        return removedCount; // return the total count of items that were removed
+        return removed;
 
     }
 
@@ -115,20 +116,48 @@ public class Backpack : MonoBehaviour {
 
         int totalCount = 0;
 
-        // check if the item exists in the backpack and has enough count
-        foreach (Slot slot in backpackSlots) {
+        foreach (ItemStack stack in contents) {
 
-            if (slot.HasItem() && slot.GetItem().Equals(item)) {
+            if (stack.GetItem() != null && stack.GetItem().Equals(item)) {
 
-                totalCount += slot.GetCount();
+                totalCount += stack.GetCount();
 
-                if (totalCount >= count) // if the total count is greater than or equal to the requested count, exit early (optimization)
-                    return true; // return true as we have enough items
+                if (totalCount >= count)
+                    return true; // if we have enough items, return true
 
             }
         }
 
-        return false; // return false if we did not find enough items in the backpack
+        return false; // if we reach here, we don't have enough items
 
     }
+
+    // helper to get the effective stack limit for an item in a slot
+    private int GetEffectiveStackLimit(Item item) {
+
+        // how the effective stack limit is determined:
+        // 1. if both the item and the slot stack limit are greater than 0, use the smaller of the two
+        // 2. if the item limit is greater than 0 and the slot limit is 0, use the item limit
+        // 3. if the slot limit is greater than 0 and the item limit is 0, use the slot limit
+        // 4. if both the item and slot limits are 0, use an infinite stack limit (int.MaxValue)
+        int itemLimit = item.GetStackSize();
+        int slotLimit = slotStackLimit;
+
+        if (itemLimit > 0 && slotLimit > 0)
+            return Math.Min(itemLimit, slotLimit); // if both limits are greater than 0, use the smaller of the two
+        if (itemLimit > 0 && slotLimit == 0)
+            return itemLimit; // if item limit is greater than 0 and slot limit is 0, use item limit
+        if (slotLimit > 0 && itemLimit == 0)
+            return slotLimit; // if slot limit is greater than 0 and item limit is 0, use slot limit
+
+        return int.MaxValue; // if both limits are 0, use an infinite stack limit
+
+    }
+
+    public ItemStack GetItemStack(int index) => contents[index];
+
+    public int GetInitialCapacity() => initialCapacity;
+
+    public void SwapItemStacks(int indexA, int indexB) => (contents[indexB], contents[indexA]) = (contents[indexA], contents[indexB]); // swap the item stacks at the given indices
+
 }

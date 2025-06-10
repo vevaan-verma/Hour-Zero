@@ -5,7 +5,7 @@ public class PlayerController : MonoBehaviour {
 
     [Header("References")]
     [SerializeField] private Transform cameraPos;
-    private UIManager uiManager;
+    private GeneralUIManager uiManager;
     private Rigidbody rb;
 
     [Header("Movement")]
@@ -38,11 +38,7 @@ public class PlayerController : MonoBehaviour {
     private float timer;
 
     [Header("Interacting")]
-    // TODO: move crosshair to UI controller/manager
-    [SerializeField] private Image crosshair;
-    [SerializeField] private Sprite interactCrosshair;
     [SerializeField] private float interactDistance;
-    private Sprite defaultCrosshair;
 
     [Header("Ground Check")]
     [SerializeField] private Transform feet;
@@ -56,10 +52,8 @@ public class PlayerController : MonoBehaviour {
 
     private void Start() {
 
-        uiManager = FindFirstObjectByType<UIManager>();
+        uiManager = FindFirstObjectByType<GeneralUIManager>(); // find the UI manager in the scene
         rb = GetComponent<Rigidbody>();
-
-        defaultCrosshair = crosshair.sprite;
 
         defaultYPos = cameraPos.localPosition.y; // for headbob
 
@@ -67,8 +61,8 @@ public class PlayerController : MonoBehaviour {
 
     private void Update() {
 
-        // backpack is checked first to ensure backpack can be opened/closed at any time; when backpack is open, other inputs may be ignored
-        if (uiManager.IsBackpackOpen()) return;
+        // prevent player from doing other actions while a menu is open
+        if (uiManager.IsMenuOpen()) return;
 
         #region GROUND CHECK
         isGrounded = Physics.CheckSphere(feet.position, groundCheckRadius, environmentMask);
@@ -114,19 +108,19 @@ public class PlayerController : MonoBehaviour {
 
             if (interactable) {
 
-                crosshair.sprite = interactCrosshair;
+                uiManager.SetCrosshairType(CrosshairType.Interact); // set crosshair to interact crosshair
 
                 if (Input.GetKeyDown(KeyCode.E))
                     interactable.Interact();
 
             } else {
 
-                crosshair.sprite = defaultCrosshair;
+                uiManager.SetCrosshairType(CrosshairType.Default); // set crosshair to default since interactable component was not found
 
             }
         } else {
 
-            crosshair.sprite = defaultCrosshair;
+            uiManager.SetCrosshairType(CrosshairType.Default); // set crosshair to default since player is not looking at interactable object
 
         }
         #endregion
@@ -149,6 +143,9 @@ public class PlayerController : MonoBehaviour {
     }
 
     private void FixedUpdate() {
+
+        // prevent player from moving while a menu is open
+        if (uiManager.IsMenuOpen()) return;
 
         if (isGrounded)
             rb.AddForce((transform.forward * verticalInput + transform.right * horizontalInput).normalized * moveSpeed, ForceMode.Force);

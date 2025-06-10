@@ -4,6 +4,7 @@ using UnityEngine;
 public class SystemInteractable : Interactable {
 
     [Header("References")]
+    private GeneralUIManager uiManager;
     private BunkerManager bunkerManager;
     private AlertManager alertManager;
     private Backpack backpack;
@@ -18,6 +19,7 @@ public class SystemInteractable : Interactable {
 
         base.Start();
 
+        uiManager = FindFirstObjectByType<GeneralUIManager>();
         bunkerManager = FindFirstObjectByType<BunkerManager>();
         alertManager = FindFirstObjectByType<AlertManager>();
         backpack = FindFirstObjectByType<Backpack>();
@@ -28,8 +30,10 @@ public class SystemInteractable : Interactable {
 
         if (backpack.ContainsItems(repairItem, repairItemCount)) {
 
-            backpack.RemoveItem(repairItem, repairItemCount); // remove the required amount of repair items from the backpack
-            bunkerManager.RepairSystem(systemType, repairAmount);
+            uiManager.OpenSystemRepairMenu(); // open the system repair menu
+
+            //backpack.RemoveItem(repairItem, repairItemCount); // remove the required amount of repair items from the backpack
+            //bunkerManager.RepairSystem(systemType, repairAmount);
 
             string formattedSystemType = Regex.Replace(systemType.ToString(), "(\\B[A-Z])", " $1"); // format the system type to be more readable by adding spaces in between the words (e.g., "AirFiltration" -> "Air Filtration")
             alertManager.SendAlert(new Alert($"Repaired {repairAmount}% {formattedSystemType} system durability using {repairItem.GetName()} x{repairItemCount}", AlertType.Success));

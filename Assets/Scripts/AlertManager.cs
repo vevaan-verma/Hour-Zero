@@ -10,8 +10,10 @@ public class AlertManager : MonoBehaviour {
     [SerializeField] private TMP_Text alertText;
     private Queue<Alert> alertQueue;
     private Coroutine alertCoroutine;
+    // no need to track fadeCoroutine as it is handled within the alert coroutine, which is tracked
 
     [Header("Settings")]
+    [SerializeField, Tooltip("If true, alerts will be queued and displayed one after another. If false, existing alerts will be replaced with new ones.")] private bool alertQueueEnabled;
     [SerializeField, Tooltip("The amount of characters to type per second in the alert text")] private int charactersPerSecond;
     [SerializeField, Tooltip("Duration for the alert text to stay visible after fully typing but before fading out")] private float alertDuration;
     [SerializeField, Tooltip("Duration for the alert text to fade out")] private float alertFadeDuration;
@@ -52,15 +54,17 @@ public class AlertManager : MonoBehaviour {
 
         // TODO: decide if alerts should be queued or existing alerts should be canceled/replaced (or maybe if specific types of alerts should be queued while others replace existing ones)
 
-        // if an alert is already being processed, add the new alert to the queue
-        if (alertCoroutine != null) {
+        // if alert queue is enabled and an alert is already being processed, add the new alert to the queue
+        if (alertQueueEnabled && alertCoroutine != null) {
 
             alertQueue.Enqueue(alert);
             return;
 
         }
 
-        //if (alertCoroutine != null) StopCoroutine(alertCoroutine); // stop any existing alert coroutine
+        // if alert queue is not enabled, stop any existing alert coroutine
+        if (!alertQueueEnabled && alertCoroutine != null) StopCoroutine(alertCoroutine);
+
         alertText.color = GetAlertColor(alert.GetAlertType()).GetColor(); // set alert text color based on alert type
         alertCoroutine = StartCoroutine(HandleAlert(alert.GetMessage())); // start alert animation coroutine
 
@@ -89,7 +93,7 @@ public class AlertManager : MonoBehaviour {
 
         alertCoroutine = null;
 
-        if (alertQueue.Count > 0) { // if there are more alerts in the queue
+        if (alertQueueEnabled && alertQueue.Count > 0) { // if alert queue is enabled and there are more alerts in the queue, process the next alert
 
             Alert nextAlert = alertQueue.Dequeue(); // get the next alert from the queue
             alertText.color = GetAlertColor(nextAlert.GetAlertType()).GetColor(); // set the color for the next alert
