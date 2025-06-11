@@ -1,4 +1,3 @@
-using System;
 using UnityEngine;
 using UnityEngine.EventSystems;
 
@@ -6,91 +5,90 @@ public class Slot : MonoBehaviour, IDropHandler {
 
     [Header("References")]
     private ItemHolder itemHolder;
-    private BackpackUI backpackUI;
-    private Backpack backpack;
-    private bool initialized;
+    private InventoryUI inventoryUI;
+    private Inventory inventory;
 
     [Header("Settings")]
-    [SerializeField][Tooltip("The maximum number of items that can be held in this slot. If set to 0, it will either use the item's stack limit, or if that is set to 0, an infinite limit")][Min(0)] private int slotStackLimit;
-    private string guid; // unique identifier for the slot, can be used to identify the slot
+    private int index;
 
-    public void Initialize(BackpackUI backpackUI) {
+    public void Initialize(Inventory inventory, InventoryUI inventoryUI, int index) {
 
-        this.backpackUI = backpackUI;
+        this.inventory = inventory;
+        this.inventoryUI = inventoryUI;
+        this.index = index;
         itemHolder = GetComponentInChildren<ItemHolder>();
-        backpack = FindFirstObjectByType<Backpack>();
 
         itemHolder.Initialize(); // initialize the item holder
         SetItem(null, 0); // initialize the slot with no item and count 0
-        guid = Guid.NewGuid().ToString(); // generate a unique identifier for the slot
 
-        initialized = true;
-
+        transform.GetChild(0).name = $"ItemHolder{index + 1}"; // rename the item holder child to reflect its index
     }
 
-    private void Start() { // called after Initialize would be called for instantiated objects
-
-        // initialize the slot if not already initialized
-        if (!initialized)
-            Initialize(null);
-
-    }
-
-    public void OnDrop(PointerEventData eventData) {
+    public void OnDrop(PointerEventData eventData) { // this is called on the target slot when an item is dropped on it
 
         ItemHolder droppedItemHolder = eventData.pointerDrag.GetComponent<ItemHolder>();
+        Slot sourceSlot = droppedItemHolder.GetInitialSlot();
 
-        int fromIndex = droppedItemHolder.GetInitialSlot().GetSlotIndex();
-        int toIndex = GetSlotIndex();
+        int sourceIndex = sourceSlot.GetIndex();
+        int targetIndex = GetIndex();
 
-        Item itemToDrop = droppedItemHolder.GetItem();
-        int countToDrop = droppedItemHolder.GetCount();
+        Inventory sourceInventory = sourceSlot.GetInventory();
+        Inventory targetInventory = GetInventory();
 
-        if (GetItem() != null && GetItem() == itemToDrop) { // check if the item in this slot is the same as the one being dropped, which would allow stacking
+        ItemStack sourceStack = sourceInventory.GetItemStack(sourceIndex);
+        ItemStack targetStack = targetInventory.GetItemStack(targetIndex);
 
-            int stackLimit = GetStackLimit();
-            int currentCount = GetCount();
-            int canAdd = Mathf.Min(stackLimit - currentCount, countToDrop); // this is how many items we can add to this stack
+        if (sourceInventory == targetInventory) { // check if the source and target inventories are the same, so the stack limits are the same
 
-            if (canAdd > 0) { // if we can add some items to this stack
+            if (GetItem() != null && GetItem() == sourceStack.GetItem()) { // check if the item in this slot is the same as the one being dropped, which would allow stacking
 
-                backpack.GetItemStack(toIndex).AddItem(canAdd); // add what we can to the target slot in Backpack
-                backpack.GetItemStack(fromIndex).RemoveItem(canAdd); // remove from the source slot in Backpack
+                int stackLimit = sourceInventory.GetEffectiveStackLimit(sourceStack.GetItem());
+                int currentCount = GetCount(); // get the count of items in the target slot
+                int canAdd = Mathf.Min(stackLimit - currentCount, sourceStack.GetCount()); // this is how many items we can add to this stack
 
-                // refresh the backpack UI if it exists
-                if (backpackUI != null)
-                    backpackUI.RefreshBackpack();
+                if (canAdd > 0) { // if we can add some items to this stack
 
-            } else {
+                    sourceInventory.SetItemStack(targetIndex, sourceStack.GetItem(), currentCount + canAdd); // set the item stack in the target inventory to the one being dropped
+                    sourceInventory.SetItemStack(sourceIndex, sourceStack.GetItem(), sourceStack.GetCount() - canAdd); // set the source slot to empty or the remainder of the source stack that wasn't stacked
 
-                // the target slot is full, so we need to swap the items instead
+                }
+            } else { // items are different, so we can't stack them; swapping is needed here
 
-                if (fromIndex != toIndex) { // if the source and target slots are different
+                if (targetStack.GetItem() == null) { // if the target slot is empty, we can just set the item there
 
-                    backpack.SwapItemStacks(fromIndex, toIndex); // swap the item stacks in Backpack
+                    targetInventory.SetItemStack(targetIndex, sourceStack.GetItem(), sourceStack.GetCount()); // set the item stack in the target inventory to the one being dropped
+                    sourceInventory.SetItemStack(sourceIndex, null, 0); // set the source slot to empty
 
-                    // refresh the backpack UI if it exists
-                    if (backpackUI != null)
-                        backpackUI.RefreshBackpack();
+                } else { // if the target slot is not empty, we need to swap the items
+
+                    // since they are in the same inventory, we can swap them directly, without regarding stack limits (since they are the same for each slot within an inventory)
+                    sourceInventory.SetItemStack(sourceIndex, targetStack.GetItem(), targetStack.GetCount()); // set the source slot to the target slot item
+                    targetInventory.SetItemStack(targetIndex, sourceStack.GetItem(), sourceStack.GetCount()); // set the target slot to the source slot item
 
                 }
             }
+        } else { // the source and target inventories are different, so we need to handle the swapping differently
 
-            // TODO: think about if theres a remainder
-            return; // exit early since we handled the stacking case
+            if (GetItem() != null && GetItem() == sourceStack.GetItem()) { // check if the item in this slot is the same as the one being dropped, which would allow stacking
 
-        }
+                int currentCount = GetCount();
 
-        // if the target and source slots aren't the same, we can swap the items because, at this point, we know the items are different, so they can't stack
-        if (fromIndex != toIndex) {
+                int remainder = targetInventory.SetItemStack(targetIndex, sourceStack.GetItem(), currentCount + sourceStack.GetCount()); // set the item stack in the target inventory to the one being dropped
+                sourceInventory.SetItemStack(sourceIndex, sourceStack.GetItem(), remainder); // set the source slot to empty or the remainder of the source stack that wasn't stacked
 
-            print("swap");
-            backpack.SwapItemStacks(fromIndex, toIndex);
+            } else {
 
-            // refresh the backpack UI if it exists
-            if (backpackUI != null)
-                backpackUI.RefreshBackpack();
+                // if the items are different, we need to swap them between the two inventories
 
+                // set the item stack in the target inventory to the one being dropped
+                int remainder = targetInventory.SetItemStack(targetIndex, sourceStack.GetItem(), sourceStack.GetCount());
+
+                if (remainder > 0)
+                    sourceInventory.SetItemStack(sourceIndex, sourceStack.GetItem(), remainder); // since a remainder was returned, we need to set the source slot to the item in the source stack with the remainder count because we prioritize the remainder over the target slot item
+                else
+                    sourceInventory.SetItemStack(sourceIndex, targetStack.GetItem(), targetStack.GetCount()); // since no remainder was returned, we can set the source slot to the item in the target slot
+
+            }
         }
     }
 
@@ -105,10 +103,12 @@ public class Slot : MonoBehaviour, IDropHandler {
 
     public void AddItem(Item item, int count) => SetItem(item, itemHolder.GetCount() + count); // add the item and count to the current slot item holder
 
+    public Inventory GetInventory() => inventory;
+
     public Item GetItem() => itemHolder.GetItem();
 
     public int GetCount() => itemHolder.GetCount();
 
-    public int GetStackLimit() => slotStackLimit;
+    public int GetIndex() => index;
 
 }

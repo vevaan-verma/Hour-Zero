@@ -5,7 +5,7 @@ public class PlayerController : MonoBehaviour {
 
     [Header("References")]
     [SerializeField] private Transform cameraPos;
-    private GeneralUIManager uiManager;
+    private UIManager uiManager;
     private Rigidbody rb;
 
     [Header("Movement")]
@@ -52,7 +52,7 @@ public class PlayerController : MonoBehaviour {
 
     private void Start() {
 
-        uiManager = FindFirstObjectByType<GeneralUIManager>(); // find the UI manager in the scene
+        uiManager = FindFirstObjectByType<UIManager>(); // find the UI manager in the scene
         rb = GetComponent<Rigidbody>();
 
         defaultYPos = cameraPos.localPosition.y; // for headbob

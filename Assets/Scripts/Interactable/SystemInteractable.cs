@@ -4,10 +4,8 @@ using UnityEngine;
 public class SystemInteractable : Interactable {
 
     [Header("References")]
-    private GeneralUIManager uiManager;
-    private BunkerManager bunkerManager;
+    private UIManager uiManager;
     private AlertManager alertManager;
-    private Backpack backpack;
 
     [Header("Settings")]
     [SerializeField] private BunkerSystemType systemType;
@@ -19,29 +17,27 @@ public class SystemInteractable : Interactable {
 
         base.Start();
 
-        uiManager = FindFirstObjectByType<GeneralUIManager>();
-        bunkerManager = FindFirstObjectByType<BunkerManager>();
+        uiManager = FindFirstObjectByType<UIManager>();
         alertManager = FindFirstObjectByType<AlertManager>();
-        backpack = FindFirstObjectByType<Backpack>();
 
     }
 
     public override void Interact() {
 
-        if (backpack.ContainsItems(repairItem, repairItemCount)) {
+        //if (backpack.ContainsItemStack(repairItem, repairItemCount)) {
 
-            uiManager.OpenSystemRepairMenu(); // open the system repair menu
+        uiManager.OpenSystemRepairMenu(); // open the system repair menu
 
-            //backpack.RemoveItem(repairItem, repairItemCount); // remove the required amount of repair items from the backpack
-            //bunkerManager.RepairSystem(systemType, repairAmount);
+        //backpack.RemoveItem(repairItem, repairItemCount); // remove the required amount of repair items from the backpack
+        //bunkerManager.RepairSystem(systemType, repairAmount);
 
-            string formattedSystemType = Regex.Replace(systemType.ToString(), "(\\B[A-Z])", " $1"); // format the system type to be more readable by adding spaces in between the words (e.g., "AirFiltration" -> "Air Filtration")
-            alertManager.SendAlert(new Alert($"Repaired {repairAmount}% {formattedSystemType} system durability using {repairItem.GetName()} x{repairItemCount}", AlertType.Success));
+        string formattedSystemType = Regex.Replace(systemType.ToString(), "(\\B[A-Z])", " $1"); // format the system type to be more readable by adding spaces in between the words (e.g., "AirFiltration" -> "Air Filtration")
+        alertManager.SendAlert(new Alert($"Repaired {repairAmount}% {formattedSystemType} system durability using {repairItem.GetName()} x{repairItemCount}", AlertType.Success));
 
-        } else {
+        //} else {
 
-            alertManager.SendAlert(new Alert($"Not enough {repairItem.GetName()} in backpack to repair! Required: {repairItemCount}", AlertType.Failure));
+        //    alertManager.SendAlert(new Alert($"Not enough {repairItem.GetName()} in backpack to repair! Required: {repairItemCount}", AlertType.Failure));
 
-        }
+        //}
     }
 }

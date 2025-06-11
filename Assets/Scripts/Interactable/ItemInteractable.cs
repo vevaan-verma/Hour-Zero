@@ -26,7 +26,7 @@ public class ItemInteractable : Interactable {
 
         if (destroyed) return; // if already destroyed, do nothing
 
-        int remainder = backpack.AddItem(item, itemCount);
+        int remainder = backpack.AddItemStack(item, itemCount);
 
         currCount = remainder; // update the current count of the item interactable
 

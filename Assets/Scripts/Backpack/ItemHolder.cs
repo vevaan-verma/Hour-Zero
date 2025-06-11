@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+using System.Linq;
 using TMPro;
 using UnityEngine;
 using UnityEngine.EventSystems;
@@ -54,6 +56,14 @@ public class ItemHolder : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDr
 
     public void OnBeginDrag(PointerEventData eventData) {
 
+        // if the item being dragged is null, destroy the dragged item to cancel the drag
+        if (item == null) {
+
+            Destroy(eventData.pointerDrag);
+            return;
+
+        }
+
         image.color = new Color(initialColor.r, initialColor.g, initialColor.b, dragAlpha); // set the image color to semi-transparent when dragging starts
         initialSlot = transform.parent.GetComponent<Slot>(); // store the original slot before changing it (so if not dropped, it can be reset)
         transform.SetParent(transform.root); // change the parent to the root canvas to allow free movement
@@ -66,13 +76,18 @@ public class ItemHolder : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDr
 
     public void OnEndDrag(PointerEventData eventData) {
 
-        // if the item is not dropped in a valid slot, reset it to its initial slot
-        if (eventData.pointerCurrentRaycast.gameObject == null || eventData.pointerCurrentRaycast.gameObject.GetComponent<Slot>() == null)
-            initialSlot.SetItem(item, count); // reset the item and count in the initial slot
+        // eventData.pointerCurrentRaycast returns the raycast result of what the pointer is currently over, whereas eventData.pointerDrag is the item being dragged
+        // if the pointer is not over a valid slot, destroy the dragged item
+        if (eventData.pointerCurrentRaycast.gameObject == null || !eventData.pointerCurrentRaycast.gameObject.GetComponent<Slot>())
+            Destroy(eventData.pointerDrag);
 
-        transform.SetParent(initialSlot.transform); // reset the parent to the initial slot (prevents the item from being orphaned if not dropped, which creates an error)
+        initialSlot.SetItem(item, count); // reset the item and count in the initial slot
         image.color = initialColor; // reset the image color when dragging ends
         image.raycastTarget = true; // re-enable raycast target
+
+        foreach (InventoryUI ui in FindObjectsByType<InventoryUI>(FindObjectsSortMode.None))
+            if (ui.IsInventoryOpen())
+                ui.RefreshInventory();
 
     }
 

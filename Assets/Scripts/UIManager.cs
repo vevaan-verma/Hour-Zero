@@ -1,17 +1,18 @@
 using System.Collections;
+using System.Linq;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class GeneralUIManager : MonoBehaviour {
+public class UIManager : MonoBehaviour {
 
     [Header("References")]
     private TimeManager timeManager;
 
     [Header("Backpack")]
-    [SerializeField, Tooltip("This is the backpack UI used for the opening the backpack itself, not exchange menus")] private BackpackUI primaryBackpackUI;
     [SerializeField] private float backpackFadeDuration;
     [SerializeField] private KeyCode backpackKey;
+    private BackpackUI primaryBackpackUI; // this is the backpack UI used for the opening the backpack itself, not exchange menus
 
     [Header("System Repair")]
     [SerializeField] private SystemRepairMenu systemRepairMenu; // reference to the system repair menu (used for opening the menu when interacting with a system interactable)
@@ -26,10 +27,30 @@ public class GeneralUIManager : MonoBehaviour {
 
     private void Start() {
 
+        #region VALIDATION
+        // make sure there is exactly one UI of each backpack type in the scene
+        BackpackType[] backpackTypes = (BackpackType[]) System.Enum.GetValues(typeof(BackpackType));
+        BackpackUI[] backpackUIs = FindObjectsByType<BackpackUI>(FindObjectsInactive.Include, FindObjectsSortMode.None);
+
+        foreach (BackpackType type in backpackTypes) {
+
+            BackpackUI[] foundBackpacks = System.Array.FindAll(backpackUIs, ui => ui.GetBackpackType() == type);
+
+            if (foundBackpacks.Length != 1) {
+
+                Debug.LogError($"There should be exactly one BackpackUI of type {type} in the scene, found {foundBackpacks.Length}.");
+                return;
+
+            }
+        }
+        #endregion
+
         // hide cursor
         Cursor.lockState = CursorLockMode.Locked;
         Cursor.visible = false;
 
+        primaryBackpackUI = FindObjectsByType<BackpackUI>(FindObjectsSortMode.None)
+            .FirstOrDefault(ui => ui.GetBackpackType() == BackpackType.Primary); // find the primary backpack UI
         systemRepairMenu = FindFirstObjectByType<SystemRepairMenu>();
         timeManager = FindFirstObjectByType<TimeManager>();
 
@@ -43,30 +64,32 @@ public class GeneralUIManager : MonoBehaviour {
     private void Update() {
 
         if (Input.GetKeyDown(backpackKey))
-            if (primaryBackpackUI.IsBackpackOpen()) // close backpack if it is open
+            if (primaryBackpackUI.IsInventoryOpen()) // close backpack if it is open
                 ClosePrimaryBackpack();
             else if (!IsMenuOpen()) // only open backpack if no other menu is open
                 OpenPrimaryBackpack();
 
         // close backpack if escape is pressed and backpack is open
-        if (Input.GetKeyDown(KeyCode.Escape) && primaryBackpackUI.IsBackpackOpen())
+        if (Input.GetKeyDown(KeyCode.Escape) && primaryBackpackUI.IsInventoryOpen())
             ClosePrimaryBackpack();
 
         UpdateTimeText(timeManager.GetHour(), timeManager.GetMinute(), timeManager.IsAM());
 
     }
 
+    // TODO: hide crosshair when backpack/menu is opened
+
     public void OpenPrimaryBackpack() {
 
-        if (IsMenuOpen() || primaryBackpackUI.IsBackpackOpen()) return; // do nothing if another menu is open or if the primary backpack is already open
-        primaryBackpackUI.OpenBackpack(); // open the primary backpack UI
+        if (IsMenuOpen() || primaryBackpackUI.IsInventoryOpen()) return; // do nothing if another menu is open or if the primary backpack is already open
+        primaryBackpackUI.OpenInventory(); // open the primary backpack UI
 
     }
 
     public void ClosePrimaryBackpack() {
 
-        if (!primaryBackpackUI.IsBackpackOpen()) return; // do nothing if the primary backpack is not open
-        primaryBackpackUI.CloseBackpack(); // close the primary backpack UI
+        if (!primaryBackpackUI.IsInventoryOpen()) return; // do nothing if the primary backpack is not open
+        primaryBackpackUI.CloseInventory(); // close the primary backpack UI
 
     }
 
@@ -124,9 +147,9 @@ public class GeneralUIManager : MonoBehaviour {
 
     }
 
-    public bool IsPrimaryBackpackOpen() => primaryBackpackUI.IsBackpackOpen();
+    public bool IsPrimaryBackpackOpen() => primaryBackpackUI.IsInventoryOpen();
 
-    public bool IsMenuOpen() => primaryBackpackUI.IsBackpackOpen() || systemRepairMenu.IsMenuOpen();
+    public bool IsMenuOpen() => primaryBackpackUI.IsInventoryOpen() || systemRepairMenu.IsMenuOpen();
 
 }
 

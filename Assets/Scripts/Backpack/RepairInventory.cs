@@ -1,23 +1,18 @@
-using System;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Backpack : Inventory {
+public class RepairInventory : Inventory {
 
-    [Header("References")]
-    private AlertManager alertManager;
+    [Header("Data")]
+    private List<ItemStack> contents;
 
     [Header("Settings")]
     [SerializeField] private int initialCapacity;
     [SerializeField] private int slotStackLimit;
     private int currCapacity;
 
-    [Header("Data")]
-    private List<ItemStack> contents;
-
     public override void Initialize() {
 
-        alertManager = FindFirstObjectByType<AlertManager>();
         contents = new List<ItemStack>(currCapacity);
         currCapacity = initialCapacity;
 
@@ -61,7 +56,7 @@ public class Backpack : Inventory {
             if (stack.GetItem() != null && stack.GetItem().Equals(item)) { // if the stack already contains the item
 
                 int currentCount = stack.GetCount();
-                int toAdd = Math.Min(stackLimit - currentCount, count); // how many can we add to this stack
+                int toAdd = Mathf.Min(stackLimit - currentCount, count); // how many can we add to this stack
 
                 if (toAdd > 0) {
 
@@ -83,7 +78,7 @@ public class Backpack : Inventory {
 
             if (stack.GetItem() == null || stack.GetCount() == 0) { // check if the slot is empty
 
-                int toAdd = Math.Min(stackLimit, count); // how many can we add to this slot
+                int toAdd = Mathf.Min(stackLimit, count); // how many can we add to this slot
                 SetItemStack(i, item, toAdd); // set the item stack in the slot
                 count -= toAdd; // reduce the count of items to add based on what was added right now
 
@@ -94,12 +89,11 @@ public class Backpack : Inventory {
         }
 
         // if we reach here, not all items could be added
-        alertManager.SendAlert(new Alert($"Backpack is full! Could not add {count}x {item.GetName()} to backpack", AlertType.Failure));
         return count;
 
     }
 
-    // returns the amount of items that were removed from the backpack
+    // returns the amount of items that were removed from the inventory
     public override int RemoveItemStack(Item item, int count) {
 
         if (item == null || count <= 0) return 0; // return 0 since we couldn't remove anything
@@ -113,7 +107,7 @@ public class Backpack : Inventory {
 
             if (stack.GetItem() != null && stack.GetItem().Equals(item) && stack.GetCount() > 0) {
 
-                int toRemove = Math.Min(stack.GetCount(), count - removed);
+                int toRemove = Mathf.Min(stack.GetCount(), count - removed);
                 stack.RemoveItem(toRemove); // remove the items from the stack
                 removed += toRemove;
 
@@ -174,31 +168,10 @@ public class Backpack : Inventory {
 
     }
 
-    public void Output() {
-
-        // outputs the contents of the backpack to the console for debugging purposes
-        Debug.Log("Backpack contents:");
-        for (int i = 0; i < contents.Count; i++) {
-            ItemStack stack = contents[i];
-            if (stack.GetItem() != null) {
-                Debug.Log($"Slot {i}: {stack.GetCount()}x {stack.GetItem().GetName()}");
-            } else {
-                Debug.Log($"Slot {i}: Empty");
-            }
-        }
-    }
-
     public int GetInitialCapacity() => initialCapacity;
 
     public override ItemStack GetItemStack(int index) => contents[index];
 
     public override void SwapItemStacks(int indexA, int indexB) => (contents[indexB], contents[indexA]) = (contents[indexA], contents[indexB]); // swap the item stacks at the given indices
-
-}
-
-public enum BackpackType {
-
-    Primary, // the main backpack that the player uses for inventory management
-    Repair // for repair menus
 
 }

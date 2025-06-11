@@ -1,20 +1,31 @@
 using System.Collections;
+using System.Linq;
 using UnityEngine;
 
 public class SystemRepairMenu : MonoBehaviour {
 
+    [Header("References")]
+    [SerializeField] private RepairInventory repairInventory;
+
     [Header("UI References")]
     [SerializeField] private CanvasGroup menuPanel;
-    [SerializeField] private BackpackUI repairBackpackUI; // reference to the backpack UI used for repairing systems
+    [SerializeField] private RepairInventoryUI repairInventoryUI; // reference to the repair inventory UI
+    [SerializeField] private Slot repairSlot;
     private bool isMenuOpen;
     private Coroutine fadeCoroutine;
+    private BackpackUI repairBackpackUI; // reference to the backpack UI used for repairing systems
 
     [Header("Settings")]
     [SerializeField] private float menuFadeDuration;
 
     private void Start() {
 
+        repairBackpackUI = FindObjectsByType<BackpackUI>(FindObjectsInactive.Include, FindObjectsSortMode.None)
+            .FirstOrDefault(ui => ui.GetBackpackType() == BackpackType.Repair); // find the repair backpack UI
+
         repairBackpackUI.Initialize(); // initialize the backpack UI for repairing systems
+        repairInventoryUI.Initialize(); // initialize the repair inventory UI
+
         menuPanel.gameObject.SetActive(false); // make sure the menu is hidden by default
 
     }
@@ -23,7 +34,8 @@ public class SystemRepairMenu : MonoBehaviour {
 
         isMenuOpen = true; // set the menu state to open
         menuPanel.gameObject.SetActive(true); // make sure the menu is active
-        repairBackpackUI.OpenBackpack(); // open the backpack UI for repairing systems (do this after starting the coroutine to ensure the menu is active)
+        repairBackpackUI.OpenInventory(); // open the backpack UI for repairing systems (do this after starting the coroutine to ensure the menu is active)
+        repairInventoryUI.OpenInventory(); // open the repair inventory UI
 
         if (fadeCoroutine != null) StopCoroutine(fadeCoroutine); // stop any ongoing fade coroutine
         fadeCoroutine = StartCoroutine(Fade(menuPanel, 1f, menuFadeDuration)); // fade in the menu
@@ -33,7 +45,8 @@ public class SystemRepairMenu : MonoBehaviour {
     public void HideMenu() {
 
         isMenuOpen = false; // set the menu state to closed
-        repairBackpackUI.CloseBackpack(); // close the backpack UI
+        repairBackpackUI.CloseInventory(); // close the backpack UI
+        repairInventoryUI.CloseInventory(); // close the repair inventory UI
 
         if (fadeCoroutine != null) StopCoroutine(fadeCoroutine); // stop any ongoing fade coroutine
         fadeCoroutine = StartCoroutine(Fade(menuPanel, 0f, menuFadeDuration)); // fade out the menu

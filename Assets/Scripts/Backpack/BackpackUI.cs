@@ -1,35 +1,37 @@
-using System;
 using System.Collections;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class BackpackUI : MonoBehaviour {
+public class BackpackUI : InventoryUI {
 
     [Header("References")]
     [SerializeField] private Slot slotPrefab;
     private Backpack backpack;
     private Animator animator;
     private Slot[] backpackSlots;
-    private Coroutine backpackCoroutine;
-    private bool isBackpackOpen;
+    private Coroutine backpackCloseCoroutine;
 
     [Header("UI References")]
-    [SerializeField] private GameObject backpackPanel; // the panel that contains the backpack UI (used to allow the script to remain active while the UI is hidden)
+    [SerializeField] private GameObject uiPanel; // the panel that contains the backpack UI (used to allow the script to remain active while the UI is hidden)
     [SerializeField] private Transform backpackContents;
     [SerializeField] private Button closeBackpackButton;
 
-    public void Initialize() {
+    [Header("Settings")]
+    [SerializeField] private BackpackType backpackType;
 
-        backpack = FindFirstObjectByType<Backpack>(); // find the backpack in the scene
+    public override void Initialize() {
+
+        backpack = FindFirstObjectByType<Backpack>();
         animator = GetComponent<Animator>();
 
         backpackSlots = new Slot[backpack.GetInitialCapacity()];
-        closeBackpackButton.onClick.AddListener(CloseBackpack); // add listener to close backpack button
-        backpackPanel.SetActive(false); // make sure the backpack panel is hidden by default
+        closeBackpackButton.onClick.AddListener(CloseInventory); // add listener to close backpack button
+
+        uiPanel.SetActive(false); // make sure the backpack panel is hidden by default
 
     }
 
-    public void RefreshBackpack() {
+    public override void RefreshInventory() {
 
         // delete all existing slots in the backpack contents
         foreach (Transform child in backpackContents)
@@ -40,22 +42,24 @@ public class BackpackUI : MonoBehaviour {
 
             Slot slot = Instantiate(slotPrefab, backpackContents);
             slot.transform.name = $"Slot{i + 1}";
-            slot.Initialize(this); // initialize the slot
+            slot.Initialize(backpack, this, i); // initialize the slot
             slot.SetItem(backpack.GetItemStack(i).GetItem(), backpack.GetItemStack(i).GetCount()); // set the item and count in the slot
             backpackSlots[i] = slot; // store the slot in the array for later reference
 
         }
     }
 
-    public void OpenBackpack() {
+    public override void OpenInventory() {
 
-        if (isBackpackOpen) return; // do nothing if the backpack is already open
+        if (isInventoryOpen) return; // do nothing if the backpack is already open
 
-        RefreshBackpack(); // refresh the backpack slots to ensure they are up to date
+        if (backpackCloseCoroutine != null) StopCoroutine(backpackCloseCoroutine); // stop any existing backpack close coroutine
 
-        isBackpackOpen = true;
+        RefreshInventory(); // refresh the backpack slots to ensure they are up to date
+
+        isInventoryOpen = true;
         closeBackpackButton.interactable = true; // enable close button to allow closing backpack
-        backpackPanel.SetActive(true); // make sure the backpack panel is active while opening
+        uiPanel.SetActive(true); // make sure the backpack panel is active while opening
 
         animator.SetTrigger("openBackpack"); // trigger open animation
 
@@ -64,22 +68,23 @@ public class BackpackUI : MonoBehaviour {
 
     }
 
-    public void CloseBackpack() {
+    public override void CloseInventory() {
 
-        if (!isBackpackOpen) return; // do nothing if the backpack is already closed
+        if (!isInventoryOpen) return; // do nothing if the backpack is already closed
 
-        RefreshBackpack(); // refresh the backpack slots to ensure they are up to date
+        RefreshInventory(); // refresh the backpack slots to ensure they are up to date
 
-        isBackpackOpen = false; // set the state to closed before waiting for animation because it feels better if the player can move and look around while the backpack is closing
+        isInventoryOpen = false; // set the state to closed before waiting for animation because it feels better if the player can move and look around while the backpack is closing
         closeBackpackButton.interactable = false; // disable close button to prevent multiple clicks (as this could mess with the toggle logic)
-        backpackPanel.SetActive(true); // make sure the backpack panel is active while closing
+        uiPanel.SetActive(true); // make sure the backpack panel is active while closing
 
         animator.SetTrigger("closeBackpack"); // trigger close animation
 
         Cursor.lockState = CursorLockMode.Locked; // lock cursor
         Cursor.visible = false; // hide cursor
 
-        StartCoroutine(WaitForBackpackCloseAnim()); // start coroutine to wait for the close animation to finish
+        if (backpackCloseCoroutine != null) StopCoroutine(backpackCloseCoroutine); // stop any existing backpack close coroutine
+        backpackCloseCoroutine = StartCoroutine(WaitForBackpackCloseAnim()); // start coroutine to wait for the close animation to finish
 
     }
 
@@ -88,10 +93,12 @@ public class BackpackUI : MonoBehaviour {
         yield return null; // wait for the next frame to ensure the animation has started
         yield return new WaitForSeconds(animator.GetCurrentAnimatorStateInfo(0).length); // wait for the animation to finish
 
-        backpackPanel.SetActive(false); // hide the backpack panel after closing
+        uiPanel.SetActive(false); // hide the backpack panel after closing
 
     }
 
-    public bool IsBackpackOpen() => isBackpackOpen;
+    public BackpackType GetBackpackType() => backpackType;
+
+    public override bool IsInventoryOpen() => isInventoryOpen;
 
 }
