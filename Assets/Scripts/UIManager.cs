@@ -54,7 +54,6 @@ public class UIManager : MonoBehaviour {
         systemRepairMenu = FindFirstObjectByType<SystemRepairMenu>();
         timeManager = FindFirstObjectByType<TimeManager>();
 
-        primaryBackpackUI.Initialize(); // initialize the primary backpack UI
         defaultCrosshair = crosshair.sprite;
 
         UpdateTimeText(timeManager.GetHour(), timeManager.GetMinute(), timeManager.IsAM());

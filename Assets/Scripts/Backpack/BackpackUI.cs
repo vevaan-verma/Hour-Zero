@@ -5,15 +5,10 @@ using UnityEngine.UI;
 public class BackpackUI : InventoryUI {
 
     [Header("References")]
-    [SerializeField] private Slot slotPrefab;
-    private Backpack backpack;
     private Animator animator;
-    private Slot[] backpackSlots;
     private Coroutine backpackCloseCoroutine;
 
     [Header("UI References")]
-    [SerializeField] private GameObject uiPanel; // the panel that contains the backpack UI (used to allow the script to remain active while the UI is hidden)
-    [SerializeField] private Transform backpackContents;
     [SerializeField] private Button closeBackpackButton;
 
     [Header("Settings")]
@@ -21,32 +16,11 @@ public class BackpackUI : InventoryUI {
 
     public override void Initialize() {
 
-        backpack = FindFirstObjectByType<Backpack>();
+        inventory = FindFirstObjectByType<Backpack>(FindObjectsInactive.Include); // find the backpack in the scene
         animator = GetComponent<Animator>();
-
-        backpackSlots = new Slot[backpack.GetInitialCapacity()];
         closeBackpackButton.onClick.AddListener(CloseInventory); // add listener to close backpack button
+        base.Initialize();
 
-        uiPanel.SetActive(false); // make sure the backpack panel is hidden by default
-
-    }
-
-    public override void RefreshInventory() {
-
-        // delete all existing slots in the backpack contents
-        foreach (Transform child in backpackContents)
-            Destroy(child.gameObject);
-
-        // instantiate the slots based on the current capacity of the backpack
-        for (int i = 0; i < backpackSlots.Length; i++) {
-
-            Slot slot = Instantiate(slotPrefab, backpackContents);
-            slot.transform.name = $"Slot{i + 1}";
-            slot.Initialize(backpack, this, i); // initialize the slot
-            slot.SetItem(backpack.GetItemStack(i).GetItem(), backpack.GetItemStack(i).GetCount()); // set the item and count in the slot
-            backpackSlots[i] = slot; // store the slot in the array for later reference
-
-        }
     }
 
     public override void OpenInventory() {
@@ -98,7 +72,5 @@ public class BackpackUI : InventoryUI {
     }
 
     public BackpackType GetBackpackType() => backpackType;
-
-    public override bool IsInventoryOpen() => isInventoryOpen;
 
 }

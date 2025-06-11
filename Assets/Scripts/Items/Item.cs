@@ -35,10 +35,6 @@ public class ItemStack {
 
     }
 
-    public void AddItem(int count) => this.count += count; // increase the count of the item in the stack
-
-    public void RemoveItem(int count) => this.count = Mathf.Max(0, this.count - count); // decrease the count of the item in the stack, ensuring it doesn't go below 0
-
     public Item GetItem() => item;
 
     public int GetCount() => count;

@@ -22,10 +22,6 @@ public class SystemRepairMenu : MonoBehaviour {
 
         repairBackpackUI = FindObjectsByType<BackpackUI>(FindObjectsInactive.Include, FindObjectsSortMode.None)
             .FirstOrDefault(ui => ui.GetBackpackType() == BackpackType.Repair); // find the repair backpack UI
-
-        repairBackpackUI.Initialize(); // initialize the backpack UI for repairing systems
-        repairInventoryUI.Initialize(); // initialize the repair inventory UI
-
         menuPanel.gameObject.SetActive(false); // make sure the menu is hidden by default
 
     }

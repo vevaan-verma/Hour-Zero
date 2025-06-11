@@ -5,16 +5,14 @@ public class Slot : MonoBehaviour, IDropHandler {
 
     [Header("References")]
     private ItemHolder itemHolder;
-    private InventoryUI inventoryUI;
     private Inventory inventory;
 
     [Header("Settings")]
     private int index;
 
-    public void Initialize(Inventory inventory, InventoryUI inventoryUI, int index) {
+    public void Initialize(Inventory inventory, int index) {
 
         this.inventory = inventory;
-        this.inventoryUI = inventoryUI;
         this.index = index;
         itemHolder = GetComponentInChildren<ItemHolder>();
 
@@ -48,22 +46,22 @@ public class Slot : MonoBehaviour, IDropHandler {
 
                 if (canAdd > 0) { // if we can add some items to this stack
 
-                    sourceInventory.SetItemStack(targetIndex, sourceStack.GetItem(), currentCount + canAdd); // set the item stack in the target inventory to the one being dropped
-                    sourceInventory.SetItemStack(sourceIndex, sourceStack.GetItem(), sourceStack.GetCount() - canAdd); // set the source slot to empty or the remainder of the source stack that wasn't stacked
+                    sourceInventory.SetItemStack(new ItemStack(sourceStack.GetItem(), currentCount + canAdd), targetIndex); // set the item stack in the target inventory to the one being dropped
+                    sourceInventory.SetItemStack(new ItemStack(sourceStack.GetItem(), sourceStack.GetCount() - canAdd), sourceIndex); // set the source slot to empty or the remainder of the source stack that wasn't stacked
 
                 }
             } else { // items are different, so we can't stack them; swapping is needed here
 
                 if (targetStack.GetItem() == null) { // if the target slot is empty, we can just set the item there
 
-                    targetInventory.SetItemStack(targetIndex, sourceStack.GetItem(), sourceStack.GetCount()); // set the item stack in the target inventory to the one being dropped
-                    sourceInventory.SetItemStack(sourceIndex, null, 0); // set the source slot to empty
+                    targetInventory.SetItemStack(new ItemStack(sourceStack.GetItem(), sourceStack.GetCount()), targetIndex); // set the item stack in the target inventory to the one being dropped
+                    sourceInventory.SetItemStack(new ItemStack(null, 0), sourceIndex); // set the source slot to empty
 
                 } else { // if the target slot is not empty, we need to swap the items
 
                     // since they are in the same inventory, we can swap them directly, without regarding stack limits (since they are the same for each slot within an inventory)
-                    sourceInventory.SetItemStack(sourceIndex, targetStack.GetItem(), targetStack.GetCount()); // set the source slot to the target slot item
-                    targetInventory.SetItemStack(targetIndex, sourceStack.GetItem(), sourceStack.GetCount()); // set the target slot to the source slot item
+                    sourceInventory.SetItemStack(new ItemStack(targetStack.GetItem(), targetStack.GetCount()), sourceIndex); // set the source slot to the target slot item
+                    targetInventory.SetItemStack(new ItemStack(sourceStack.GetItem(), sourceStack.GetCount()), targetIndex); // set the target slot to the source slot item
 
                 }
             }
@@ -73,20 +71,20 @@ public class Slot : MonoBehaviour, IDropHandler {
 
                 int currentCount = GetCount();
 
-                int remainder = targetInventory.SetItemStack(targetIndex, sourceStack.GetItem(), currentCount + sourceStack.GetCount()); // set the item stack in the target inventory to the one being dropped
-                sourceInventory.SetItemStack(sourceIndex, sourceStack.GetItem(), remainder); // set the source slot to empty or the remainder of the source stack that wasn't stacked
+                int remainder = targetInventory.SetItemStack(new ItemStack(sourceStack.GetItem(), currentCount + sourceStack.GetCount()), targetIndex); // set the item stack in the target inventory to the one being dropped
+                sourceInventory.SetItemStack(new ItemStack(sourceStack.GetItem(), remainder), sourceIndex); // set the source slot to empty or the remainder of the source stack that wasn't stacked
 
             } else {
 
                 // if the items are different, we need to swap them between the two inventories
 
                 // set the item stack in the target inventory to the one being dropped
-                int remainder = targetInventory.SetItemStack(targetIndex, sourceStack.GetItem(), sourceStack.GetCount());
+                int remainder = targetInventory.SetItemStack(new ItemStack(sourceStack.GetItem(), sourceStack.GetCount()), targetIndex);
 
                 if (remainder > 0)
-                    sourceInventory.SetItemStack(sourceIndex, sourceStack.GetItem(), remainder); // since a remainder was returned, we need to set the source slot to the item in the source stack with the remainder count because we prioritize the remainder over the target slot item
+                    sourceInventory.SetItemStack(new ItemStack(sourceStack.GetItem(), remainder), sourceIndex); // since a remainder was returned, we need to set the source slot to the item in the source stack with the remainder count because we prioritize the remainder over the target slot item
                 else
-                    sourceInventory.SetItemStack(sourceIndex, targetStack.GetItem(), targetStack.GetCount()); // since no remainder was returned, we can set the source slot to the item in the target slot
+                    sourceInventory.SetItemStack(new ItemStack(targetStack.GetItem(), targetStack.GetCount()), sourceIndex); // since no remainder was returned, we can set the source slot to the item in the target slot
 
             }
         }
@@ -100,8 +98,6 @@ public class Slot : MonoBehaviour, IDropHandler {
         itemHolder.transform.position = transform.position; // move the new item to the position of this slot
 
     }
-
-    public void AddItem(Item item, int count) => SetItem(item, itemHolder.GetCount() + count); // add the item and count to the current slot item holder
 
     public Inventory GetInventory() => inventory;
 
