@@ -14,14 +14,11 @@ public abstract class InventoryUI : MonoBehaviour {
     [Header("Settings")]
     protected bool isInventoryOpen;
 
-    public virtual void Initialize() {
-
-        inventorySlots = new Slot[inventory.GetInitialCapacity()];
-        uiPanel.SetActive(false); // make sure the inventory panel is hidden by default
-
-    }
+    public virtual void Initialize() => uiPanel.SetActive(false); // make sure the inventory panel is hidden by default
 
     public virtual void RefreshInventory() {
+
+        inventorySlots = new Slot[inventory.GetInitialCapacity()];
 
         // delete all existing slots in the inventory contents
         foreach (Transform child in inventoryContents)

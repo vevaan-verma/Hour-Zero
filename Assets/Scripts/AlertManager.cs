@@ -13,7 +13,7 @@ public class AlertManager : MonoBehaviour {
     // no need to track fadeCoroutine as it is handled within the alert coroutine, which is tracked
 
     [Header("Settings")]
-    [SerializeField, Tooltip("If true, alerts will be queued and displayed one after another. If false, existing alerts will be replaced with new ones.")] private bool alertQueueEnabled;
+    [SerializeField, Tooltip("If true, alerts will be queued and displayed one after another. If false, existing alerts will be replaced with new ones")] private bool alertQueueEnabled;
     [SerializeField, Tooltip("The amount of characters to type per second in the alert text")] private int charactersPerSecond;
     [SerializeField, Tooltip("Duration for the alert text to stay visible after fully typing but before fading out")] private float alertDuration;
     [SerializeField, Tooltip("Duration for the alert text to fade out")] private float alertFadeDuration;

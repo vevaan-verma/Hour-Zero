@@ -18,7 +18,10 @@ public class BackpackUI : InventoryUI {
 
         inventory = FindFirstObjectByType<Backpack>(FindObjectsInactive.Include); // find the backpack in the scene
         animator = GetComponent<Animator>();
+
         closeBackpackButton.onClick.AddListener(CloseInventory); // add listener to close backpack button
+        closeBackpackButton.gameObject.SetActive(backpackType == BackpackType.Primary); // only show the close button if this is the primary backpack
+
         base.Initialize();
 
     }

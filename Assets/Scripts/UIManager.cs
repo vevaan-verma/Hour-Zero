@@ -38,7 +38,7 @@ public class UIManager : MonoBehaviour {
 
             if (foundBackpacks.Length != 1) {
 
-                Debug.LogError($"There should be exactly one BackpackUI of type {type} in the scene, found {foundBackpacks.Length}.");
+                Debug.LogError($"There should be exactly one BackpackUI of type {type} in the scene, found {foundBackpacks.Length}");
                 return;
 
             }
@@ -49,8 +49,7 @@ public class UIManager : MonoBehaviour {
         Cursor.lockState = CursorLockMode.Locked;
         Cursor.visible = false;
 
-        primaryBackpackUI = FindObjectsByType<BackpackUI>(FindObjectsSortMode.None)
-            .FirstOrDefault(ui => ui.GetBackpackType() == BackpackType.Primary); // find the primary backpack UI
+        primaryBackpackUI = FindObjectsByType<BackpackUI>(FindObjectsSortMode.None).FirstOrDefault(ui => ui.GetBackpackType() == BackpackType.Primary); // find the primary backpack UI
         systemRepairMenu = FindFirstObjectByType<SystemRepairMenu>();
         timeManager = FindFirstObjectByType<TimeManager>();
 
@@ -69,8 +68,11 @@ public class UIManager : MonoBehaviour {
                 OpenPrimaryBackpack();
 
         // close backpack if escape is pressed and backpack is open
-        if (Input.GetKeyDown(KeyCode.Escape) && primaryBackpackUI.IsInventoryOpen())
-            ClosePrimaryBackpack();
+        if (Input.GetKeyDown(KeyCode.Escape))
+            if (primaryBackpackUI.IsInventoryOpen()) // close backpack if it is open
+                ClosePrimaryBackpack();
+            else if (systemRepairMenu.IsMenuOpen()) // close system repair menu if it is open
+                CloseSystemRepairMenu();
 
         UpdateTimeText(timeManager.GetHour(), timeManager.GetMinute(), timeManager.IsAM());
 
@@ -92,17 +94,17 @@ public class UIManager : MonoBehaviour {
 
     }
 
-    public void OpenSystemRepairMenu() {
+    public void OpenSystemRepairMenu(ItemStack repairStack, int repairSlotCount, int repairPercent, BunkerSystemType systemType) {
 
         if (IsMenuOpen() || systemRepairMenu.IsMenuOpen()) return; // do nothing if another menu is open or if the system repair menu is already open
-        systemRepairMenu.ShowMenu(); // open the system repair menu
+        systemRepairMenu.OpenMenu(repairStack, repairSlotCount, repairPercent, systemType); // open the system repair menu
 
     }
 
     public void CloseSystemRepairMenu() {
 
         if (!systemRepairMenu.IsMenuOpen()) return; // do nothing if the system repair menu is not open
-        systemRepairMenu.HideMenu(); // close the system repair menu
+        systemRepairMenu.CloseMenu(); // close the system repair menu
 
     }
 

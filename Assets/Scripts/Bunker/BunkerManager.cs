@@ -33,7 +33,7 @@ public class BunkerManager : MonoBehaviour {
             }
 
             if (!found)
-                Debug.LogError($"BunkerController: No BunkerSystem component found for {systemType} in the scene. Please add it to the scene.");
+                Debug.LogError($"BunkerController: No BunkerSystem component found for {systemType} in the scene. Please add it to the scene");
 
         }
         #endregion
@@ -45,11 +45,11 @@ public class BunkerManager : MonoBehaviour {
 
     }
 
-    public void RepairSystem(BunkerSystemType systemType, int repairAmount) {
+    public void RepairSystem(BunkerSystemType systemType, int repairPercent) {
 
         BunkerSystem system = bunkerSystems[systemType];
-        system.Repair(repairAmount);
-        Debug.Log($"Repaired {systemType} by {repairAmount}. Current durability: {system.GetCurrentDurability()}.");
+        system.Repair(repairPercent);
+        Debug.Log($"Repaired {systemType} by {repairPercent}. Current durability: {system.GetCurrentDurability()}");
 
     }
 

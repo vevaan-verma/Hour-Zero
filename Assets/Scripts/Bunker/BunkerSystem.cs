@@ -20,7 +20,7 @@ public class BunkerSystem : MonoBehaviour {
 
     }
 
-    public void Repair(int repairAmount) => currDurability = Mathf.Clamp(currDurability + repairAmount, 0, initialDurability); // ensure current durability does not exceed initial durability (clamp it between 0 and initialDurability)
+    public void Repair(int repairPercent) => currDurability = Mathf.Clamp(currDurability + repairPercent, 0, initialDurability); // ensure current durability does not exceed initial durability (clamp it between 0 and initialDurability)
 
     private IEnumerator HandleDurabilityLoss() {
 

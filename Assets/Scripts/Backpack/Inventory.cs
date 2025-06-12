@@ -1,22 +1,25 @@
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
 public abstract class Inventory : MonoBehaviour {
 
     [Header("Settings")]
-    [SerializeField] private int initialCapacity;
-    [SerializeField] private int slotStackLimit;
-    private int currCapacity;
+    [SerializeField][Min(1)] protected int initialSlotCount;
+    [SerializeField] protected int slotStackLimit;
+    [SerializeField, Tooltip("Items that can be added to the inventory, if empty, all items are allowed")] protected Item[] itemWhitelist;
+    private int currSlotCount;
 
     [Header("Data")]
     protected List<ItemStack> contents;
+    protected Action onItemStackAdded;
 
     public virtual void Initialize() {
 
-        contents = new List<ItemStack>(currCapacity);
-        currCapacity = initialCapacity;
+        contents = new List<ItemStack>(currSlotCount);
+        currSlotCount = initialSlotCount;
 
-        for (int i = 0; i < currCapacity; i++)
+        for (int i = 0; i < currSlotCount; i++)
             contents.Add(new ItemStack(null, 0));
 
     }
@@ -37,9 +40,12 @@ public abstract class Inventory : MonoBehaviour {
 
         }
 
+        if (itemWhitelist.Length > 0 && Array.FindIndex(itemWhitelist, x => x != null && x.Equals(item)) < 0) return count; // if the item is not in the whitelist, return the count because no items were added (use the FindIndex method to make sure the Equals method is used for comparison); do this after checking for null and count to ensure null items are part of the whitelist by default so the slots can actually be cleared
+
         int stackLimit = GetEffectiveStackLimit(item);
         int toSet = Mathf.Min(stackLimit, count); // how many we can set in the slot
         contents[index] = new ItemStack(item, toSet); // set the item stack in the slot
+        onItemStackAdded?.Invoke(); // invoke the item added event
         return count - toSet; // return the count of items that could not be set
 
     }
@@ -52,6 +58,8 @@ public abstract class Inventory : MonoBehaviour {
 
         if (item == null || count <= 0) return count; // return the count since we couldn't add anything
 
+        if (itemWhitelist.Length > 0 && Array.IndexOf(itemWhitelist, item) < 0) return count; // if the item is not in the whitelist, return the count because no items were added
+
         // first, try to stack into existing stacks
         for (int i = 0; i < contents.Count; i++) {
 
@@ -63,9 +71,12 @@ public abstract class Inventory : MonoBehaviour {
                 int remainder = SetItemStack(new ItemStack(item, currentCount + count), i); // set the item stack in the slot with the new count
                 count = remainder; // update count to the remainder
 
-                if (count <= 0)
+                if (count <= 0) {
+
+                    onItemStackAdded?.Invoke(); // invoke the item added event since we successfully added items (placed here because we only want to invoke it once)
                     return 0; // return 0 since all items were added
 
+                }
             }
         }
 
@@ -78,13 +89,21 @@ public abstract class Inventory : MonoBehaviour {
 
                 count = SetItemStack(new ItemStack(item, count), i); // set the item stack in the slot and get the remainder of items that couldn't be added
 
-                if (count <= 0)
+                if (count <= 0) {
+
+                    onItemStackAdded?.Invoke(); // invoke the item added event since we successfully added items (placed here because we only want to invoke it once)
                     return 0; // return 0 since all items were added
 
+                }
             }
         }
 
         // if we reach here, not all items could be added
+
+        // check if at least one item was added to the inventory
+        if (count != itemStack.GetCount())
+            onItemStackAdded?.Invoke(); // invoke the item added event since the count is different from the original count, meaning at least one item was added
+
         return count; // return the count of items that could not be added
 
     }
@@ -170,6 +189,17 @@ public abstract class Inventory : MonoBehaviour {
 
     public ItemStack GetItemStack(int index) => contents[index];
 
-    public int GetInitialCapacity() => initialCapacity;
+    public int GetInitialCapacity() => initialSlotCount;
 
+    public bool IsFull() {
+
+        // TODO: should this use the slot stack limit or effective stack limit?
+        // if any slot is not filled to the SLOT stack limit, return false
+        foreach (ItemStack stack in contents)
+            if (stack.GetItem() == null || stack.GetCount() < slotStackLimit)
+                return false; // if the stack is empty or not filled to the SLOT stack limit, return false
+
+        return true; // if we reach here, all slots are filled to the stack limit
+
+    }
 }
