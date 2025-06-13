@@ -27,6 +27,10 @@ public class RepairInventory : Inventory {
 
     private void OnDisable() => onItemStackAdded -= OnItemStackAdded;
 
+    // helper to get the effective stack limit for an item in a slot
+    // effective stack limit for the repair inventory is the amount of items required for repairing divided by the initial slot count; therefore, the repair stack count must be completely divisible by the initial slot count
+    public override int GetEffectiveStackLimit(Item item) => repairStack.GetCount() / initialSlotCount;
+
     private void OnItemStackAdded() {
 
         if (IsFull())

@@ -8,7 +8,7 @@ public class ItemInteractable : Interactable {
     private Backpack backpack;
 
     [Header("Settings")]
-    [SerializeField][Min(1)] private int itemCount;
+    [SerializeField, Min(1)] private int itemCount;
     [SerializeField] private float destroyDuration;
     private int currCount;
     private bool destroyed; // flag to prevent multiple destruction calls

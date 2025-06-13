@@ -45,13 +45,7 @@ public class BunkerManager : MonoBehaviour {
 
     }
 
-    public void RepairSystem(BunkerSystemType systemType, int repairPercent) {
-
-        BunkerSystem system = bunkerSystems[systemType];
-        system.Repair(repairPercent);
-        Debug.Log($"Repaired {systemType} by {repairPercent}. Current durability: {system.GetCurrentDurability()}");
-
-    }
+    public void RepairSystem(BunkerSystemType systemType, int repairPercent) => bunkerSystems[systemType].Repair(repairPercent);
 
     public BunkerSystem GetBunkerSystem(BunkerSystemType systemType) => bunkerSystems[systemType];
 

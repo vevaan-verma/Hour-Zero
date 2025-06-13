@@ -5,7 +5,7 @@ using UnityEngine;
 public abstract class Inventory : MonoBehaviour {
 
     [Header("Settings")]
-    [SerializeField][Min(1)] protected int initialSlotCount;
+    [SerializeField, Min(1)] protected int initialSlotCount;
     [SerializeField] protected int slotStackLimit;
     [SerializeField, Tooltip("Items that can be added to the inventory, if empty, all items are allowed")] protected Item[] itemWhitelist;
     private int currSlotCount;
@@ -166,7 +166,7 @@ public abstract class Inventory : MonoBehaviour {
     }
 
     // helper to get the effective stack limit for an item in a slot
-    public int GetEffectiveStackLimit(Item item) {
+    public virtual int GetEffectiveStackLimit(Item item) {
 
         // how the effective stack limit is determined:
         // 1. if both the item and the slot stack limit are greater than 0, use the smaller of the two
@@ -193,13 +193,12 @@ public abstract class Inventory : MonoBehaviour {
 
     public bool IsFull() {
 
-        // TODO: should this use the slot stack limit or effective stack limit?
-        // if any slot is not filled to the SLOT stack limit, return false
+        // if any slot is not filled to the effective stack limit, return false
         foreach (ItemStack stack in contents)
-            if (stack.GetItem() == null || stack.GetCount() < slotStackLimit)
-                return false; // if the stack is empty or not filled to the SLOT stack limit, return false
+            if (stack.GetItem() == null || stack.GetCount() < GetEffectiveStackLimit(stack.GetItem()))
+                return false; // if the stack is empty or not filled to the effective stack limit, return false
 
-        return true; // if we reach here, all slots are filled to the stack limit
+        return true; // if we reach here, all slots are filled to the effective stack limit
 
     }
 }

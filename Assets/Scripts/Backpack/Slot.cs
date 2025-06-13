@@ -10,16 +10,17 @@ public class Slot : MonoBehaviour, IDropHandler {
     [Header("Settings")]
     private int index;
 
-    public void Initialize(Inventory inventory, int index) {
+    public void Initialize(Inventory inventory, int index, Item item, int count) {
 
         this.inventory = inventory;
         this.index = index;
         itemHolder = GetComponentInChildren<ItemHolder>();
 
         itemHolder.Initialize(); // initialize the item holder
-        SetItem(null, 0); // initialize the slot with no item and count 0
+        SetItem(item, count); // initialize the slot with no item and count 0
 
         transform.GetChild(0).name = $"ItemHolder{index + 1}"; // rename the item holder child to reflect its index
+
     }
 
     public void OnDrop(PointerEventData eventData) { // this is called on the target slot when an item is dropped on it
@@ -38,18 +39,11 @@ public class Slot : MonoBehaviour, IDropHandler {
 
         if (sourceInventory == targetInventory) { // check if the source and target inventories are the same, so the stack limits are the same
 
-            if (GetItem() != null && GetItem() == sourceStack.GetItem()) { // check if the item in this slot is the same as the one being dropped, which would allow stacking
+            if (GetItem() != null && GetItem() == sourceStack.GetItem()) { // check if the item in this slot is the same as the one being dropped, which would allow stacking (same regardless of if the interaction is between different inventories or not)
 
-                int stackLimit = sourceInventory.GetEffectiveStackLimit(sourceStack.GetItem());
-                int currentCount = GetCount(); // get the count of items in the target slot
-                int canAdd = Mathf.Min(stackLimit - currentCount, sourceStack.GetCount()); // this is how many items we can add to this stack
+                int remainder = sourceInventory.SetItemStack(new ItemStack(sourceStack.GetItem(), GetCount() + sourceStack.GetCount()), targetIndex); // set the item stack in the target inventory to the one being dropped and get the remainder of items that couldn't be added
+                sourceInventory.SetItemStack(new ItemStack(sourceStack.GetItem(), remainder), sourceIndex); // set the source slot to empty or the remainder of the source stack that wasn't stacked
 
-                if (canAdd > 0) { // if we can add some items to this stack
-
-                    sourceInventory.SetItemStack(new ItemStack(sourceStack.GetItem(), currentCount + canAdd), targetIndex); // set the item stack in the target inventory to the one being dropped
-                    sourceInventory.SetItemStack(new ItemStack(sourceStack.GetItem(), sourceStack.GetCount() - canAdd), sourceIndex); // set the source slot to empty or the remainder of the source stack that wasn't stacked
-
-                }
             } else { // items are different, so we can't stack them; swapping is needed here
 
                 if (targetStack.GetItem() == null) { // if the target slot is empty, we can just set the item there
@@ -67,11 +61,9 @@ public class Slot : MonoBehaviour, IDropHandler {
             }
         } else { // the source and target inventories are different, so we need to handle the swapping differently
 
-            if (GetItem() != null && GetItem() == sourceStack.GetItem()) { // check if the item in this slot is the same as the one being dropped, which would allow stacking
+            if (GetItem() != null && GetItem() == sourceStack.GetItem()) { // check if the item in this slot is the same as the one being dropped, which would allow stacking (same regardless of if the interaction is between different inventories or not)
 
-                int currentCount = GetCount();
-
-                int remainder = targetInventory.SetItemStack(new ItemStack(sourceStack.GetItem(), currentCount + sourceStack.GetCount()), targetIndex); // set the item stack in the target inventory to the one being dropped and get the remainder of items that couldn't be added
+                int remainder = targetInventory.SetItemStack(new ItemStack(sourceStack.GetItem(), GetCount() + sourceStack.GetCount()), targetIndex); // set the item stack in the target inventory to the one being dropped and get the remainder of items that couldn't be added
                 sourceInventory.SetItemStack(new ItemStack(sourceStack.GetItem(), remainder), sourceIndex); // set the source slot to empty or the remainder of the source stack that wasn't stacked
 
             } else {

@@ -7,8 +7,8 @@ public class TalkRadiusIndicator : MonoBehaviour {
     private Transform target;
 
     [Header("Settings")]
-    [SerializeField][Tooltip("Degrees per second to spin around the ground-normal")] private float spinSpeed;
-    [SerializeField][Tooltip("Max distance for ground raycast; begins at talk radius indicator position")] private float groundRaycastDistance;
+    [SerializeField, Tooltip("Degrees per second to spin around the ground-normal")] private float spinSpeed;
+    [SerializeField, Tooltip("Max distance for ground raycast; begins at talk radius indicator position")] private float groundRaycastDistance;
     private float currSpinAngle;
 
     public void Initialize(Transform target, float radius) {

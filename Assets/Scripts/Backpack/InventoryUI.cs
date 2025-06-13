@@ -29,8 +29,7 @@ public abstract class InventoryUI : MonoBehaviour {
 
             Slot slot = Instantiate(slotPrefab, inventoryContents);
             slot.transform.name = $"Slot{i + 1}";
-            slot.Initialize(inventory, i); // initialize the slot
-            slot.SetItem(inventory.GetItemStack(i).GetItem(), inventory.GetItemStack(i).GetCount()); // set the item and count in the slot
+            slot.Initialize(inventory, i, inventory.GetItemStack(i).GetItem(), inventory.GetItemStack(i).GetCount()); // initialize the slot
             inventorySlots[i] = slot; // store the slot in the array for later reference
 
         }

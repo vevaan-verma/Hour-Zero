@@ -10,8 +10,8 @@ public class WanderingAI : AI {
     private bool isWaiting;
 
     [Header("Settings")]
-    [SerializeField][Tooltip("Minimum wait time at each destination")] private float minWaitTime;
-    [SerializeField][Tooltip("Maximum wait time at each destination")] private float maxWaitTime;
+    [SerializeField, Tooltip("Minimum wait time at each destination")] private float minWaitTime;
+    [SerializeField, Tooltip("Maximum wait time at each destination")] private float maxWaitTime;
 
     private new void Update() {
 

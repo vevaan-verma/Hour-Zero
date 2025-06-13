@@ -7,7 +7,7 @@ public class Item : ScriptableObject {
     [Header("Properties")]
     [SerializeField] private string itemName;
     [SerializeField] private Sprite icon;
-    [SerializeField][Tooltip("The maximum number of items that can be stacked in this item. If set to 0, it will either use the slot's stack limit, or if that is set to 0, an infinite limit")][Min(0)] private int stackLimit;
+    [SerializeField, Tooltip("The maximum number of items that can be stacked in this item. If set to 0, it will either use the slot's stack limit, or if that is set to 0, an infinite limit"), Min(0)] private int stackLimit;
 
     public string GetName() => itemName;
 
