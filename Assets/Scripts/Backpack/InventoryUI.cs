@@ -3,13 +3,13 @@ using UnityEngine;
 public abstract class InventoryUI : MonoBehaviour {
 
     [Header("References")]
-    [SerializeField] private Slot slotPrefab;
+    [SerializeField] protected Slot slotPrefab;
     protected Inventory inventory;
-    private Slot[] inventorySlots;
+    protected Slot[] inventorySlots;
 
     [Header("UI References")]
     [SerializeField] protected GameObject uiPanel; // the panel that contains the inventory UI (used to allow the script to remain active while the UI is hidden)
-    [SerializeField] private Transform inventoryContents;
+    [SerializeField] protected Transform inventoryContents;
 
     [Header("Settings")]
     protected bool isInventoryOpen;

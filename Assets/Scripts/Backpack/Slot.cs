@@ -14,6 +14,7 @@ public class Slot : MonoBehaviour, IDropHandler {
 
         this.inventory = inventory;
         this.index = index;
+
         itemHolder = GetComponentInChildren<ItemHolder>();
 
         itemHolder.Initialize(); // initialize the item holder

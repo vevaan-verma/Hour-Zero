@@ -191,14 +191,6 @@ public abstract class Inventory : MonoBehaviour {
 
     public int GetInitialCapacity() => initialSlotCount;
 
-    public bool IsFull() {
+    public int GetStackLimit() => slotStackLimit;
 
-        // if any slot is not filled to the effective stack limit, return false
-        foreach (ItemStack stack in contents)
-            if (stack.GetItem() == null || stack.GetCount() < GetEffectiveStackLimit(stack.GetItem()))
-                return false; // if the stack is empty or not filled to the effective stack limit, return false
-
-        return true; // if we reach here, all slots are filled to the effective stack limit
-
-    }
 }

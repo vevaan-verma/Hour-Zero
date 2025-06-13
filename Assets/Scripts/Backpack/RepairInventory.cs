@@ -5,18 +5,23 @@ public class RepairInventory : Inventory {
 
     [Header("References")]
     private SystemRepairMenu systemRepairMenu;
-    private ItemStack repairStack;
+    private ItemStack[] repairStacks;
     private int repairPercent;
     private BunkerSystemType systemType;
 
-    public void Initialize(ItemStack repairStack, int repairSlotCount, int repairPercent, BunkerSystemType systemType) {
+    public void Initialize(ItemStack[] repairStacks, int repairSlotCount, int repairPercent, BunkerSystemType systemType) {
 
-        this.repairStack = repairStack; // set the repair stack to the stack that is required for repairing
-        this.initialSlotCount = repairSlotCount; // set the initial slot count to the number of slots that are required for repairing
+        this.repairStacks = repairStacks; // set the repair stack to the stack that is required for repairing
+        this.initialSlotCount = repairStacks.Length; // set the initial slot count to the number of items that are required for repairing
         this.repairPercent = repairPercent; // set the repair percent to the percent durability of the system that is to be repaired
         this.systemType = systemType; // set the system type to the type of system that is to be repaired
-        this.slotStackLimit = repairStack.GetCount(); // set the slot stack limit to the count of the stack that is required for repairing
-        this.itemWhitelist = new Item[] { repairStack.GetItem() }; // set the item whitelist to only allow the item that is required for repairing
+
+        // set the item whitelist to the repair stack items
+        this.itemWhitelist = new Item[repairStacks.Length];
+
+        for (int i = 0; i < repairStacks.Length; i++)
+            this.itemWhitelist[i] = repairStacks[i].GetItem();
+
         base.Initialize(); // initialize at the end to ensure the properties are set before calling the base method (especially the slot count)
 
     }
@@ -27,16 +32,31 @@ public class RepairInventory : Inventory {
 
     private void OnDisable() => onItemStackAdded -= OnItemStackAdded;
 
-    // helper to get the effective stack limit for an item in a slot
-    // effective stack limit for the repair inventory is the amount of items required for repairing divided by the initial slot count; therefore, the repair stack count must be completely divisible by the initial slot count
-    public override int GetEffectiveStackLimit(Item item) => repairStack.GetCount() / initialSlotCount;
-
     private void OnItemStackAdded() {
 
-        if (IsFull())
-            systemRepairMenu.OnRepairInventoryFull(repairStack, repairPercent, systemType); // notify the system repair menu that the repair inventory is full, which means the necessary items for repairing were put in
+        foreach (ItemStack stack in repairStacks)
+            if (!ContainsItemStack(stack))
+                return;
+
+        // if we reach here, all required stacks are present for repairing
+        systemRepairMenu.OnRepairInventoryFull(repairStacks, repairPercent, systemType); // notify the system repair menu that the repair inventory is full, which means the necessary items for repairing were put in
 
     }
+
+    // helper to get the effective stack limit for an item in a slot
+    public override int GetEffectiveStackLimit(Item item) {
+
+        // return the amount of items required to repair the system if the item is in the repair stack
+        for (int i = 0; i < repairStacks.Length; i++)
+            if (repairStacks[i].GetItem().Equals(item))
+                return repairStacks[i].GetCount();
+
+        return 0;
+
+    }
+
+    public ItemStack[] GetRepairStacks() => repairStacks;
+
 }
 
 #if UNITY_EDITOR
