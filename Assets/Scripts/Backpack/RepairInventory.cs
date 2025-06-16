@@ -39,7 +39,7 @@ public class RepairInventory : Inventory {
                 return;
 
         // if we reach here, all required stacks are present for repairing
-        systemRepairMenu.OnRepairInventoryFull(repairStacks, repairPercent, systemType); // notify the system repair menu that the repair inventory is full, which means the necessary items for repairing were put in
+        systemRepairMenu.OnRepairInventoryFull(repairPercent, systemType); // notify the system repair menu that the repair inventory is full, which means the necessary items for repairing were put in
 
     }
 

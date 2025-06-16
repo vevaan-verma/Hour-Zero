@@ -1,4 +1,5 @@
 using Pathfinding;
+using Pathfinding.RVO;
 using System.Collections;
 using UnityEngine;
 

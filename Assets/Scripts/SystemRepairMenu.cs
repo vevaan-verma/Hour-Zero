@@ -60,13 +60,13 @@ public class SystemRepairMenu : MonoBehaviour {
     }
 
     // when the repair inventory is full, the player has put all the necessary items in the repair inventory to repair the system
-    public void OnRepairInventoryFull(ItemStack[] repairStacks, int repairPercent, BunkerSystemType systemType) {
+    public void OnRepairInventoryFull(int repairPercent, BunkerSystemType systemType) {
 
         CloseMenu(); // close the menu when the repair inventory is full
         bunkerManager.RepairSystem(systemType, repairPercent); // repair the system using the bunker manager
 
-        string formattedSystemType = Regex.Replace(systemType.ToString(), "(\\B[A-Z])", " $1"); // format the system type to be more readable by adding spaces in between the words (e.g., "AirFiltration" -> "Air Filtration")
-        //alertManager.SendAlert(new Alert($"Repaired {repairPercent}% {formattedSystemType} system durability using {repairStacks.GetItem().GetName()} x{repairStacks.GetCount()}", AlertType.Success));
+        string formattedSystemType = Regex.Replace(systemType.ToString(), "(\\B[A-Z])", " $1").ToLower(); // format the system type to be more readable by adding spaces in between the words (e.g., "AirFiltration" -> "Air Filtration") and convert to lowercase
+        alertManager.SendAlert(new Alert($"System {formattedSystemType} durability repaired ({repairPercent}%)", AlertType.Success));
 
     }
 
