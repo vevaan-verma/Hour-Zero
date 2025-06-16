@@ -1,5 +1,7 @@
 using UnityEngine;
 
+// This class allows you to store items and it was made in 1(one) afternoon.
+
 public class Backpack : Inventory {
 
     [Header("References")]
