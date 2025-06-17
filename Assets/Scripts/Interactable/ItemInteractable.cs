@@ -6,6 +6,7 @@ public class ItemInteractable : Interactable {
     [Header("References")]
     [SerializeField] private Item item;
     private Backpack backpack;
+    private Hotbar hotbar;
 
     [Header("Settings")]
     [SerializeField, Min(1)] private int itemCount;
@@ -18,6 +19,7 @@ public class ItemInteractable : Interactable {
         base.Start();
 
         backpack = FindFirstObjectByType<Backpack>();
+        hotbar = FindFirstObjectByType<Hotbar>();
         currCount = itemCount;
 
     }
@@ -26,7 +28,8 @@ public class ItemInteractable : Interactable {
 
         if (destroyed) return; // if already destroyed, do nothing
 
-        int remainder = backpack.AddItemStack(new ItemStack(item, itemCount));
+        int remainder = hotbar.AddItemStack(new ItemStack(item, itemCount)); // try to add the item to the hotbar first
+        remainder = backpack.AddItemStack(new ItemStack(item, remainder)); // then try to add the remainder to the backpack
 
         currCount = remainder; // update the current count of the item interactable
 

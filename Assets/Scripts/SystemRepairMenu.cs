@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Linq;
+using System.Collections.Generic;
 using System.Text.RegularExpressions;
 using UnityEngine;
 using UnityEngine.UI;
@@ -8,6 +9,7 @@ public class SystemRepairMenu : MonoBehaviour {
 
     [Header("References")]
     [SerializeField] private RepairInventory repairInventory;
+    private Backpack backpack;
     private BunkerManager bunkerManager;
     private AlertManager alertManager;
 
@@ -24,11 +26,12 @@ public class SystemRepairMenu : MonoBehaviour {
 
     private void Start() {
 
+        backpack = FindFirstObjectByType<Backpack>(FindObjectsInactive.Include); // find the backpack in the scene
         repairBackpackUI = FindObjectsByType<BackpackUI>(FindObjectsInactive.Include, FindObjectsSortMode.None).FirstOrDefault(ui => ui.GetBackpackType() == BackpackType.Repair); // find the repair backpack UI
         bunkerManager = FindFirstObjectByType<BunkerManager>();
         alertManager = FindFirstObjectByType<AlertManager>();
 
-        closeRepairMenuButton.onClick.AddListener(CloseMenu); // add listener to close menu button
+        closeRepairMenuButton.onClick.AddListener(() => CloseMenu()); // add listener to close menu button
 
         menuPanel.gameObject.SetActive(false); // make sure the menu is hidden by default
 
@@ -48,7 +51,18 @@ public class SystemRepairMenu : MonoBehaviour {
 
     }
 
-    public void CloseMenu() {
+    public void CloseMenu(bool repairRequirementsMet = false) {
+
+        // if the repair requirements are not met, return all the items in the repair inventory back to the backpack
+        if (!repairRequirementsMet) {
+
+            List<ItemStack> itemsToReturn = repairInventory.GetContents(); // get all the items in the repair inventory
+
+            foreach (ItemStack itemStack in itemsToReturn)
+                if (itemStack.GetItem() != null) // check if the item is not null
+                    backpack.AddItemStack(itemStack); // add the item stack back to the repair backpack
+
+        }
 
         isMenuOpen = false; // set the menu state to closed
         repairBackpackUI.CloseInventory(); // close the backpack UI
@@ -59,10 +73,10 @@ public class SystemRepairMenu : MonoBehaviour {
 
     }
 
-    // when the repair inventory is full, the player has put all the necessary items in the repair inventory to repair the system
-    public void OnRepairInventoryFull(int repairPercent, BunkerSystemType systemType) {
+    // when the repair requirements are met, the player has put all the necessary items in the repair inventory to repair the system
+    public void OnRepairRequirementsMet(int repairPercent, BunkerSystemType systemType) {
 
-        CloseMenu(); // close the menu when the repair inventory is full
+        CloseMenu(true); // close the menu when the repair inventory is full (with a flag that the repair requirements were met)
         bunkerManager.RepairSystem(systemType, repairPercent); // repair the system using the bunker manager
 
         string formattedSystemType = Regex.Replace(systemType.ToString(), "(\\B[A-Z])", " $1").ToLower(); // format the system type to be more readable by adding spaces in between the words (e.g., "AirFiltration" -> "Air Filtration") and convert to lowercase

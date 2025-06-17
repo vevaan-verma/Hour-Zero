@@ -12,7 +12,7 @@ public class RepairInventoryUI : InventoryUI {
     public override void RefreshInventory() {
 
         // initialSlotCount is the amount of repair items that are needed to repair the system (each item gets a slot)
-        inventorySlots = new Slot[inventory.GetInitialCapacity()];
+        inventorySlots = new Slot[inventory.GetInitialSlotCount()];
 
         // delete all existing slots in the inventory contents
         foreach (Transform child in inventoryContents)

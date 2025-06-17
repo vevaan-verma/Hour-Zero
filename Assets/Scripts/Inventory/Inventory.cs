@@ -6,13 +6,17 @@ public abstract class Inventory : MonoBehaviour {
 
     [Header("Settings")]
     [SerializeField, Min(1)] protected int initialSlotCount;
-    [SerializeField] protected int slotStackLimit;
-    [SerializeField, Tooltip("Items that can be added to the inventory, if empty, all items are allowed")] protected Item[] itemWhitelist;
+    [SerializeField, Tooltip("The maximum number of items that can be stacked in a slot. If set to 0, it will either use the item's stack limit, or if that is set to 0, an infinite limit")] private int slotStackLimit;
+    [SerializeField, Tooltip("Type of filter to apply to the item types in the filteredItemTypes array (e.g., whitelist or blacklist)")] protected FilterType itemTypeFilterType;
+    [SerializeField] protected ItemType[] filteredItemTypes;
+    [SerializeField, Tooltip("Type of filter to apply to the filteredItems array (e.g., whitelist or blacklist)")] protected FilterType itemFilterType;
+    [SerializeField] protected Item[] filteredItems;
+    [SerializeField] private bool visibleByDefault;
     private int currSlotCount;
 
     [Header("Data")]
-    protected List<ItemStack> contents;
-    protected Action onItemStackAdded;
+    private List<ItemStack> contents; // a list is used because the inventory size can change
+    public Action onContentsUpdate;
 
     public virtual void Initialize() {
 
@@ -40,12 +44,28 @@ public abstract class Inventory : MonoBehaviour {
 
         }
 
-        if (itemWhitelist.Length > 0 && Array.FindIndex(itemWhitelist, x => x != null && x.Equals(item)) < 0) return count; // if the item is not in the whitelist, return the count because no items were added (use the FindIndex method to make sure the Equals method is used for comparison); do this after checking for null and count to ensure null items are part of the whitelist by default so the slots can actually be cleared
+        if (filteredItemTypes.Length > 0) { // if there are filtered item types, check if the item type is allowed by the filter
+
+            bool found = Array.FindIndex(filteredItemTypes, x => x.Equals(item.GetItemType())) >= 0; // use FindIndex to check if the item type is in the filtered item types list
+
+            if ((itemTypeFilterType == FilterType.Whitelist && !found) || (itemTypeFilterType == FilterType.Blacklist && found)) // if the filter is a whitelist and the item type is not found, or if the filter is a blacklist and the item type is found, return the count because no items were added
+                return count; // item type not allowed by filter
+
+        }
+
+        if (filteredItems.Length > 0) { // if there are filtered items, check if the item is allowed by the filter
+
+            bool found = Array.FindIndex(filteredItems, x => x != null && x.Equals(item)) >= 0; // use FindIndex to check if the item is in the filtered items list
+
+            if ((itemFilterType == FilterType.Whitelist && !found) || (itemFilterType == FilterType.Blacklist && found)) // if the filter is a whitelist and the item is not found, or if the filter is a blacklist and the item is found, return the count because no items were added
+                return count; // item not allowed by filter
+
+        }
 
         int stackLimit = GetEffectiveStackLimit(item);
         int toSet = Mathf.Min(stackLimit, count); // how many we can set in the slot
         contents[index] = new ItemStack(item, toSet); // set the item stack in the slot
-        onItemStackAdded?.Invoke(); // invoke the item added event
+        onContentsUpdate?.Invoke(); // invoke the item added event
         return count - toSet; // return the count of items that could not be set
 
     }
@@ -58,7 +78,7 @@ public abstract class Inventory : MonoBehaviour {
 
         if (item == null || count <= 0) return count; // return the count since we couldn't add anything
 
-        if (itemWhitelist.Length > 0 && Array.IndexOf(itemWhitelist, item) < 0) return count; // if the item is not in the whitelist, return the count because no items were added
+        if (filteredItems.Length > 0 && Array.IndexOf(filteredItems, item) < 0) return count; // if the item is not in the whitelist, return the count because no items were added
 
         // first, try to stack into existing stacks
         for (int i = 0; i < contents.Count; i++) {
@@ -73,7 +93,7 @@ public abstract class Inventory : MonoBehaviour {
 
                 if (count <= 0) {
 
-                    onItemStackAdded?.Invoke(); // invoke the item added event since we successfully added items (placed here because we only want to invoke it once)
+                    onContentsUpdate?.Invoke(); // invoke the item added event since we successfully added items (placed here because we only want to invoke it once)
                     return 0; // return 0 since all items were added
 
                 }
@@ -91,7 +111,7 @@ public abstract class Inventory : MonoBehaviour {
 
                 if (count <= 0) {
 
-                    onItemStackAdded?.Invoke(); // invoke the item added event since we successfully added items (placed here because we only want to invoke it once)
+                    onContentsUpdate?.Invoke(); // invoke the item added event since we successfully added items (placed here because we only want to invoke it once)
                     return 0; // return 0 since all items were added
 
                 }
@@ -102,7 +122,7 @@ public abstract class Inventory : MonoBehaviour {
 
         // check if at least one item was added to the inventory
         if (count != itemStack.GetCount())
-            onItemStackAdded?.Invoke(); // invoke the item added event since the count is different from the original count, meaning at least one item was added
+            onContentsUpdate?.Invoke(); // invoke the item added event since the count is different from the original count, meaning at least one item was added
 
         return count; // return the count of items that could not be added
 
@@ -187,10 +207,21 @@ public abstract class Inventory : MonoBehaviour {
 
     }
 
+    public List<ItemStack> GetContents() => contents;
+
     public ItemStack GetItemStack(int index) => contents[index];
 
-    public int GetInitialCapacity() => initialSlotCount;
+    public int GetInitialSlotCount() => initialSlotCount;
 
     public int GetStackLimit() => slotStackLimit;
+
+    public bool IsVisibleByDefault() => visibleByDefault;
+
+}
+
+public enum FilterType {
+
+    Whitelist, // only items in the filteredItems list are allowed
+    Blacklist // items in the filteredItems list are not allowed
 
 }

@@ -26,7 +26,7 @@ public class Slot : MonoBehaviour, IDropHandler {
 
     public void OnDrop(PointerEventData eventData) { // this is called on the target slot when an item is dropped on it
 
-        ItemHolder droppedItemHolder = eventData.pointerDrag.GetComponent<ItemHolder>();
+        DraggableItemHolder droppedItemHolder = eventData.pointerDrag.GetComponent<DraggableItemHolder>();
         Slot sourceSlot = droppedItemHolder.GetInitialSlot();
 
         int sourceIndex = sourceSlot.GetIndex();
@@ -83,6 +83,7 @@ public class Slot : MonoBehaviour, IDropHandler {
                 } else {
 
                     sourceInventory.SetItemStack(new ItemStack(targetStack.GetItem(), targetStack.GetCount()), sourceIndex); // since no remainder was returned, we can set the source slot to the item in the target slot
+
                 }
             }
         }

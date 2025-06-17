@@ -8,12 +8,15 @@ public class Item : ScriptableObject {
     [SerializeField] private string itemName;
     [SerializeField] private Sprite icon;
     [SerializeField, Tooltip("The maximum number of items that can be stacked in this item. If set to 0, it will either use the slot's stack limit, or if that is set to 0, an infinite limit"), Min(0)] private int stackLimit;
+    [SerializeField] private ItemType itemType;
 
     public string GetName() => itemName;
 
     public Sprite GetIcon() => icon;
 
     public int GetStackSize() => stackLimit;
+
+    public ItemType GetItemType() => itemType;
 
     public override bool Equals(object other) => other is Item item && itemName == item.itemName && icon == item.icon && stackLimit == item.stackLimit;
 
@@ -38,5 +41,12 @@ public class ItemStack {
     public Item GetItem() => item;
 
     public int GetCount() => count;
+
+}
+
+public enum ItemType {
+
+    Consumable,
+    Tool
 
 }
