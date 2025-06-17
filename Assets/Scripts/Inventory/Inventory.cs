@@ -16,7 +16,7 @@ public abstract class Inventory : MonoBehaviour {
 
     [Header("Data")]
     protected List<ItemStack> contents; // a list is used because the inventory size can change
-    public Action onContentsUpdate;
+    public Action onContentsUpdated;
 
     public virtual void Initialize() {
 
@@ -66,7 +66,7 @@ public abstract class Inventory : MonoBehaviour {
         int stackLimit = GetEffectiveStackLimit(item);
         int toSet = Mathf.Min(stackLimit, count); // how many we can set in the slot
         contents[index] = new ItemStack(item, toSet); // set the item stack in the slot
-        onContentsUpdate?.Invoke(); // invoke the item added event
+        onContentsUpdated?.Invoke(); // invoke the item added event
         return count - toSet; // return the count of items that could not be set
 
     }
@@ -94,7 +94,7 @@ public abstract class Inventory : MonoBehaviour {
 
                 if (count <= 0) {
 
-                    onContentsUpdate?.Invoke(); // invoke the item added event since we successfully added items (placed here because we only want to invoke it once)
+                    onContentsUpdated?.Invoke(); // invoke the item added event since we successfully added items (placed here because we only want to invoke it once)
                     return 0; // return 0 since all items were added
 
                 }
@@ -112,7 +112,7 @@ public abstract class Inventory : MonoBehaviour {
 
                 if (count <= 0) {
 
-                    onContentsUpdate?.Invoke(); // invoke the item added event since we successfully added items (placed here because we only want to invoke it once)
+                    onContentsUpdated?.Invoke(); // invoke the item added event since we successfully added items (placed here because we only want to invoke it once)
                     return 0; // return 0 since all items were added
 
                 }
@@ -123,7 +123,7 @@ public abstract class Inventory : MonoBehaviour {
 
         // check if at least one item was added to the inventory
         if (count != itemStack.GetCount())
-            onContentsUpdate?.Invoke(); // invoke the item added event since the count is different from the original count, meaning at least one item was added
+            onContentsUpdated?.Invoke(); // invoke the item added event since the count is different from the original count, meaning at least one item was added
 
         return count; // return the count of items that could not be added
 

@@ -1,10 +1,5 @@
-using Pathfinding;
 using System;
-using Unity.Entities;
-using Unity.VisualScripting;
 using UnityEngine;
-using static Unity.Entities.EntitiesJournaling;
-using static Unity.VisualScripting.Icons;
 
 public class Hotbar : Inventory {
 
@@ -20,6 +15,7 @@ public class Hotbar : Inventory {
     public override void Initialize() {
 
         playerController = FindFirstObjectByType<PlayerController>();
+        onContentsUpdated += UpdateHeldTool; // subscribe to the contents updated event to update the held tool when the contents change
 
         base.Initialize();
         SelectSlot(0);
@@ -31,11 +27,7 @@ public class Hotbar : Inventory {
         if (index < 0 || index >= currSlotCount) return; // do nothing if the index is out of bounds
         selectedIndex = index; // set the selected index to the given index
 
-        if (contents[selectedIndex].GetItem() == null)
-            playerController.SetHeldTool(null); // set the player's held tool to the one in the selected slot
-        else if (contents[selectedIndex].GetItem().GetItemType() == ItemType.Tool)
-            playerController.SetHeldTool(contents[selectedIndex].GetItem().GetHeldToolPrefab()); // set the player's held tool to the prefab of the item in the selected slot
-
+        UpdateHeldTool(); // update the held tool
         onSlotSelected?.Invoke(); // invoke the slot selected event
 
     }
@@ -51,8 +43,14 @@ public class Hotbar : Inventory {
 
     }
 
+    public void UpdateHeldTool() {
 
-    // TODO: add method to update the held tool in the player controller when the hotbar is changed
+        if (contents[selectedIndex].GetItem() == null)
+            playerController.SetHeldTool(null); // if the selected slot is empty, set the player's held tool to null to remove any held tool
+        else if (contents[selectedIndex].GetItem().GetItemType() == ItemType.Tool)
+            playerController.SetHeldTool(contents[selectedIndex].GetItem().GetHeldToolPrefab()); // set the player's held tool to the held tool prefab of the item in the selected slot
+
+    }
 
     public int GetSelectedIndex() => selectedIndex;
 

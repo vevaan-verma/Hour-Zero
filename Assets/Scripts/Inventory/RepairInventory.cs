@@ -35,11 +35,11 @@ public class RepairInventory : Inventory {
 
     }
 
-    private void OnEnable() => onContentsUpdate += OnItemStackAdded;
+    private void OnEnable() => onContentsUpdated += OnItemStackAdded;
 
     private void Start() => systemRepairMenu = FindFirstObjectByType<SystemRepairMenu>();
 
-    private void OnDisable() => onContentsUpdate -= OnItemStackAdded;
+    private void OnDisable() => onContentsUpdated -= OnItemStackAdded;
 
     private void OnItemStackAdded() {
 

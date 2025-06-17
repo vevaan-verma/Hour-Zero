@@ -20,11 +20,11 @@ public abstract class InventoryUI : MonoBehaviour {
             uiPanel.SetActive(false);
 
         RefreshInventory();
-        inventory.onContentsUpdate += RefreshInventory; // subscribe to the inventory's contents update event to refresh the UI when the contents change
+        inventory.onContentsUpdated += RefreshInventory; // subscribe to the inventory's contents update event to refresh the UI when the contents change
 
     }
 
-    private void OnDisable() => inventory.onContentsUpdate -= RefreshInventory;
+    private void OnDisable() => inventory.onContentsUpdated -= RefreshInventory;
 
     public virtual void RefreshInventory() {
 
