@@ -28,6 +28,12 @@ public class PlayerController : MonoBehaviour {
     [SerializeField] private float jumpHeight;
     [SerializeField] private float fallMultiplier;
 
+    [Header("Hotbar")]
+    private Hotbar hotbar;
+
+    [Header("Holding")]
+    [SerializeField] private Transform heldToolPos; // position where the held tool will be placed
+
     [Header("Headbob")]
     [SerializeField] private float walkBobSpeed;
     [SerializeField] private float walkBobAmount;
@@ -54,6 +60,7 @@ public class PlayerController : MonoBehaviour {
 
         uiManager = FindFirstObjectByType<UIManager>(); // find the UI manager in the scene
         rb = GetComponent<Rigidbody>();
+        hotbar = FindFirstObjectByType<Hotbar>();
 
         defaultYPos = cameraPos.localPosition.y; // for headbob
 
@@ -93,6 +100,16 @@ public class PlayerController : MonoBehaviour {
 
         if (rb.linearVelocity.y < 0f)
             rb.linearVelocity += Vector3.up * Physics.gravity.y * (fallMultiplier - 1) * Time.deltaTime;
+        #endregion
+
+        #region HOTBAR
+        if (Input.mouseScrollDelta.y != 0f)
+            hotbar.CycleSlot(Input.mouseScrollDelta.y < 0f ? 1 : -1);
+
+        // check for number keys 1-9 to select hotbar slots
+        for (int i = 0; i < 9; i++)
+            if (Input.GetKeyDown((i + 1).ToString()))
+                hotbar.SelectSlot(i);
         #endregion
 
         #region HEADBOB
@@ -173,5 +190,17 @@ public class PlayerController : MonoBehaviour {
             cameraPos.localPosition = new Vector3(cameraPos.localPosition.x, Mathf.Lerp(cameraPos.localPosition.y, defaultYPos, Time.deltaTime * (moveSpeed == walkSpeed ? walkBobSpeed : sprintBobSpeed)), cameraPos.localPosition.z);
 
         }
+    }
+
+    public void SetHeldTool(GameObject toolPrefab) {
+
+        // destroy any existing held tool prefab at the held tool position
+        foreach (Transform child in heldToolPos)
+            Destroy(child.gameObject);
+
+        // instantiate the new held tool prefab at the held tool position if the toolPrefab is not null (a null parameter would clear the held tool)
+        if (toolPrefab)
+            Instantiate(toolPrefab, heldToolPos.position, heldToolPos.rotation, heldToolPos); // instantiate the held tool prefab at the held tool position
+
     }
 }

@@ -10,7 +10,7 @@ public class Slot : MonoBehaviour, IDropHandler {
     [Header("Settings")]
     private int index;
 
-    public void Initialize(Inventory inventory, int index, Item item, int count) {
+    public virtual void Initialize(Inventory inventory, int index, Item item, int count) {
 
         this.inventory = inventory;
         this.index = index;

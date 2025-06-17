@@ -12,10 +12,10 @@ public abstract class Inventory : MonoBehaviour {
     [SerializeField, Tooltip("Type of filter to apply to the filteredItems array (e.g., whitelist or blacklist)")] protected FilterType itemFilterType;
     [SerializeField] protected Item[] filteredItems;
     [SerializeField] private bool visibleByDefault;
-    private int currSlotCount;
+    protected int currSlotCount;
 
     [Header("Data")]
-    private List<ItemStack> contents; // a list is used because the inventory size can change
+    protected List<ItemStack> contents; // a list is used because the inventory size can change
     public Action onContentsUpdate;
 
     public virtual void Initialize() {
@@ -23,6 +23,7 @@ public abstract class Inventory : MonoBehaviour {
         contents = new List<ItemStack>(currSlotCount);
         currSlotCount = initialSlotCount;
 
+        // initialize the contents with empty ItemStacks
         for (int i = 0; i < currSlotCount; i++)
             contents.Add(new ItemStack(null, 0));
 
