@@ -2,17 +2,24 @@ using UnityEngine;
 
 public class HeldToolSway : MonoBehaviour {
 
+    [Header("References")]
+    private PlayerController playerController;
+
     [Header("Settings")]
     [SerializeField] private float swayAmount;
     [SerializeField] private float swaySmoothness;
     [SerializeField] private float rotationSwayAmount;
     [SerializeField] private float rotationSwaySmoothness;
+    [SerializeField] private float breathingAmplitude = 0.02f;
+    [SerializeField] private float breathingFrequency = 1.5f;
     [SerializeField, Tooltip("Deadzone for mouse movement to prevent jittering")] private float mouseDeadzone;
     private Vector3 initialPosition;
     private Quaternion initialRotation;
     private Vector3 swayVelocity;
 
     private void Start() {
+
+        playerController = FindFirstObjectByType<PlayerController>();
 
         initialPosition = transform.localPosition;
         initialRotation = transform.localRotation;
@@ -32,8 +39,14 @@ public class HeldToolSway : MonoBehaviour {
         moveX *= -swayAmount;
         moveY *= -swayAmount;
 
+        // add breathing offset (smooth up and down bobbing)
+        float breathingOffset = Mathf.Sin(Time.time * breathingFrequency) * breathingAmplitude;
+
+        // add headbob offset from the camera movement
+        float headbobOffset = playerController ? playerController.GetHeadbobOffset() : 0f;
+
         // calculate the target position and rotation based on mouse movement
-        Vector3 targetPosition = initialPosition + new Vector3(moveX, moveY, 0);
+        Vector3 targetPosition = initialPosition + new Vector3(moveX, moveY + breathingOffset + headbobOffset, 0);
         transform.localPosition = Vector3.SmoothDamp(transform.localPosition, targetPosition, ref swayVelocity, 1f / swaySmoothness);
 
         // calculate the rotations based on mouse movement

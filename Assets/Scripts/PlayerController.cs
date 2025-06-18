@@ -203,4 +203,7 @@ public class PlayerController : MonoBehaviour {
             Instantiate(toolPrefab, heldToolPos.position, heldToolPos.rotation, heldToolPos); // instantiate the held tool prefab at the held tool position
 
     }
+
+    public float GetHeadbobOffset() => cameraPos.localPosition.y - defaultYPos; // returns the headbob offset from the default position
+
 }
