@@ -9,6 +9,9 @@ public class UIManager : MonoBehaviour {
     [Header("References")]
     private TimeManager timeManager;
 
+    [Header("Hotbar")]
+    private HotbarUI hotbarUI;
+
     [Header("Backpack")]
     [SerializeField] private float backpackFadeDuration;
     [SerializeField] private KeyCode backpackKey;
@@ -49,6 +52,7 @@ public class UIManager : MonoBehaviour {
         Cursor.lockState = CursorLockMode.Locked;
         Cursor.visible = false;
 
+        hotbarUI = FindFirstObjectByType<HotbarUI>();
         primaryBackpackUI = FindObjectsByType<BackpackUI>(FindObjectsSortMode.None).FirstOrDefault(ui => ui.GetBackpackType() == BackpackType.Primary); // find the primary backpack UI
         systemRepairMenu = FindFirstObjectByType<SystemRepairMenu>();
         timeManager = FindFirstObjectByType<TimeManager>();
@@ -83,6 +87,7 @@ public class UIManager : MonoBehaviour {
     public void OpenPrimaryBackpack() {
 
         if (IsMenuOpen() || primaryBackpackUI.IsInventoryOpen()) return; // do nothing if another menu is open or if the primary backpack is already open
+        hotbarUI.CloseInventory(); // close the hotbar UI since the primary backpack UI is opening
         primaryBackpackUI.OpenInventory(); // open the primary backpack UI
 
     }
@@ -90,6 +95,7 @@ public class UIManager : MonoBehaviour {
     public void ClosePrimaryBackpack() {
 
         if (!primaryBackpackUI.IsInventoryOpen()) return; // do nothing if the primary backpack is not open
+        hotbarUI.OpenInventory(); // open the hotbar UI since the primary backpack UI is closing
         primaryBackpackUI.CloseInventory(); // close the primary backpack UI
 
     }
@@ -97,6 +103,7 @@ public class UIManager : MonoBehaviour {
     public void OpenSystemRepairMenu(ItemStack[] repairStacks, int repairSlotCount, int repairPercent, BunkerSystemType systemType) {
 
         if (IsMenuOpen() || systemRepairMenu.IsMenuOpen()) return; // do nothing if another menu is open or if the system repair menu is already open
+        hotbarUI.CloseInventory(); // close the hotbar UI since the system repair menu is opening
         systemRepairMenu.OpenMenu(repairStacks, repairSlotCount, repairPercent, systemType); // open the system repair menu
 
     }
@@ -104,6 +111,7 @@ public class UIManager : MonoBehaviour {
     public void CloseSystemRepairMenu() {
 
         if (!systemRepairMenu.IsMenuOpen()) return; // do nothing if the system repair menu is not open
+        hotbarUI.OpenInventory(); // open the hotbar UI since the system repair menu is closing
         systemRepairMenu.CloseMenu(); // close the system repair menu
 
     }

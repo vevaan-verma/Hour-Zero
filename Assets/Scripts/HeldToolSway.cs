@@ -39,11 +39,9 @@ public class HeldToolSway : MonoBehaviour {
         moveX *= -swayAmount;
         moveY *= -swayAmount;
 
-        // add breathing offset (smooth up and down bobbing)
-        float breathingOffset = Mathf.Sin(Time.time * breathingFrequency) * breathingAmplitude;
+        float breathingOffset = Mathf.Sin(Time.time * breathingFrequency) * breathingAmplitude; // add breathing offset (smooth up and down bobbing)
 
-        // add headbob offset from the camera movement
-        float headbobOffset = playerController ? playerController.GetHeadbobOffset() : 0f;
+        float headbobOffset = playerController ? playerController.GetHeadbobOffset() : 0f; // add headbob offset from the camera movement
 
         // calculate the target position and rotation based on mouse movement
         Vector3 targetPosition = initialPosition + new Vector3(moveX, moveY + breathingOffset + headbobOffset, 0);

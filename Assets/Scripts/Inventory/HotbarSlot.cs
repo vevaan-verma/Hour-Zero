@@ -14,9 +14,9 @@ public class HotbarSlot : Slot {
     private Color initialColor;
     private bool isSelected;
 
-    public override void Initialize(Inventory inventory, int index, Item item, int count) {
+    public override void Initialize(Inventory inventory, int index, Item item, int count, bool showItemInfoWidgetOnHover) {
 
-        base.Initialize(inventory, index, item, count);
+        base.Initialize(inventory, index, item, count, showItemInfoWidgetOnHover);
 
         image = GetComponent<Image>();
         initialColor = image.color; // store the initial color of the slot

@@ -10,16 +10,18 @@ public class Slot : MonoBehaviour, IDropHandler, IPointerEnterHandler, IPointerE
     private Inventory inventory;
 
     [Header("Settings")]
-    [SerializeField] private bool showItemInfoWidgetOnHover;
+    private bool showItemInfoWidgetOnHover;
 
     [Header("Data")]
     private Item item;
     private int index;
 
-    public virtual void Initialize(Inventory inventory, int index, Item item, int count) {
+    public virtual void Initialize(Inventory inventory, int index, Item item, int count, bool showItemInfoWidgetOnHover) {
 
         this.inventory = inventory;
         this.index = index;
+        this.showItemInfoWidgetOnHover = showItemInfoWidgetOnHover;
+        // no need to set item here since it gets set in the SetItem method
 
         itemHolder = GetComponentInChildren<ItemHolder>();
 
@@ -30,9 +32,13 @@ public class Slot : MonoBehaviour, IDropHandler, IPointerEnterHandler, IPointerE
 
     }
 
+    private void OnDisable() => DestroyCurrentItemInfoWidget(); // destroy the item info widget if it exists (prevents the widget from being shown when the inventory is closed)
+
     public void OnPointerEnter(PointerEventData eventData) {
 
-        if (item == null || !showItemInfoWidgetOnHover) return; // if the slot is empty or the item info widget is disabled, do nothing
+        if (eventData.dragging || item == null || !showItemInfoWidgetOnHover) return; // if the slot is empty or the item info widget is disabled, do nothing
+
+        DestroyCurrentItemInfoWidget(); // destroy the item info widget if it exists
 
         currItemInfoWidget = Instantiate(itemInfoWidgetPrefab, Input.mousePosition, Quaternion.identity, transform.root); // instantiate the special item info widget at the mouse position and set its parent to the root transform; the root transform is used to ensure that the special item info widget is always in the same space as the root object and not in world space
         currItemInfoWidget.transform.SetAsLastSibling(); // set the widget to the front
@@ -40,13 +46,7 @@ public class Slot : MonoBehaviour, IDropHandler, IPointerEnterHandler, IPointerE
 
     }
 
-    public void OnPointerExit(PointerEventData eventData) {
-
-        // destroy the special item info widget if it exists
-        if (currItemInfoWidget != null)
-            Destroy(currItemInfoWidget.gameObject);
-
-    }
+    public void OnPointerExit(PointerEventData eventData) => DestroyCurrentItemInfoWidget(); // destroy the item info widget if it exists
 
     public void OnDrop(PointerEventData eventData) { // this is called on the target slot when an item is dropped on it
 
@@ -63,6 +63,8 @@ public class Slot : MonoBehaviour, IDropHandler, IPointerEnterHandler, IPointerE
         ItemStack targetStack = targetInventory.GetItemStack(targetIndex);
 
         if (sourceInventory == targetInventory) { // check if the source and target inventories are the same, so the stack limits are the same
+
+            if (sourceIndex == targetIndex) return; // if the source and target slots are the same, we can just return
 
             if (GetItem() != null && GetItem() == sourceStack.GetItem()) { // check if the item in this slot is the same as the one being dropped, which would allow stacking (same regardless of if the interaction is between different inventories or not)
 
@@ -121,6 +123,12 @@ public class Slot : MonoBehaviour, IDropHandler, IPointerEnterHandler, IPointerE
         itemHolder.transform.SetParent(transform); // set the parent of the new item to this slot
         itemHolder.transform.SetAsFirstSibling(); // set to the first sibling so the count text appears on top
         itemHolder.transform.position = transform.position; // move the new item to the position of this slot
+
+    }
+
+    public void DestroyCurrentItemInfoWidget() {
+
+        if (currItemInfoWidget != null) Destroy(currItemInfoWidget.gameObject); // destroy the item info widget if it exists
 
     }
 

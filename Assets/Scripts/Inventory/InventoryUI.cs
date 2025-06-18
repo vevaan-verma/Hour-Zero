@@ -8,16 +8,17 @@ public abstract class InventoryUI : MonoBehaviour {
     protected Slot[] inventorySlots;
 
     [Header("UI References")]
-    [SerializeField] protected GameObject uiPanel; // the panel that contains the inventory UI (used to allow the script to remain active while the UI is hidden)
+    [SerializeField] protected CanvasGroup uiPanel; // the panel that contains the inventory UI (used to allow the script to remain active while the UI is hidden)
     [SerializeField] protected Transform inventoryContents;
 
     [Header("Settings")]
+    [SerializeField, Tooltip("Whether to show the item info widget when hovering over an item in the inventory")] protected bool showItemInfoWidgetOnHover;
     protected bool isInventoryOpen;
 
     public virtual void Initialize() {
 
         if (!inventory.IsVisibleByDefault())
-            uiPanel.SetActive(false);
+            uiPanel.gameObject.SetActive(false);
 
         RefreshInventory();
         inventory.onContentsUpdated += RefreshInventory; // subscribe to the inventory's contents update event to refresh the UI when the contents change
@@ -39,7 +40,7 @@ public abstract class InventoryUI : MonoBehaviour {
 
             Slot slot = Instantiate(slotPrefab, inventoryContents);
             slot.transform.name = $"Slot{i + 1}";
-            slot.Initialize(inventory, i, inventory.GetItemStack(i).GetItem(), inventory.GetItemStack(i).GetCount()); // initialize the slot
+            slot.Initialize(inventory, i, inventory.GetItemStack(i).GetItem(), inventory.GetItemStack(i).GetCount(), showItemInfoWidgetOnHover); // initialize the slot
             inventorySlots[i] = slot; // store the slot in the array for later reference
 
         }

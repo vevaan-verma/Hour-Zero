@@ -32,6 +32,7 @@ public class DraggableItemHolder : ItemHolder, IBeginDragHandler, IDragHandler, 
         transform.SetParent(transform.root); // change the parent to the root canvas to allow free movement
         transform.SetAsLastSibling(); // bring the dragged item to the front
         itemIcon.raycastTarget = false; // disable raycast target to allow interaction with other UI elements while dragging
+        initialSlot.DestroyCurrentItemInfoWidget(); // destroy the item info widget if it exists in the initial slot (prevents the widget from being shown while dragging)
 
     }
 

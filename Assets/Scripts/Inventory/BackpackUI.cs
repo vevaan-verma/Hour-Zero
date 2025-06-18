@@ -36,7 +36,7 @@ public class BackpackUI : InventoryUI {
 
         isInventoryOpen = true;
         closeBackpackButton.interactable = true; // enable close button to allow closing backpack
-        uiPanel.SetActive(true); // make sure the backpack panel is active while opening
+        uiPanel.gameObject.SetActive(true); // make sure the backpack panel is active while opening
 
         animator.SetTrigger("openBackpack"); // trigger open animation
 
@@ -53,7 +53,7 @@ public class BackpackUI : InventoryUI {
 
         isInventoryOpen = false; // set the state to closed before waiting for animation because it feels better if the player can move and look around while the backpack is closing
         closeBackpackButton.interactable = false; // disable close button to prevent multiple clicks (as this could mess with the toggle logic)
-        uiPanel.SetActive(true); // make sure the backpack panel is active while closing
+        uiPanel.gameObject.SetActive(true); // make sure the backpack panel is active while closing
 
         animator.SetTrigger("closeBackpack"); // trigger close animation
 
@@ -70,7 +70,7 @@ public class BackpackUI : InventoryUI {
         yield return null; // wait for the next frame to ensure the animation has started
         yield return new WaitForSeconds(animator.GetCurrentAnimatorStateInfo(0).length); // wait for the animation to finish
 
-        uiPanel.SetActive(false); // hide the backpack panel after closing
+        uiPanel.gameObject.SetActive(false); // hide the backpack panel after closing
 
     }
 
