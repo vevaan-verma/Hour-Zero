@@ -6,12 +6,15 @@ public class Item : ScriptableObject {
 
     [Header("Properties")]
     [SerializeField] private string itemName;
+    [SerializeField] private string itemDescription;
     [SerializeField] private Sprite icon;
     [SerializeField, Tooltip("The maximum number of items that can be stacked in this item. If set to 0, it will either use the slot's stack limit, or if that is set to 0, an infinite limit"), Min(0)] private int stackLimit;
     [SerializeField] private ItemType itemType;
     [SerializeField] private GameObject heldToolPrefab;
 
     public string GetName() => itemName;
+
+    public string GetDescription() => itemDescription;
 
     public Sprite GetIcon() => icon;
 
@@ -63,10 +66,21 @@ public class ItemEditor : UnityEditor.Editor {
 
         serializedObject.Update();
 
-        UnityEditor.EditorGUILayout.PropertyField(serializedObject.FindProperty("itemName"));
-        UnityEditor.EditorGUILayout.PropertyField(serializedObject.FindProperty("icon"));
-        UnityEditor.EditorGUILayout.PropertyField(serializedObject.FindProperty("stackLimit"));
-        UnityEditor.EditorGUILayout.PropertyField(serializedObject.FindProperty("itemType"));
+        // Replace the individual PropertyField lines with this block to draw all properties except "heldToolPrefab"
+        UnityEditor.SerializedProperty prop = serializedObject.GetIterator();
+        bool enterChildren = true;
+
+        while (prop.NextVisible(enterChildren)) {
+
+            enterChildren = false;
+
+            // skip the heldToolPrefab property
+            if (prop.name == "heldToolPrefab")
+                continue;
+
+            UnityEditor.EditorGUILayout.PropertyField(prop, true); // show all properties except heldToolPrefab
+
+        }
 
         // hides the grip position field if the item type is not a tool
         if ((ItemType) serializedObject.FindProperty("itemType").enumValueIndex == ItemType.Tool)

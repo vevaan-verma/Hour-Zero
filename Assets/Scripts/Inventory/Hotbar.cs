@@ -1,4 +1,5 @@
 using System;
+using UnityEditor;
 using UnityEngine;
 
 public class Hotbar : Inventory {
@@ -54,4 +55,26 @@ public class Hotbar : Inventory {
 
     public int GetSelectedIndex() => selectedIndex;
 
+}
+
+// <summary>
+// custom editor for the Hotbar class to allow for a range slider for the slotStackLimit field
+// since we need to constrain the slot count between 1 and 9
+// this is because each slot needs to have a single digit key binding from 1 to 9
+// </summary>
+[CustomEditor(typeof(Hotbar))]
+public class HotbarEditor : Editor {
+
+    public override void OnInspectorGUI() {
+
+        serializedObject.Update();
+
+        DrawPropertiesExcluding(serializedObject, "initialSlotCount"); // draw all fields except initialSlotCount
+        SerializedProperty initialSlotCount = serializedObject.FindProperty("initialSlotCount"); // draw initialSlotCount with a range slider
+
+        initialSlotCount.intValue = EditorGUILayout.IntSlider("Initial Slot Count", initialSlotCount.intValue, 1, 9); // draw the initial slot count field with a range slider
+
+        serializedObject.ApplyModifiedProperties();
+
+    }
 }

@@ -1,13 +1,19 @@
 using UnityEngine;
 using UnityEngine.EventSystems;
 
-public class Slot : MonoBehaviour, IDropHandler {
+public class Slot : MonoBehaviour, IDropHandler, IPointerEnterHandler, IPointerExitHandler {
 
     [Header("References")]
+    [SerializeField] private ItemInfoWidget itemInfoWidgetPrefab;
+    private ItemInfoWidget currItemInfoWidget;
     private ItemHolder itemHolder;
     private Inventory inventory;
 
     [Header("Settings")]
+    [SerializeField] private bool showItemInfoWidgetOnHover;
+
+    [Header("Data")]
+    private Item item;
     private int index;
 
     public virtual void Initialize(Inventory inventory, int index, Item item, int count) {
@@ -21,6 +27,24 @@ public class Slot : MonoBehaviour, IDropHandler {
         SetItem(item, count); // initialize the slot with no item and count 0
 
         transform.GetChild(0).name = $"ItemHolder{index + 1}"; // rename the item holder child to reflect its index
+
+    }
+
+    public void OnPointerEnter(PointerEventData eventData) {
+
+        if (item == null || !showItemInfoWidgetOnHover) return; // if the slot is empty or the item info widget is disabled, do nothing
+
+        currItemInfoWidget = Instantiate(itemInfoWidgetPrefab, Input.mousePosition, Quaternion.identity, transform.root); // instantiate the special item info widget at the mouse position and set its parent to the root transform; the root transform is used to ensure that the special item info widget is always in the same space as the root object and not in world space
+        currItemInfoWidget.transform.SetAsLastSibling(); // set the widget to the front
+        currItemInfoWidget.Initialize(item); // initialize the widget with the special item
+
+    }
+
+    public void OnPointerExit(PointerEventData eventData) {
+
+        // destroy the special item info widget if it exists
+        if (currItemInfoWidget != null)
+            Destroy(currItemInfoWidget.gameObject);
 
     }
 
@@ -90,6 +114,8 @@ public class Slot : MonoBehaviour, IDropHandler {
     }
 
     public void SetItem(Item item, int count) {
+
+        this.item = item; // set the item in this slot to the one being dropped
 
         itemHolder.SetItem(item, count); // set the item and count in the new slot item holder
         itemHolder.transform.SetParent(transform); // set the parent of the new item to this slot

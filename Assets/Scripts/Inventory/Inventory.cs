@@ -71,7 +71,7 @@ public abstract class Inventory : MonoBehaviour {
 
     }
 
-    // returns the amount of items that could not be added to the backpack
+    // returns the amount of items that could not be added to the inventory
     public virtual int AddItemStack(ItemStack itemStack) {
 
         Item item = itemStack.GetItem();
@@ -79,7 +79,14 @@ public abstract class Inventory : MonoBehaviour {
 
         if (item == null || count <= 0) return count; // return the count since we couldn't add anything
 
-        if (filteredItems.Length > 0 && Array.IndexOf(filteredItems, item) < 0) return count; // if the item is not in the whitelist, return the count because no items were added
+        if (filteredItems.Length > 0) { // if there are filtered items, check if the item is allowed by the filter
+
+            bool found = Array.FindIndex(filteredItems, x => x != null && x.Equals(item)) >= 0; // use FindIndex to check if the item is in the filtered items list
+
+            if ((itemFilterType == FilterType.Whitelist && !found) || (itemFilterType == FilterType.Blacklist && found)) // if the filter is a whitelist and the item is not found, or if the filter is a blacklist and the item is found, return the count because no items were added
+                return count; // item not allowed by filter
+
+        }
 
         // first, try to stack into existing stacks
         for (int i = 0; i < contents.Count; i++) {
@@ -129,7 +136,7 @@ public abstract class Inventory : MonoBehaviour {
 
     }
 
-    // returns the amount of items that could not be removed from the backpack
+    // returns the amount of items that could not be removed from the inventory
     public int RemoveItemStack(ItemStack itemStack) {
 
         Item item = itemStack.GetItem();

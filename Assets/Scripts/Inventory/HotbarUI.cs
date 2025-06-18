@@ -6,7 +6,7 @@ public class HotbarUI : InventoryUI {
     private Hotbar hotbar;
 
     public override void Initialize() {
-
+        
         inventory = FindFirstObjectByType<Hotbar>(FindObjectsInactive.Include); // find the hotbar in the scene
         hotbar = (Hotbar) inventory; // cast the inventory to a hotbar
         hotbar.onSlotSelected += RefreshInventory; // subscribe to the slot selected event to refresh the inventory UI when a slot is selected
