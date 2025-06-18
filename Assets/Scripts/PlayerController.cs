@@ -21,6 +21,8 @@ public class PlayerController : MonoBehaviour {
     [SerializeField] private float ySensitivity;
     [SerializeField] private float topCameraClamp;
     [SerializeField] private float bottomCameraClamp;
+    private float mouseX;
+    private float mouseY;
     private float xRotation;
     private float yRotation;
 
@@ -32,7 +34,7 @@ public class PlayerController : MonoBehaviour {
     private Hotbar hotbar;
 
     [Header("Holding")]
-    [SerializeField] private Transform heldToolPos; // position where the held tool will be placed
+    [SerializeField] private HeldToolSway heldToolSway;
 
     [Header("Headbob")]
     [SerializeField] private float walkBobSpeed;
@@ -42,6 +44,15 @@ public class PlayerController : MonoBehaviour {
     [SerializeField] private float bobMovementThreshold; // minimum velocity to start headbob
     private float defaultYPos;
     private float timer;
+
+    [Header("Tool Sway")]
+    [SerializeField] private float swayAmount;
+    [SerializeField] private float swaySmoothness;
+    [SerializeField] private float rotationSwayAmount;
+    [SerializeField] private float rotationSwaySmoothness;
+    [SerializeField] private float breathingAmplitude;
+    [SerializeField] private float breathingFrequency;
+    [SerializeField, Tooltip("Deadzone for mouse movement to prevent jittering in sway effect")] private float mouseSwayDeadzone;
 
     [Header("Interacting")]
     [SerializeField] private float interactDistance;
@@ -61,6 +72,8 @@ public class PlayerController : MonoBehaviour {
         uiManager = FindFirstObjectByType<UIManager>(); // find the UI manager in the scene
         rb = GetComponent<Rigidbody>();
         hotbar = FindFirstObjectByType<Hotbar>();
+
+        heldToolSway.Initialize(swayAmount, swaySmoothness, rotationSwayAmount, rotationSwaySmoothness, breathingAmplitude, breathingFrequency, mouseSwayDeadzone); // initialize the held tool sway with the settings
 
         defaultYPos = cameraPos.localPosition.y; // for headbob
 
@@ -83,8 +96,8 @@ public class PlayerController : MonoBehaviour {
         #endregion
 
         #region LOOKING
-        float mouseX = Input.GetAxisRaw("Mouse X") * xSensitivity * Time.fixedDeltaTime;
-        float mouseY = Input.GetAxisRaw("Mouse Y") * ySensitivity * Time.fixedDeltaTime;
+        mouseX = Input.GetAxisRaw("Mouse X") * xSensitivity * Time.fixedDeltaTime;
+        mouseY = Input.GetAxisRaw("Mouse Y") * ySensitivity * Time.fixedDeltaTime;
 
         yRotation += mouseX;
 
@@ -171,6 +184,18 @@ public class PlayerController : MonoBehaviour {
 
     }
 
+    private void LateUpdate() {
+
+        bool menuOpen = uiManager.IsMenuOpen();
+
+        // if a menu is open, smoothly return the held tool position to the center point
+        if (menuOpen)
+            heldToolSway.SmoothReturnToCenter();
+
+        heldToolSway.HandleSway(mouseX, mouseY, true, !menuOpen, !menuOpen); // handle the sway effect for the held tool based on mouse movement; use LateUpdate to calculate sway to ensure the sway happens after all other updates, preventing jittering; the breathe effect is always enabled, headbob is enabled when not in a menu, and sway is enabled when not in a menu
+
+    }
+
     private void Jump() => rb.linearVelocity = new Vector3(rb.linearVelocity.x, jumpHeight, rb.linearVelocity.z);
 
     private void HandleHeadbob() {
@@ -195,12 +220,12 @@ public class PlayerController : MonoBehaviour {
     public void SetHeldTool(GameObject toolPrefab) {
 
         // destroy any existing held tool prefab at the held tool position
-        foreach (Transform child in heldToolPos)
+        foreach (Transform child in heldToolSway.transform)
             Destroy(child.gameObject);
 
         // instantiate the new held tool prefab at the held tool position if the toolPrefab is not null (a null parameter would clear the held tool)
         if (toolPrefab)
-            Instantiate(toolPrefab, heldToolPos.position, heldToolPos.rotation, heldToolPos); // instantiate the held tool prefab at the held tool position
+            Instantiate(toolPrefab, heldToolSway.transform.position, heldToolSway.transform.rotation, heldToolSway.transform); // instantiate the held tool prefab at the held tool position
 
     }
 

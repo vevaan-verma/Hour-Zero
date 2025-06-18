@@ -41,6 +41,7 @@ public abstract class Inventory : MonoBehaviour {
         if (item == null || count == 0) {
 
             contents[index] = new ItemStack(null, 0);
+            onContentsUpdated?.Invoke(); // invoke the item added event
             return 0;
 
         }
@@ -79,6 +80,15 @@ public abstract class Inventory : MonoBehaviour {
 
         if (item == null || count <= 0) return count; // return the count since we couldn't add anything
 
+        if (filteredItemTypes.Length > 0) { // if there are filtered item types, check if the item type is allowed by the filter
+
+            bool found = Array.FindIndex(filteredItemTypes, x => x.Equals(item.GetItemType())) >= 0; // use FindIndex to check if the item type is in the filtered item types list
+
+            if ((itemTypeFilterType == FilterType.Whitelist && !found) || (itemTypeFilterType == FilterType.Blacklist && found)) // if the filter is a whitelist and the item type is not found, or if the filter is a blacklist and the item type is found, return the count because no items were added
+                return count; // item type not allowed by filter
+
+        }
+
         if (filteredItems.Length > 0) { // if there are filtered items, check if the item is allowed by the filter
 
             bool found = Array.FindIndex(filteredItems, x => x != null && x.Equals(item)) >= 0; // use FindIndex to check if the item is in the filtered items list
@@ -99,12 +109,8 @@ public abstract class Inventory : MonoBehaviour {
                 int remainder = SetItemStack(new ItemStack(item, currentCount + count), i); // set the item stack in the slot with the new count
                 count = remainder; // update count to the remainder
 
-                if (count <= 0) {
+                if (count <= 0) return 0; // return 0 since all items were added; no need to invoke the item added event here, as it will be invoked in the SetItemStack method if items were successfully added
 
-                    onContentsUpdated?.Invoke(); // invoke the item added event since we successfully added items (placed here because we only want to invoke it once)
-                    return 0; // return 0 since all items were added
-
-                }
             }
         }
 
@@ -117,20 +123,14 @@ public abstract class Inventory : MonoBehaviour {
 
                 count = SetItemStack(new ItemStack(item, count), i); // set the item stack in the slot and get the remainder of items that couldn't be added
 
-                if (count <= 0) {
+                if (count <= 0) return 0; // return 0 since all items were added; no need to invoke the item added event here, as it will be invoked in the SetItemStack method if items were successfully added
 
-                    onContentsUpdated?.Invoke(); // invoke the item added event since we successfully added items (placed here because we only want to invoke it once)
-                    return 0; // return 0 since all items were added
-
-                }
             }
         }
 
         // if we reach here, not all items could be added
 
-        // check if at least one item was added to the inventory
-        if (count != itemStack.GetCount())
-            onContentsUpdated?.Invoke(); // invoke the item added event since the count is different from the original count, meaning at least one item was added
+        // no need to invoke the item added event here, as it was already invoked in the SetItemStack method if items were successfully added
 
         return count; // return the count of items that could not be added
 

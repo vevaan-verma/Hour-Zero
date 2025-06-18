@@ -25,7 +25,12 @@ public abstract class InventoryUI : MonoBehaviour {
 
     }
 
-    private void OnDisable() => inventory.onContentsUpdated -= RefreshInventory;
+    private void OnDisable() {
+
+        if (inventory)
+            inventory.onContentsUpdated -= RefreshInventory;
+
+    }
 
     public virtual void RefreshInventory() {
 

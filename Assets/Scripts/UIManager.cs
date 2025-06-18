@@ -82,12 +82,11 @@ public class UIManager : MonoBehaviour {
 
     }
 
-    // TODO: hide crosshair when backpack/menu is opened
-
     public void OpenPrimaryBackpack() {
 
         if (IsMenuOpen() || primaryBackpackUI.IsInventoryOpen()) return; // do nothing if another menu is open or if the primary backpack is already open
-        hotbarUI.CloseInventory(); // close the hotbar UI since the primary backpack UI is opening
+
+        hotbarUI.CloseInventory(); // close the hotbar UI if it is open (this is done to ensure the hotbar is not visible when the primary backpack is open)
         primaryBackpackUI.OpenInventory(); // open the primary backpack UI
 
     }
@@ -95,7 +94,8 @@ public class UIManager : MonoBehaviour {
     public void ClosePrimaryBackpack() {
 
         if (!primaryBackpackUI.IsInventoryOpen()) return; // do nothing if the primary backpack is not open
-        hotbarUI.OpenInventory(); // open the hotbar UI since the primary backpack UI is closing
+
+        hotbarUI.OpenInventory(); // re-open the hotbar UI
         primaryBackpackUI.CloseInventory(); // close the primary backpack UI
 
     }
@@ -103,7 +103,8 @@ public class UIManager : MonoBehaviour {
     public void OpenSystemRepairMenu(ItemStack[] repairStacks, int repairSlotCount, int repairPercent, BunkerSystemType systemType) {
 
         if (IsMenuOpen() || systemRepairMenu.IsMenuOpen()) return; // do nothing if another menu is open or if the system repair menu is already open
-        hotbarUI.CloseInventory(); // close the hotbar UI since the system repair menu is opening
+
+        hotbarUI.CloseInventory(); // close the hotbar UI if it is open (this is done to ensure the hotbar is not visible when the system repair menu is open)
         systemRepairMenu.OpenMenu(repairStacks, repairSlotCount, repairPercent, systemType); // open the system repair menu
 
     }
@@ -111,7 +112,8 @@ public class UIManager : MonoBehaviour {
     public void CloseSystemRepairMenu() {
 
         if (!systemRepairMenu.IsMenuOpen()) return; // do nothing if the system repair menu is not open
-        hotbarUI.OpenInventory(); // open the hotbar UI since the system repair menu is closing
+
+        hotbarUI.OpenInventory(); // re-open the hotbar UI
         systemRepairMenu.CloseMenu(); // close the system repair menu
 
     }

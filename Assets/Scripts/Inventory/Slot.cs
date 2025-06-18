@@ -75,14 +75,15 @@ public class Slot : MonoBehaviour, IDropHandler, IPointerEnterHandler, IPointerE
 
                 if (targetStack.GetItem() == null) { // if the target slot is empty, we can just set the item there
 
-                    targetInventory.SetItemStack(new ItemStack(sourceStack.GetItem(), sourceStack.GetCount()), targetIndex); // set the item stack in the target inventory to the one being dropped
+                    print(targetIndex);
+                    sourceInventory.SetItemStack(new ItemStack(sourceStack.GetItem(), sourceStack.GetCount()), targetIndex); // set the item stack in the target inventory to the one being dropped
                     sourceInventory.SetItemStack(new ItemStack(null, 0), sourceIndex); // set the source slot to empty
 
                 } else { // if the target slot is not empty, we need to swap the items
 
                     // since they are in the same inventory, we can swap them directly, without regarding stack limits (since they are the same for each slot within an inventory)
                     sourceInventory.SetItemStack(new ItemStack(targetStack.GetItem(), targetStack.GetCount()), sourceIndex); // set the source slot to the target slot item
-                    targetInventory.SetItemStack(new ItemStack(sourceStack.GetItem(), sourceStack.GetCount()), targetIndex); // set the target slot to the source slot item
+                    sourceInventory.SetItemStack(new ItemStack(sourceStack.GetItem(), sourceStack.GetCount()), targetIndex); // set the target slot to the source slot item
 
                 }
             }

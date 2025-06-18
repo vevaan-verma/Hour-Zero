@@ -6,18 +6,26 @@ public class HeldToolSway : MonoBehaviour {
     private PlayerController playerController;
 
     [Header("Settings")]
-    [SerializeField] private float swayAmount;
-    [SerializeField] private float swaySmoothness;
-    [SerializeField] private float rotationSwayAmount;
-    [SerializeField] private float rotationSwaySmoothness;
-    [SerializeField] private float breathingAmplitude = 0.02f;
-    [SerializeField] private float breathingFrequency = 1.5f;
-    [SerializeField, Tooltip("Deadzone for mouse movement to prevent jittering")] private float mouseDeadzone;
+    private float swayAmount;
+    private float swaySmoothness;
+    private float rotationSwayAmount;
+    private float rotationSwaySmoothness;
+    private float breathingAmplitude;
+    private float breathingFrequency;
+    [Tooltip("Deadzone for mouse movement to prevent jittering in sway effect")] private float mouseSwayDeadzone;
     private Vector3 initialPosition;
     private Quaternion initialRotation;
     private Vector3 swayVelocity;
 
-    private void Start() {
+    public void Initialize(float swayAmount, float swaySmoothness, float rotationSwayAmount, float rotationSwaySmoothness, float breathingAmplitude, float breathingFrequency, float mouseSwayDeadzone) {
+
+        this.swayAmount = swayAmount;
+        this.swaySmoothness = swaySmoothness;
+        this.rotationSwayAmount = rotationSwayAmount;
+        this.rotationSwaySmoothness = rotationSwaySmoothness;
+        this.breathingAmplitude = breathingAmplitude;
+        this.breathingFrequency = breathingFrequency;
+        this.mouseSwayDeadzone = mouseSwayDeadzone;
 
         playerController = FindFirstObjectByType<PlayerController>();
 
@@ -26,34 +34,43 @@ public class HeldToolSway : MonoBehaviour {
 
     }
 
-    // LateUpdate is used to ensure the sway happens after all other updates, preventing jittering
-    private void LateUpdate() {
+    public void HandleSway(float mouseX, float mouseY, bool enableBreathing, bool enableHeadbob, bool enableSway) {
 
-        float moveX = Input.GetAxis("Mouse X");
-        float moveY = Input.GetAxis("Mouse Y");
-
-        if (Mathf.Abs(moveX) < mouseDeadzone) moveX = 0f; // if the mouse movement is less than the deadzone, set it to 0 to prevent jittering
-        if (Mathf.Abs(moveY) < mouseDeadzone) moveY = 0f; // if the mouse movement is less than the deadzone, set it to 0 to prevent jittering
+        if (Mathf.Abs(mouseX) < mouseSwayDeadzone) mouseX = 0f; // if the mouse movement is less than the deadzone, set it to 0 to prevent jittering
+        if (Mathf.Abs(mouseY) < mouseSwayDeadzone) mouseY = 0f; // if the mouse movement is less than the deadzone, set it to 0 to prevent jittering
 
         // invert the sway directions for a more natural feel
-        moveX *= -swayAmount;
-        moveY *= -swayAmount;
+        if (enableSway) {
 
-        float breathingOffset = Mathf.Sin(Time.time * breathingFrequency) * breathingAmplitude; // add breathing offset (smooth up and down bobbing)
+            mouseX *= -swayAmount;
+            mouseY *= -swayAmount;
 
-        float headbobOffset = playerController ? playerController.GetHeadbobOffset() : 0f; // add headbob offset from the camera movement
+        } else {
+
+            mouseX = 0f;
+            mouseY = 0f;
+
+        }
+
+        float breathingOffset = enableBreathing ? Mathf.Sin(Time.time * breathingFrequency) * breathingAmplitude : 0f; // add breathing offset (smooth up and down bobbing)
+
+        float headbobOffset = (enableHeadbob && playerController) ? playerController.GetHeadbobOffset() : 0f; // add headbob offset from the camera movement
 
         // calculate the target position and rotation based on mouse movement
-        Vector3 targetPosition = initialPosition + new Vector3(moveX, moveY + breathingOffset + headbobOffset, 0);
+        Vector3 targetPosition = initialPosition + new Vector3(mouseX, mouseY + breathingOffset + headbobOffset, 0);
         transform.localPosition = Vector3.SmoothDamp(transform.localPosition, targetPosition, ref swayVelocity, 1f / swaySmoothness);
 
         // calculate the rotations based on mouse movement
-        float rotX = moveY * rotationSwayAmount;
-        float rotY = moveX * rotationSwayAmount;
+        float rotX = mouseY * rotationSwayAmount;
+        float rotY = mouseX * rotationSwayAmount;
 
         // apply the rotations to the initial rotation
         Quaternion targetRotation = Quaternion.Euler(rotX, -rotY, 0);
         transform.localRotation = Quaternion.Slerp(transform.localRotation, initialRotation * targetRotation, Time.deltaTime * rotationSwaySmoothness);
 
     }
+
+    // smoothly returns the sway position and rotation to the initial position and rotation.
+    public void SmoothReturnToCenter() => transform.SetLocalPositionAndRotation(Vector3.SmoothDamp(transform.localPosition, initialPosition, ref swayVelocity, 1f / swaySmoothness), Quaternion.Slerp(transform.localRotation, initialRotation, Time.deltaTime * rotationSwaySmoothness));
+
 }
