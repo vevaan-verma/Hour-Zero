@@ -15,13 +15,13 @@ public class RepairInventoryUI : InventoryUI {
         inventorySlots = new Slot[inventory.GetInitialSlotCount()];
 
         // delete all existing slots in the inventory contents
-        foreach (Transform child in inventoryContents)
+        foreach (Transform child in inventoryContents.transform)
             Destroy(child.gameObject);
 
         // instantiate the slots based on the current capacity of the inventory
         for (int i = 0; i < inventorySlots.Length; i++) {
 
-            Slot slot = Instantiate(slotPrefab, inventoryContents);
+            Slot slot = Instantiate(slotPrefab, inventoryContents.transform);
             slot.transform.name = $"Slot{i + 1}";
             slot.Initialize(inventory, i, inventory.GetItemStack(i).GetItem(), inventory.GetItemStack(i).GetCount(), showItemInfoWidgetOnHover); // initialize the slot
             inventorySlots[i] = slot; // store the slot in the array for later reference

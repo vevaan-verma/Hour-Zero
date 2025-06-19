@@ -9,7 +9,7 @@ public class RepairInventory : Inventory {
     private int repairPercent;
     private BunkerSystemType systemType;
 
-    public void Initialize(ItemStack[] repairStacks, int repairSlotCount, int repairPercent, BunkerSystemType systemType) {
+    public void Initialize(ItemStack[] repairStacks, int repairPercent, BunkerSystemType systemType) {
 
         this.repairStacks = repairStacks; // set the repair stack to the stack that is required for repairing
         this.initialSlotCount = repairStacks.Length; // set the initial slot count to the number of items that are required for repairing
@@ -74,6 +74,7 @@ public class RepairInventoryEditor : Editor {
 
         // draw all properties except the excluded ones
         DrawPropertiesExcluding(serializedObject,
+            "slotsPerRow",
             "initialSlotCount",
             "slotStackLimit",
             "itemTypeFilterType",

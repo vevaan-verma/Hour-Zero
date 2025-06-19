@@ -22,7 +22,7 @@ public class Item : ScriptableObject {
 
     public ItemType GetItemType() => itemType;
 
-    public GameObject GetHeldToolPrefab() => heldToolPrefab;
+    public GameObject GetHeldItemPrefab() => heldToolPrefab;
 
     public override bool Equals(object other) => other is Item item && itemName == item.itemName && icon == item.icon && stackLimit == item.stackLimit;
 

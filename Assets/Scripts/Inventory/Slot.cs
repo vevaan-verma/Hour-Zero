@@ -69,13 +69,13 @@ public class Slot : MonoBehaviour, IDropHandler, IPointerEnterHandler, IPointerE
             if (GetItem() != null && GetItem() == sourceStack.GetItem()) { // check if the item in this slot is the same as the one being dropped, which would allow stacking (same regardless of if the interaction is between different inventories or not)
 
                 int remainder = sourceInventory.SetItemStack(new ItemStack(sourceStack.GetItem(), GetCount() + sourceStack.GetCount()), targetIndex); // set the item stack in the target inventory to the one being dropped and get the remainder of items that couldn't be added
+
                 sourceInventory.SetItemStack(new ItemStack(sourceStack.GetItem(), remainder), sourceIndex); // set the source slot to empty or the remainder of the source stack that wasn't stacked
 
             } else { // items are different, so we can't stack them; swapping is needed here
 
                 if (targetStack.GetItem() == null) { // if the target slot is empty, we can just set the item there
 
-                    print(targetIndex);
                     sourceInventory.SetItemStack(new ItemStack(sourceStack.GetItem(), sourceStack.GetCount()), targetIndex); // set the item stack in the target inventory to the one being dropped
                     sourceInventory.SetItemStack(new ItemStack(null, 0), sourceIndex); // set the source slot to empty
 
@@ -101,6 +101,9 @@ public class Slot : MonoBehaviour, IDropHandler, IPointerEnterHandler, IPointerE
                 int remainder = targetInventory.SetItemStack(new ItemStack(sourceStack.GetItem(), sourceStack.GetCount()), targetIndex); // set the item stack in the target inventory to the one being dropped and get the remainder of items that couldn't be added
 
                 if (remainder > 0) {
+
+                    //// if the remainder is equal to the count of the item being dropped, we can return as that means the target slot had no space for the item being dropped; this is here to prevent a re-equip animation from playing when the item being dropped is entirely returned to its source slot
+                    //if (remainder == sourceStack.GetCount()) return;
 
                     sourceInventory.SetItemStack(new ItemStack(sourceStack.GetItem(), remainder), sourceIndex); // since a remainder was returned, we need to set the source slot to the item in the source stack with the remainder count because we prioritize the remainder over the target slot item
                     remainder = sourceInventory.AddItemStack(new ItemStack(targetStack.GetItem(), targetStack.GetCount())); // add the target slot item to the source inventory if possible and get the remainder of items that couldn't be added (since we prioritize the remainder of the dropped item over the target slot item)

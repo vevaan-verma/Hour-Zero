@@ -34,7 +34,7 @@ public class PlayerController : MonoBehaviour {
     private Hotbar hotbar;
 
     [Header("Holding")]
-    [SerializeField] private HeldToolSway heldToolSway;
+    [SerializeField] private HeldItemSway heldItemSway;
 
     [Header("Headbob")]
     [SerializeField] private float walkBobSpeed;
@@ -45,7 +45,7 @@ public class PlayerController : MonoBehaviour {
     private float defaultYPos;
     private float timer;
 
-    [Header("Tool Sway")]
+    [Header("Held Item Sway")]
     [SerializeField] private float swayAmount;
     [SerializeField] private float swaySmoothness;
     [SerializeField] private float rotationSwayAmount;
@@ -73,7 +73,7 @@ public class PlayerController : MonoBehaviour {
         rb = GetComponent<Rigidbody>();
         hotbar = FindFirstObjectByType<Hotbar>();
 
-        heldToolSway.Initialize(swayAmount, swaySmoothness, rotationSwayAmount, rotationSwaySmoothness, breathingAmplitude, breathingFrequency, mouseSwayDeadzone); // initialize the held tool sway with the settings
+        heldItemSway.Initialize(swayAmount, swaySmoothness, rotationSwayAmount, rotationSwaySmoothness, breathingAmplitude, breathingFrequency, mouseSwayDeadzone); // initialize the held item sway with the settings
 
         defaultYPos = cameraPos.localPosition.y; // for headbob
 
@@ -188,11 +188,11 @@ public class PlayerController : MonoBehaviour {
 
         bool menuOpen = uiManager.IsMenuOpen();
 
-        // if a menu is open, smoothly return the held tool position to the center point
+        // if a menu is open, smoothly return the held item position to the center point
         if (menuOpen)
-            heldToolSway.SmoothReturnToCenter();
+            heldItemSway.SmoothReturnToCenter();
 
-        heldToolSway.HandleSway(mouseX, mouseY, true, !menuOpen, !menuOpen); // handle the sway effect for the held tool based on mouse movement; use LateUpdate to calculate sway to ensure the sway happens after all other updates, preventing jittering; the breathe effect is always enabled, headbob is enabled when not in a menu, and sway is enabled when not in a menu
+        heldItemSway.HandleSway(mouseX, mouseY, true, !menuOpen, !menuOpen); // handle the sway effect for the held item based on mouse movement; use LateUpdate to calculate sway to ensure the sway happens after all other updates, preventing jittering; the breathe effect is always enabled, headbob is enabled when not in a menu, and sway is enabled when not in a menu
 
     }
 
@@ -217,15 +217,15 @@ public class PlayerController : MonoBehaviour {
         }
     }
 
-    public void SetHeldTool(GameObject toolPrefab) {
+    public void SetHeldItem(GameObject heldItemPrefab) {
 
-        // destroy any existing held tool prefab at the held tool position
-        foreach (Transform child in heldToolSway.transform)
+        // destroy any existing held item prefab at the held item position
+        foreach (Transform child in heldItemSway.transform)
             Destroy(child.gameObject);
 
-        // instantiate the new held tool prefab at the held tool position if the toolPrefab is not null (a null parameter would clear the held tool)
-        if (toolPrefab)
-            Instantiate(toolPrefab, heldToolSway.transform.position, heldToolSway.transform.rotation, heldToolSway.transform); // instantiate the held tool prefab at the held tool position
+        // instantiate the new held item prefab at the held item position if the heldItemPrefab is not null (a null parameter would clear the held item)
+        if (heldItemPrefab)
+            Instantiate(heldItemPrefab, heldItemSway.transform.position, heldItemSway.transform.rotation, heldItemSway.transform); // instantiate the held item prefab at the held item position
 
     }
 

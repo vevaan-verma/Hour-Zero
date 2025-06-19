@@ -5,6 +5,7 @@ using UnityEngine;
 public abstract class Inventory : MonoBehaviour {
 
     [Header("Settings")]
+    [SerializeField, Tooltip("The number of slots to show per row in the inventory UI (used to calculate the size of the inventory contents grid layout group)")] protected int slotsPerRow;
     [SerializeField, Min(1)] protected int initialSlotCount;
     [SerializeField, Tooltip("The maximum number of items that can be stacked in a slot. If set to 0, it will either use the item's stack limit, or if that is set to 0, an infinite limit")] private int slotStackLimit;
     [SerializeField, Tooltip("Type of filter to apply to the item types in the filteredItemTypes array (e.g., whitelist or blacklist)")] protected FilterType itemTypeFilterType;
@@ -137,7 +138,7 @@ public abstract class Inventory : MonoBehaviour {
     }
 
     // returns the amount of items that could not be removed from the inventory
-    public int RemoveItemStack(ItemStack itemStack) {
+    public virtual int RemoveItemStack(ItemStack itemStack) {
 
         Item item = itemStack.GetItem();
         int count = itemStack.GetCount();
@@ -170,7 +171,7 @@ public abstract class Inventory : MonoBehaviour {
 
     }
 
-    public bool ContainsItemStack(ItemStack itemStack) {
+    public virtual bool ContainsItemStack(ItemStack itemStack) {
 
         Item item = itemStack.GetItem();
         int count = itemStack.GetCount();
@@ -219,7 +220,11 @@ public abstract class Inventory : MonoBehaviour {
 
     public ItemStack GetItemStack(int index) => contents[index];
 
+    public int GetSlotsPerRow() => slotsPerRow;
+
     public int GetInitialSlotCount() => initialSlotCount;
+
+    public int GetCurrentSlotCount() => currSlotCount;
 
     public int GetStackLimit() => slotStackLimit;
 

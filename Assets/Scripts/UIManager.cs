@@ -100,12 +100,12 @@ public class UIManager : MonoBehaviour {
 
     }
 
-    public void OpenSystemRepairMenu(ItemStack[] repairStacks, int repairSlotCount, int repairPercent, BunkerSystemType systemType) {
+    public void OpenSystemRepairMenu(ItemStack[] repairStacks, int repairPercent, BunkerSystemType systemType) {
 
         if (IsMenuOpen() || systemRepairMenu.IsMenuOpen()) return; // do nothing if another menu is open or if the system repair menu is already open
 
         hotbarUI.CloseInventory(); // close the hotbar UI if it is open (this is done to ensure the hotbar is not visible when the system repair menu is open)
-        systemRepairMenu.OpenMenu(repairStacks, repairSlotCount, repairPercent, systemType); // open the system repair menu
+        systemRepairMenu.OpenMenu(repairStacks, repairPercent, systemType); // open the system repair menu
 
     }
 

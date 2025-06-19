@@ -5,6 +5,7 @@ using UnityEngine.UI;
 public class BackpackUI : InventoryUI {
 
     [Header("References")]
+    private UIManager uiManager;
     private Animator animator;
     private Coroutine backpackCloseCoroutine;
 
@@ -13,13 +14,15 @@ public class BackpackUI : InventoryUI {
 
     [Header("Settings")]
     [SerializeField] private BackpackType backpackType;
+    // the last [slotsPerRow] amount of slots of the backpack are the hotbar slots
 
     public override void Initialize() {
 
+        uiManager = FindFirstObjectByType<UIManager>();
         inventory = FindFirstObjectByType<Backpack>(FindObjectsInactive.Include); // find the backpack in the scene
         animator = GetComponent<Animator>();
 
-        closeBackpackButton.onClick.AddListener(CloseInventory); // add listener to close backpack button
+        closeBackpackButton.onClick.AddListener(uiManager.ClosePrimaryBackpack); // add listener to close backpack button; call the UIManager method to close the primary backpack rather than this class directly to ensure the extra logic is executed too (e.g. closing the hotbar UI)
         closeBackpackButton.gameObject.SetActive(backpackType == BackpackType.Primary); // only show the close button if this is the primary backpack
 
         base.Initialize();
@@ -32,7 +35,7 @@ public class BackpackUI : InventoryUI {
 
         if (backpackCloseCoroutine != null) StopCoroutine(backpackCloseCoroutine); // stop any existing backpack close coroutine
 
-        RefreshInventory(); // refresh the backpack slots to ensure they are up to date
+        RefreshInventory(); // refresh the backpack inventory UI to ensure it is up to date before opening
 
         isInventoryOpen = true;
         closeBackpackButton.interactable = true; // enable close button to allow closing backpack
@@ -48,8 +51,6 @@ public class BackpackUI : InventoryUI {
     public override void CloseInventory() {
 
         if (!isInventoryOpen) return; // do nothing if the backpack is already closed
-
-        RefreshInventory(); // refresh the backpack slots to ensure they are up to date
 
         isInventoryOpen = false; // set the state to closed before waiting for animation because it feels better if the player can move and look around while the backpack is closing
         closeBackpackButton.interactable = false; // disable close button to prevent multiple clicks (as this could mess with the toggle logic)

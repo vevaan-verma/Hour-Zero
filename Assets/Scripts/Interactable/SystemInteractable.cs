@@ -18,6 +18,6 @@ public class SystemInteractable : Interactable {
 
     }
 
-    public override void Interact() => uiManager.OpenSystemRepairMenu(repairStacks, repairSlotCount, repairPercent, systemType); // open the system repair menu
+    public override void Interact() => uiManager.OpenSystemRepairMenu(repairStacks, repairPercent, systemType); // open the system repair menu
 
 }

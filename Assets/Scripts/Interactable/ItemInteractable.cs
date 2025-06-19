@@ -28,8 +28,7 @@ public class ItemInteractable : Interactable {
 
         if (destroyed) return; // if already destroyed, do nothing
 
-        int remainder = hotbar.AddItemStack(new ItemStack(item, itemCount)); // try to add the item to the hotbar first
-        remainder = backpack.AddItemStack(new ItemStack(item, remainder)); // then try to add the remainder to the backpack
+        int remainder = backpack.AddItemStack(new ItemStack(item, itemCount)); // add the item stack to the backpack
 
         currCount = remainder; // update the current count of the item interactable
 

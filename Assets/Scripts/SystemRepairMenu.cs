@@ -37,12 +37,12 @@ public class SystemRepairMenu : MonoBehaviour {
 
     }
 
-    public void OpenMenu(ItemStack[] repairStacks, int repairSlotCount, int repairPercent, BunkerSystemType systemType) {
+    public void OpenMenu(ItemStack[] repairStacks, int repairPercent, BunkerSystemType systemType) {
 
         isMenuOpen = true; // set the menu state to open
         menuPanel.gameObject.SetActive(true); // make sure the menu is active
 
-        repairInventory.Initialize(repairStacks, repairSlotCount, repairPercent, systemType); // initialize the repair inventory with the required stack, slot count, and repair percent
+        repairInventory.Initialize(repairStacks, repairPercent, systemType); // initialize the repair inventory with the required stack, slot count, and repair percent
         repairBackpackUI.OpenInventory(); // open the backpack UI for repairing systems (do this after starting the coroutine to ensure the menu is active)
         repairInventoryUI.OpenInventory(); // open the repair inventory UI
 
