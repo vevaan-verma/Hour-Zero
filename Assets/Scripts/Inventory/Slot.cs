@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEngine.EventSystems;
+using UnityEngine.UI;
 
 public class Slot : MonoBehaviour, IDropHandler, IPointerEnterHandler, IPointerExitHandler {
 
@@ -8,6 +9,7 @@ public class Slot : MonoBehaviour, IDropHandler, IPointerEnterHandler, IPointerE
     private ItemInfoWidget currItemInfoWidget;
     private ItemHolder itemHolder;
     private Inventory inventory;
+    protected Image image;
 
     [Header("Settings")]
     private bool showItemInfoWidgetOnHover;
@@ -16,7 +18,7 @@ public class Slot : MonoBehaviour, IDropHandler, IPointerEnterHandler, IPointerE
     private Item item;
     private int index;
 
-    public virtual void Initialize(Inventory inventory, int index, Item item, int count, bool showItemInfoWidgetOnHover) {
+    public virtual void Initialize(Inventory inventory, int index, Item item, int count, bool showItemInfoWidgetOnHover, Color? slotColor = null) {
 
         this.inventory = inventory;
         this.index = index;
@@ -24,6 +26,11 @@ public class Slot : MonoBehaviour, IDropHandler, IPointerEnterHandler, IPointerE
         // no need to set item here since it gets set in the SetItem method
 
         itemHolder = GetComponentInChildren<ItemHolder>();
+        image = GetComponent<Image>();
+
+        // set the color of the slot to the one provided if it is not null, otherwise use the default color of the slot
+        if (slotColor != null)
+            image.color = (Color) slotColor;
 
         itemHolder.Initialize(); // initialize the item holder
         SetItem(item, count); // initialize the slot with no item and count 0

@@ -5,7 +5,6 @@ using UnityEngine.UI;
 public class HotbarSlot : Slot {
 
     [Header("References")]
-    private Image image;
     private Coroutine fadeCoroutine;
 
     [Header("Settings")]
@@ -14,12 +13,10 @@ public class HotbarSlot : Slot {
     private Color initialColor;
     private bool isSelected;
 
-    public override void Initialize(Inventory inventory, int index, Item item, int count, bool showItemInfoWidgetOnHover) {
+    public override void Initialize(Inventory inventory, int index, Item item, int count, bool showItemInfoWidgetOnHover, Color? slotColor) {
 
-        base.Initialize(inventory, index, item, count, showItemInfoWidgetOnHover);
-
-        image = GetComponent<Image>();
-        initialColor = image.color; // store the initial color of the slot
+        base.Initialize(inventory, index, item, count, showItemInfoWidgetOnHover, slotColor);
+        initialColor = image.color; // store the initial color of the slot; takes place after the base initialization to ensure the color is set correctly if a custom color is provided
 
     }
 
