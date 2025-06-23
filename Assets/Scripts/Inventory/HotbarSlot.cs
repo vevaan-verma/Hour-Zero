@@ -1,6 +1,5 @@
 using System.Collections;
 using UnityEngine;
-using UnityEngine.UI;
 
 public class HotbarSlot : Slot {
 
@@ -13,9 +12,9 @@ public class HotbarSlot : Slot {
     private Color initialColor;
     private bool isSelected;
 
-    public override void Initialize(Inventory inventory, int index, Item item, int count, bool showItemInfoWidgetOnHover, Color? slotColor) {
+    public override void Initialize(Inventory inventory, InventoryUI inventoryUI, int index, ItemStack itemStack, bool showItemInfoWidgetOnHover, Color? slotColor) {
 
-        base.Initialize(inventory, index, item, count, showItemInfoWidgetOnHover, slotColor);
+        base.Initialize(inventory, inventoryUI, index, itemStack, showItemInfoWidgetOnHover, slotColor);
         initialColor = image.color; // store the initial color of the slot; takes place after the base initialization to ensure the color is set correctly if a custom color is provided
 
     }

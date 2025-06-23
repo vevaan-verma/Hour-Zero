@@ -33,6 +33,8 @@ public class Item : ScriptableObject {
 [Serializable]
 public class ItemStack {
 
+    // don't check if this object is null, check if the item is null instead because empty slots store empty item stacks, but null item objects
+
     [Header("Data")]
     [SerializeField] private Item item;
     [SerializeField] private int count;
@@ -66,7 +68,7 @@ public class ItemEditor : UnityEditor.Editor {
 
         serializedObject.Update();
 
-        // Replace the individual PropertyField lines with this block to draw all properties except "heldToolPrefab"
+        // replace the individual PropertyField lines with this block to draw all properties except "heldToolPrefab"
         UnityEditor.SerializedProperty prop = serializedObject.GetIterator();
         bool enterChildren = true;
 
@@ -82,7 +84,7 @@ public class ItemEditor : UnityEditor.Editor {
 
         }
 
-        // hides the grip position field if the item type is not a tool
+        // hides the heldToolPrefab field if the item type is not a tool
         if ((ItemType) serializedObject.FindProperty("itemType").enumValueIndex == ItemType.Tool)
             UnityEditor.EditorGUILayout.PropertyField(serializedObject.FindProperty("heldToolPrefab"), new GUIContent("Held Tool Prefab"));
 

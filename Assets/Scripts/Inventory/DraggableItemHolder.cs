@@ -20,7 +20,7 @@ public class DraggableItemHolder : ItemHolder, IBeginDragHandler, IDragHandler, 
     public void OnBeginDrag(PointerEventData eventData) {
 
         // if the item being dragged is null, destroy the dragged item to cancel the drag
-        if (item == null) {
+        if (itemStack.GetItem() == null) {
 
             Destroy(eventData.pointerDrag);
             return;
@@ -45,7 +45,7 @@ public class DraggableItemHolder : ItemHolder, IBeginDragHandler, IDragHandler, 
         if (eventData.pointerCurrentRaycast.gameObject == null || !eventData.pointerCurrentRaycast.gameObject.GetComponent<Slot>())
             Destroy(eventData.pointerDrag);
 
-        initialSlot.SetItem(item, count); // reset the item and count in the initial slot
+        initialSlot.SetItemStack(itemStack); // reset the item and count in the initial slot
         itemIcon.color = initialColor; // reset the image color when dragging ends
         itemIcon.raycastTarget = true; // re-enable raycast target
 

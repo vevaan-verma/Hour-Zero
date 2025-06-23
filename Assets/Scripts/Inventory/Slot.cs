@@ -2,25 +2,27 @@ using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
-public class Slot : MonoBehaviour, IDropHandler, IPointerEnterHandler, IPointerExitHandler {
+public class Slot : MonoBehaviour, IDropHandler, IPointerEnterHandler, IPointerExitHandler, IPointerClickHandler {
 
     [Header("References")]
     [SerializeField] private ItemInfoWidget itemInfoWidgetPrefab;
     private ItemInfoWidget currItemInfoWidget;
     private ItemHolder itemHolder;
     private Inventory inventory;
+    private InventoryUI inventoryUI;
     protected Image image;
 
     [Header("Settings")]
     private bool showItemInfoWidgetOnHover;
 
     [Header("Data")]
-    private Item item;
+    private ItemStack itemStack;
     private int index;
 
-    public virtual void Initialize(Inventory inventory, int index, Item item, int count, bool showItemInfoWidgetOnHover, Color? slotColor = null) {
+    public virtual void Initialize(Inventory inventory, InventoryUI inventoryUI, int index, ItemStack itemStack, bool showItemInfoWidgetOnHover, Color? slotColor = null) {
 
         this.inventory = inventory;
+        this.inventoryUI = inventoryUI;
         this.index = index;
         this.showItemInfoWidgetOnHover = showItemInfoWidgetOnHover;
         // no need to set item here since it gets set in the SetItem method
@@ -33,7 +35,7 @@ public class Slot : MonoBehaviour, IDropHandler, IPointerEnterHandler, IPointerE
             image.color = (Color) slotColor;
 
         itemHolder.Initialize(); // initialize the item holder
-        SetItem(item, count); // initialize the slot with no item and count 0
+        SetItemStack(itemStack); // initialize the slot with the provided item stack
 
         transform.GetChild(0).name = $"ItemHolder{index + 1}"; // rename the item holder child to reflect its index
 
@@ -41,15 +43,23 @@ public class Slot : MonoBehaviour, IDropHandler, IPointerEnterHandler, IPointerE
 
     private void OnDisable() => DestroyCurrentItemInfoWidget(); // destroy the item info widget if it exists (prevents the widget from being shown when the inventory is closed)
 
+    public void OnPointerClick(PointerEventData eventData) {
+
+        // check if shift + left click is pressed to activate quick transfer and make sure the item is not null to make sure there is something to transfer
+        if (Input.GetKey(KeyCode.LeftShift) && itemStack.GetItem() != null)
+            inventory.QuickTransferItem(inventoryUI.GetQuickTransferInventory(), itemStack, index);
+
+    }
+
     public void OnPointerEnter(PointerEventData eventData) {
 
-        if (eventData.dragging || item == null || !showItemInfoWidgetOnHover) return; // if the slot is empty or the item info widget is disabled, do nothing
+        if (eventData.dragging || itemStack.GetItem() == null || !showItemInfoWidgetOnHover) return; // if the slot is empty or the item info widget is disabled, do nothing
 
         DestroyCurrentItemInfoWidget(); // destroy the item info widget if it exists
 
         currItemInfoWidget = Instantiate(itemInfoWidgetPrefab, Input.mousePosition, Quaternion.identity, transform.root); // instantiate the special item info widget at the mouse position and set its parent to the root transform; the root transform is used to ensure that the special item info widget is always in the same space as the root object and not in world space
         currItemInfoWidget.transform.SetAsLastSibling(); // set the widget to the front
-        currItemInfoWidget.Initialize(item); // initialize the widget with the special item
+        currItemInfoWidget.Initialize(itemStack); // initialize the widget with the special item
 
     }
 
@@ -126,11 +136,11 @@ public class Slot : MonoBehaviour, IDropHandler, IPointerEnterHandler, IPointerE
         }
     }
 
-    public void SetItem(Item item, int count) {
+    public void SetItemStack(ItemStack itemStack) {
 
-        this.item = item; // set the item in this slot to the one being dropped
+        this.itemStack = itemStack; // set the item stack in this slot to the one being dropped
 
-        itemHolder.SetItem(item, count); // set the item and count in the new slot item holder
+        itemHolder.SetItemStack(itemStack); // set the item stack in the new slot item holder
         itemHolder.transform.SetParent(transform); // set the parent of the new item to this slot
         itemHolder.transform.SetAsFirstSibling(); // set to the first sibling so the count text appears on top
         itemHolder.transform.position = transform.position; // move the new item to the position of this slot

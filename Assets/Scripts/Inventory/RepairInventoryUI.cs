@@ -23,7 +23,8 @@ public class RepairInventoryUI : InventoryUI {
 
             Slot slot = Instantiate(slotPrefab, inventoryContents.transform);
             slot.transform.name = $"Slot{i + 1}";
-            slot.Initialize(inventory, i, inventory.GetItemStack(i).GetItem(), inventory.GetItemStack(i).GetCount(), showItemInfoWidgetOnHover); // initialize the slot
+            ItemStack itemStack = inventory.GetItemStack(i); // get the item stack from the inventory at the corresponding index
+            slot.Initialize(inventory, this, i, new ItemStack(itemStack.GetItem(), itemStack.GetCount()), showItemInfoWidgetOnHover); // initialize the slot
             inventorySlots[i] = slot; // store the slot in the array for later reference
 
         }

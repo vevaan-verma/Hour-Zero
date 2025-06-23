@@ -13,10 +13,17 @@ public abstract class InventoryUI : MonoBehaviour {
     [SerializeField] protected GridLayoutGroup inventoryContents;
 
     [Header("Settings")]
+    [SerializeField] private bool quickTransferEnabled;
+    [SerializeField, Tooltip("The inventory that can be used for quick transfering items between inventories.")] private Inventory quickTransferInventory;
     [SerializeField, Tooltip("Whether to show the item info widget when hovering over an item in the inventory")] protected bool showItemInfoWidgetOnHover;
     protected bool isInventoryOpen;
 
     public virtual void Initialize() {
+
+        #region VALIDATION
+        if (quickTransferEnabled && quickTransferInventory == null)
+            Debug.LogError("Quick transfer is enabled but no quick transfer inventory is set on " + gameObject.name);
+        #endregion
 
         uiPanel.gameObject.SetActive(inventory.IsVisibleByDefault());
 
@@ -50,7 +57,8 @@ public abstract class InventoryUI : MonoBehaviour {
 
             Slot slot = Instantiate(slotPrefab, inventoryContents.transform);
             slot.transform.name = $"Slot{i + 1}";
-            slot.Initialize(inventory, i, inventory.GetItemStack(i).GetItem(), inventory.GetItemStack(i).GetCount(), showItemInfoWidgetOnHover); // initialize the slot
+            ItemStack itemStack = inventory.GetItemStack(i); // get the item stack from the inventory at the corresponding index
+            slot.Initialize(inventory, this, i, new ItemStack(itemStack.GetItem(), itemStack.GetCount()), showItemInfoWidgetOnHover); // initialize the slot
             inventorySlots[i] = slot; // store the slot in the array for later reference
 
         }
@@ -62,4 +70,41 @@ public abstract class InventoryUI : MonoBehaviour {
 
     public bool IsInventoryOpen() => isInventoryOpen;
 
+    public Inventory GetQuickTransferInventory() => quickTransferInventory;
+
 }
+
+#if UNITY_EDITOR
+// using UnityEditor prefix to avoid needing to hide the import in the final build
+[UnityEditor.CustomEditor(typeof(InventoryUI), true)]
+public class InventoryUIEditor : UnityEditor.Editor {
+
+    public override void OnInspectorGUI() {
+
+        serializedObject.Update();
+
+        // replace the individual PropertyField lines with this block to draw all properties except "quickTransferInventory"
+        UnityEditor.SerializedProperty prop = serializedObject.GetIterator();
+        bool enterChildren = true;
+
+        while (prop.NextVisible(enterChildren)) {
+
+            enterChildren = false;
+
+            // skip the quickTransferInventory property
+            if (prop.name == "quickTransferInventory")
+                continue;
+
+            UnityEditor.EditorGUILayout.PropertyField(prop, true); // show all properties except quickTransferInventory
+
+        }
+
+        // hides the quickTransferInventory field if quick transfer is not enabled
+        if (serializedObject.FindProperty("quickTransferEnabled").boolValue == true)
+            UnityEditor.EditorGUILayout.PropertyField(serializedObject.FindProperty("quickTransferInventory"), new GUIContent("Quick Transfer Inventory"));
+
+        serializedObject.ApplyModifiedProperties();
+
+    }
+}
+#endif

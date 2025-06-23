@@ -1,5 +1,4 @@
 using System;
-using UnityEditor;
 using UnityEngine;
 
 public class Hotbar : Inventory {
@@ -82,7 +81,7 @@ public class Hotbar : Inventory {
 
     }
 
-    public override int RemoveItemStack(ItemStack itemStack) {
+    public override int RemoveItemStack(ItemStack itemStack, int? slotIndex = null) {
 
         Debug.LogError("Cannot remove ItemStack directly from the hotbar. Please remove items through the backpack."); // output error because ItemStacks cannot be removed from the hotbar directly, they must go through the backpack instead
         return -1;
@@ -110,8 +109,9 @@ public class Hotbar : Inventory {
 // since we need to constrain the slot count between 1 and 9
 // this is because each slot needs to have a single digit key binding from 1 to 9
 // </summary>
-[CustomEditor(typeof(Hotbar))]
-public class HotbarEditor : Editor {
+[UnityEditor.CustomEditor(typeof(Hotbar))]
+// using UnityEditor prefix to avoid needing to hide the import in the final build
+public class HotbarEditor : UnityEditor.Editor {
 
     public override void OnInspectorGUI() {
 

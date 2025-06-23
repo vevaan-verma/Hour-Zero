@@ -137,13 +137,36 @@ public abstract class Inventory : MonoBehaviour {
 
     }
 
-    // returns the amount of items that could not be removed from the inventory
-    public virtual int RemoveItemStack(ItemStack itemStack) {
+    // returns the amount of items that could not be removed from the inventory; allows specifying a slot index to remove from, or null to remove from any slot
+    public virtual int RemoveItemStack(ItemStack itemStack, int? slotIndex = null) {
 
         Item item = itemStack.GetItem();
         int count = itemStack.GetCount();
 
         if (item == null || count <= 0) return 0; // return 0 since we couldn't remove anything
+
+        // if the slot index is specified, remove from there first
+        if (slotIndex.HasValue && slotIndex >= 0 && slotIndex < contents.Count) {
+
+            ItemStack stack = contents[(int) slotIndex];
+
+            if (stack.GetItem() != null && stack.GetItem().Equals(item)) { // check if the stack contains the item
+
+                int toRemove = Mathf.Min(stack.GetCount(), count); // how many we can remove
+                int newCount = stack.GetCount() - toRemove; // calculate the new count after removing
+
+                SetItemStack(newCount > 0 ? new ItemStack(item, newCount) : new ItemStack(null, 0), slotIndex.Value); // set the item stack in the slot with the new count or empty if the count is 0
+
+                // SetItemStack returns the amount that could not be set, but for removal we already know the new count, so we just update count to reflect the removed items
+                count -= toRemove;
+
+                if (count <= 0)
+                    return 0; // return 0 since all items were removed
+
+            }
+        }
+
+        // if the slot index is not specified or there is still count left to remove, we need to search through the inventory contents
 
         // remove from the last slots first
         for (int i = contents.Count - 1; i >= 0; i--) {
@@ -155,10 +178,10 @@ public abstract class Inventory : MonoBehaviour {
                 int toRemove = Mathf.Min(stack.GetCount(), count); // how many we can remove
                 int newCount = stack.GetCount() - toRemove; // calculate the new count after removing
 
-                ItemStack newStack = newCount > 0 ? new ItemStack(item, newCount) : new ItemStack(null, 0); // create a new ItemStack with the reduced count or null if empty
-                contents[i] = newStack; // set the new stack in the slot
+                SetItemStack(newCount > 0 ? new ItemStack(item, newCount) : new ItemStack(null, 0), i); // set the item stack in the slot with the new count or empty if the count is 0
 
-                count -= toRemove; // reduce the count of items to remove
+                // SetItemStack returns the amount that could not be set, but for removal we already know the new count, so we just update count to reflect the removed items
+                count -= toRemove;
 
                 if (count <= 0)
                     return 0; // return 0 since all items were removed
@@ -216,6 +239,16 @@ public abstract class Inventory : MonoBehaviour {
 
     }
 
+    // targetQuickTransferInventory is the inventory to which the items will be quick transferred
+    public virtual void QuickTransferItem(Inventory quickTransferInventory, ItemStack itemStack, int slotIndex) {
+
+        if (quickTransferInventory == null) return; // if there is no quick transfer inventory, do nothing
+
+        int remainder = quickTransferInventory.AddItemStack(itemStack); // try to add the item stack to the quick transfer inventory
+        RemoveItemStack(new ItemStack(itemStack.GetItem(), itemStack.GetCount() - remainder), slotIndex); // remove the items that were successfully added to the quick transfer inventory from this inventory
+
+    }
+
     public List<ItemStack> GetContents() => contents;
 
     public ItemStack GetItemStack(int index) => contents[index];
@@ -225,8 +258,6 @@ public abstract class Inventory : MonoBehaviour {
     public int GetInitialSlotCount() => initialSlotCount;
 
     public int GetCurrentSlotCount() => currSlotCount;
-
-    public int GetStackLimit() => slotStackLimit;
 
     public bool IsVisibleByDefault() => visibleByDefault;
 

@@ -61,7 +61,7 @@ public class HotbarUI : InventoryUI {
             Slot slot = Instantiate(slotPrefab, inventoryContents.transform);
             slot.transform.name = $"Slot{i + 1}";
             ItemStack itemStack = backpack.GetItemStack(i); // get the item stack from the backpack at the corresponding index (because the hotbar is the top row of the backpack)
-            slot.Initialize(inventory, i, itemStack.GetItem(), itemStack.GetCount(), showItemInfoWidgetOnHover); // initialize the slot
+            slot.Initialize(inventory, this, i, new ItemStack(itemStack.GetItem(), itemStack.GetCount()), showItemInfoWidgetOnHover); // initialize the slot
             inventorySlots[i] = slot; // store the slot in the array for later reference
 
         }

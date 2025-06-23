@@ -19,7 +19,7 @@ public class ItemInfoWidget : MonoBehaviour {
     [Header("Settings")]
     [SerializeField] private float fadeDuration;
 
-    public void Initialize(Item item) {
+    public void Initialize(ItemStack itemStack) {
 
         canvasGroup = GetComponent<CanvasGroup>();
         rectTransform = GetComponent<RectTransform>();
@@ -31,6 +31,7 @@ public class ItemInfoWidget : MonoBehaviour {
         canvasCorners = new Vector3[4];
         canvasRect.GetWorldCorners(canvasCorners);
 
+        Item item = itemStack.GetItem(); // get the item from the item stack
         upgradeIcon.sprite = item.GetIcon();
         nameText.text = item.GetName();
         descriptionText.text = item.GetDescription();

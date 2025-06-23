@@ -1,4 +1,3 @@
-using UnityEditor;
 using UnityEngine;
 
 public class RepairInventory : Inventory {
@@ -65,8 +64,9 @@ public class RepairInventory : Inventory {
 }
 
 #if UNITY_EDITOR
-[CustomEditor(typeof(RepairInventory))]
-public class RepairInventoryEditor : Editor {
+[UnityEditor.CustomEditor(typeof(RepairInventory))]
+// using UnityEditor prefix to avoid needing to hide the import in the final build
+public class RepairInventoryEditor : UnityEditor.Editor {
 
     public override void OnInspectorGUI() {
 
