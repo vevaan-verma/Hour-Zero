@@ -59,7 +59,7 @@ public class Hotbar : Inventory {
 
         Item currentItem = backpack.GetItemStack(selectedIndex).GetItem();
 
-        // Only update if the selected index or item has changed
+        // only update if the selected index or item has changed
         if (selectedIndex == lastSelectedIndex && currentItem == lastSelectedItem)
             return;
 
@@ -68,7 +68,7 @@ public class Hotbar : Inventory {
         else
             playerController.SetHeldItem(currentItem.GetHeldItemPrefab()); // set the player's held item to the held item prefab of the item in the selected slot of the backpack; backpack is used since the hotbar is a part of the backpack (the top row)
 
-        // Track last selected index and item to prevent unnecessary re-equip animations
+        // track last selected index and item to prevent unnecessary re-equip animations
         lastSelectedIndex = selectedIndex;
         lastSelectedItem = currentItem;
 
@@ -76,12 +76,16 @@ public class Hotbar : Inventory {
 
     public override int AddItemStack(ItemStack itemStack) {
 
+        // no point implementing this method since there isn't really a situation where you would want to add an item stack to the hotbar directly; instead, items should be added through the backpack
+
         Debug.LogError("Cannot add ItemStack directly to the hotbar. Please add items through the backpack."); // output error because ItemStacks cannot be added to the hotbar directly, they must go through the backpack instead
         return -1;
 
     }
 
     public override int RemoveItemStack(ItemStack itemStack, int? slotIndex = null) {
+
+        // no point implementing this method since there isn't really a situation where you would want to remove an item stack from the hotbar directly; instead, items should be removed through the backpack
 
         Debug.LogError("Cannot remove ItemStack directly from the hotbar. Please remove items through the backpack."); // output error because ItemStacks cannot be removed from the hotbar directly, they must go through the backpack instead
         return -1;
@@ -100,15 +104,14 @@ public class Hotbar : Inventory {
 
     public override int GetEffectiveStackLimit(Item item) => backpack.GetEffectiveStackLimit(item); // since the hotbar is a part of the backpack, we can use the backpack's GetEffectiveStackLimit method to get the stack limit
 
+    public override ItemStack GetItemStack(int index) => backpack.GetItemStack(index); // return the item stack from the backpack at the given index; backpack is used since the hotbar is a part of the backpack (the top row)
+
     public int GetSelectedIndex() => selectedIndex;
+
+    public ItemStack GetSelectedItemStack() => backpack.GetItemStack(selectedIndex); // get the item stack in the selected slot of the backpack; backpack is used since the hotbar is a part of the backpack (the top row)
 
 }
 
-// <summary>
-// custom editor for the Hotbar class to allow for a range slider for the slotStackLimit field
-// since we need to constrain the slot count between 1 and 9
-// this is because each slot needs to have a single digit key binding from 1 to 9
-// </summary>
 [UnityEditor.CustomEditor(typeof(Hotbar))]
 // using UnityEditor prefix to avoid needing to hide the import in the final build
 public class HotbarEditor : UnityEditor.Editor {

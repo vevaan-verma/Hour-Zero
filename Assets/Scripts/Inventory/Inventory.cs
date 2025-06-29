@@ -137,7 +137,7 @@ public abstract class Inventory : MonoBehaviour {
 
     }
 
-    // returns the amount of items that could not be removed from the inventory; allows specifying a slot index to remove from, or null to remove from any slot
+    // returns the amount of items that could not be removed from the inventory; allows specifying a slot index to prioritize removing from, or null to remove from any slot
     public virtual int RemoveItemStack(ItemStack itemStack, int? slotIndex = null) {
 
         Item item = itemStack.GetItem();
@@ -251,7 +251,7 @@ public abstract class Inventory : MonoBehaviour {
 
     public List<ItemStack> GetContents() => contents;
 
-    public ItemStack GetItemStack(int index) => contents[index];
+    public virtual ItemStack GetItemStack(int index) => contents[index];
 
     public int GetSlotsPerRow() => slotsPerRow;
 

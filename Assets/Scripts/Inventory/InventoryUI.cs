@@ -83,23 +83,9 @@ public class InventoryUIEditor : UnityEditor.Editor {
 
         serializedObject.Update();
 
-        // replace the individual PropertyField lines with this block to draw all properties except "quickTransferInventory"
-        UnityEditor.SerializedProperty prop = serializedObject.GetIterator();
-        bool enterChildren = true;
+        DrawPropertiesExcluding(serializedObject, "quickTransferInventory"); // draw all properties except quickTransferInventory
 
-        while (prop.NextVisible(enterChildren)) {
-
-            enterChildren = false;
-
-            // skip the quickTransferInventory property
-            if (prop.name == "quickTransferInventory")
-                continue;
-
-            UnityEditor.EditorGUILayout.PropertyField(prop, true); // show all properties except quickTransferInventory
-
-        }
-
-        // hides the quickTransferInventory field if quick transfer is not enabled
+        // conditionally draw the quick transfer inventory field based on the quickTransferEnabled property
         if (serializedObject.FindProperty("quickTransferEnabled").boolValue == true)
             UnityEditor.EditorGUILayout.PropertyField(serializedObject.FindProperty("quickTransferInventory"), new GUIContent("Quick Transfer Inventory"));
 

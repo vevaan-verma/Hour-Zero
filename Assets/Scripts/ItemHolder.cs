@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class HeldItemSway : MonoBehaviour {
+public class ItemHolder : MonoBehaviour {
 
     [Header("References")]
     private PlayerController playerController;

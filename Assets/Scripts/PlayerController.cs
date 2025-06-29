@@ -33,9 +33,6 @@ public class PlayerController : MonoBehaviour {
     [Header("Hotbar")]
     private Hotbar hotbar;
 
-    [Header("Holding")]
-    [SerializeField] private HeldItemSway heldItemSway;
-
     [Header("Headbob")]
     [SerializeField] private float walkBobSpeed;
     [SerializeField] private float walkBobAmount;
@@ -45,7 +42,7 @@ public class PlayerController : MonoBehaviour {
     private float defaultYPos;
     private float timer;
 
-    [Header("Held Item Sway")]
+    [Header("Holding")]
     [SerializeField] private float swayAmount;
     [SerializeField] private float swaySmoothness;
     [SerializeField] private float rotationSwayAmount;
@@ -53,6 +50,8 @@ public class PlayerController : MonoBehaviour {
     [SerializeField] private float breathingAmplitude;
     [SerializeField] private float breathingFrequency;
     [SerializeField, Tooltip("Deadzone for mouse movement to prevent jittering in sway effect")] private float mouseSwayDeadzone;
+    private ItemHolder slotItemHolder;
+    private HeldItem currHeldItem;
 
     [Header("Interacting")]
     [SerializeField] private float interactDistance;
@@ -72,8 +71,9 @@ public class PlayerController : MonoBehaviour {
         uiManager = FindFirstObjectByType<UIManager>(); // find the UI manager in the scene
         rb = GetComponent<Rigidbody>();
         hotbar = FindFirstObjectByType<Hotbar>();
+        slotItemHolder = FindFirstObjectByType<ItemHolder>();
 
-        heldItemSway.Initialize(swayAmount, swaySmoothness, rotationSwayAmount, rotationSwaySmoothness, breathingAmplitude, breathingFrequency, mouseSwayDeadzone); // initialize the held item sway with the settings
+        slotItemHolder.Initialize(swayAmount, swaySmoothness, rotationSwayAmount, rotationSwaySmoothness, breathingAmplitude, breathingFrequency, mouseSwayDeadzone); // initialize the held item sway with the settings
 
         defaultYPos = cameraPos.localPosition.y; // for headbob
 
@@ -123,6 +123,11 @@ public class PlayerController : MonoBehaviour {
         for (int i = 0; i < 9; i++)
             if (Input.GetKeyDown((i + 1).ToString()))
                 hotbar.SelectSlot(i);
+        #endregion
+
+        #region TOOL USAGE
+        if (Input.GetMouseButtonDown(0) && currHeldItem) // check for left mouse button press and if there is a currently held item
+            currHeldItem.Attack(); // call the attack method on the held item
         #endregion
 
         #region HEADBOB
@@ -190,9 +195,9 @@ public class PlayerController : MonoBehaviour {
 
         // if a menu is open, smoothly return the held item position to the center point
         if (menuOpen)
-            heldItemSway.SmoothReturnToCenter();
+            slotItemHolder.SmoothReturnToCenter();
 
-        heldItemSway.HandleSway(mouseX, mouseY, true, !menuOpen, !menuOpen); // handle the sway effect for the held item based on mouse movement; use LateUpdate to calculate sway to ensure the sway happens after all other updates, preventing jittering; the breathe effect is always enabled, headbob is enabled when not in a menu, and sway is enabled when not in a menu
+        slotItemHolder.HandleSway(mouseX, mouseY, true, !menuOpen, !menuOpen); // handle the sway effect for the held item based on mouse movement; use LateUpdate to calculate sway to ensure the sway happens after all other updates, preventing jittering; the breathe effect is always enabled, headbob is enabled when not in a menu, and sway is enabled when not in a menu
 
     }
 
@@ -217,15 +222,17 @@ public class PlayerController : MonoBehaviour {
         }
     }
 
-    public void SetHeldItem(GameObject heldItemPrefab) {
+    public void SetHeldItem(HeldItem heldItemPrefab) {
 
         // destroy any existing held item prefab at the held item position
-        foreach (Transform child in heldItemSway.transform)
+        foreach (Transform child in slotItemHolder.transform)
             Destroy(child.gameObject);
 
         // instantiate the new held item prefab at the held item position if the heldItemPrefab is not null (a null parameter would clear the held item)
         if (heldItemPrefab)
-            Instantiate(heldItemPrefab, heldItemSway.transform.position, heldItemSway.transform.rotation, heldItemSway.transform); // instantiate the held item prefab at the held item position
+            currHeldItem = Instantiate(heldItemPrefab, slotItemHolder.transform.position, slotItemHolder.transform.rotation, slotItemHolder.transform); // instantiate the held item prefab at the held item position
+        else
+            currHeldItem = null; // clear the held item
 
     }
 

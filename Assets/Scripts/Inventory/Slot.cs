@@ -7,7 +7,7 @@ public class Slot : MonoBehaviour, IDropHandler, IPointerEnterHandler, IPointerE
     [Header("References")]
     [SerializeField] private ItemInfoWidget itemInfoWidgetPrefab;
     private ItemInfoWidget currItemInfoWidget;
-    private ItemHolder itemHolder;
+    private SlotItemHolder slotItemHolder;
     private Inventory inventory;
     private InventoryUI inventoryUI;
     protected Image image;
@@ -27,14 +27,14 @@ public class Slot : MonoBehaviour, IDropHandler, IPointerEnterHandler, IPointerE
         this.showItemInfoWidgetOnHover = showItemInfoWidgetOnHover;
         // no need to set item here since it gets set in the SetItem method
 
-        itemHolder = GetComponentInChildren<ItemHolder>();
+        slotItemHolder = GetComponentInChildren<SlotItemHolder>();
         image = GetComponent<Image>();
 
         // set the color of the slot to the one provided if it is not null, otherwise use the default color of the slot
         if (slotColor != null)
             image.color = (Color) slotColor;
 
-        itemHolder.Initialize(); // initialize the item holder
+        slotItemHolder.Initialize(); // initialize the item holder
         SetItemStack(itemStack); // initialize the slot with the provided item stack
 
         transform.GetChild(0).name = $"ItemHolder{index + 1}"; // rename the item holder child to reflect its index
@@ -67,7 +67,7 @@ public class Slot : MonoBehaviour, IDropHandler, IPointerEnterHandler, IPointerE
 
     public void OnDrop(PointerEventData eventData) { // this is called on the target slot when an item is dropped on it
 
-        DraggableItemHolder droppedItemHolder = eventData.pointerDrag.GetComponent<DraggableItemHolder>();
+        DraggableSlotItemHolder droppedItemHolder = eventData.pointerDrag.GetComponent<DraggableSlotItemHolder>();
         Slot sourceSlot = droppedItemHolder.GetInitialSlot();
 
         int sourceIndex = sourceSlot.GetIndex();
@@ -140,10 +140,10 @@ public class Slot : MonoBehaviour, IDropHandler, IPointerEnterHandler, IPointerE
 
         this.itemStack = itemStack; // set the item stack in this slot to the one being dropped
 
-        itemHolder.SetItemStack(itemStack); // set the item stack in the new slot item holder
-        itemHolder.transform.SetParent(transform); // set the parent of the new item to this slot
-        itemHolder.transform.SetAsFirstSibling(); // set to the first sibling so the count text appears on top
-        itemHolder.transform.position = transform.position; // move the new item to the position of this slot
+        slotItemHolder.SetItemStack(itemStack); // set the item stack in the new slot item holder
+        slotItemHolder.transform.SetParent(transform); // set the parent of the new item to this slot
+        slotItemHolder.transform.SetAsFirstSibling(); // set to the first sibling so the count text appears on top
+        slotItemHolder.transform.position = transform.position; // move the new item to the position of this slot
 
     }
 
@@ -155,9 +155,9 @@ public class Slot : MonoBehaviour, IDropHandler, IPointerEnterHandler, IPointerE
 
     public Inventory GetInventory() => inventory;
 
-    public Item GetItem() => itemHolder.GetItem();
+    public Item GetItem() => slotItemHolder.GetItem();
 
-    public int GetCount() => itemHolder.GetCount();
+    public int GetCount() => slotItemHolder.GetCount();
 
     public int GetIndex() => index;
 

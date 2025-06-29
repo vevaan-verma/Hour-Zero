@@ -32,7 +32,7 @@ public class ItemInfoWidget : MonoBehaviour {
         canvasRect.GetWorldCorners(canvasCorners);
 
         Item item = itemStack.GetItem(); // get the item from the item stack
-        upgradeIcon.sprite = item.GetIcon();
+        upgradeIcon.sprite = item.GetItemIcon();
         nameText.text = item.GetName();
         descriptionText.text = item.GetDescription();
 

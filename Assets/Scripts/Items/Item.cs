@@ -7,26 +7,36 @@ public class Item : ScriptableObject {
     [Header("Properties")]
     [SerializeField] private string itemName;
     [SerializeField] private string itemDescription;
-    [SerializeField] private Sprite icon;
+    [SerializeField] private Sprite itemIcon;
     [SerializeField, Tooltip("The maximum number of items that can be stacked in this item. If set to 0, it will either use the slot's stack limit, or if that is set to 0, an infinite limit"), Min(0)] private int stackLimit;
     [SerializeField] private ItemType itemType;
-    [SerializeField] private GameObject heldToolPrefab;
+    [SerializeField] private HeldItem heldItemPrefab;
+    [Space]
+    [SerializeField] private float attackDistance;
+    [SerializeField] private float attackForce;
+    [SerializeField] private float attackCooldown;
 
     public string GetName() => itemName;
 
     public string GetDescription() => itemDescription;
 
-    public Sprite GetIcon() => icon;
+    public Sprite GetItemIcon() => itemIcon;
 
     public int GetStackSize() => stackLimit;
 
     public ItemType GetItemType() => itemType;
 
-    public GameObject GetHeldItemPrefab() => heldToolPrefab;
+    public HeldItem GetHeldItemPrefab() => heldItemPrefab;
 
-    public override bool Equals(object other) => other is Item item && itemName == item.itemName && icon == item.icon && stackLimit == item.stackLimit;
+    public float GetAttackDistance() => attackDistance;
 
-    public override int GetHashCode() => itemName.GetHashCode() ^ icon.GetHashCode() ^ stackLimit.GetHashCode(); // combine hash codes of item properties for uniqueness
+    public float GetAttackForce() => attackForce;
+
+    public float GetAttackCooldown() => attackCooldown;
+
+    public override bool Equals(object other) => other is Item item && itemName == item.itemName && itemDescription == item.itemDescription && itemIcon == item.itemIcon && itemType == item.itemType;
+
+    public override int GetHashCode() => itemName.GetHashCode() ^ itemDescription.GetHashCode() ^ itemIcon.GetHashCode() ^ itemType.GetHashCode(); // combine hash codes of item properties for uniqueness
 
 }
 
@@ -58,38 +68,3 @@ public enum ItemType {
     Tool
 
 }
-
-#if UNITY_EDITOR
-// using UnityEditor prefix to avoid needing to hide the import in the final build
-[UnityEditor.CustomEditor(typeof(Item))]
-public class ItemEditor : UnityEditor.Editor {
-
-    public override void OnInspectorGUI() {
-
-        serializedObject.Update();
-
-        // replace the individual PropertyField lines with this block to draw all properties except "heldToolPrefab"
-        UnityEditor.SerializedProperty prop = serializedObject.GetIterator();
-        bool enterChildren = true;
-
-        while (prop.NextVisible(enterChildren)) {
-
-            enterChildren = false;
-
-            // skip the heldToolPrefab property
-            if (prop.name == "heldToolPrefab")
-                continue;
-
-            UnityEditor.EditorGUILayout.PropertyField(prop, true); // show all properties except heldToolPrefab
-
-        }
-
-        // hides the heldToolPrefab field if the item type is not a tool
-        if ((ItemType) serializedObject.FindProperty("itemType").enumValueIndex == ItemType.Tool)
-            UnityEditor.EditorGUILayout.PropertyField(serializedObject.FindProperty("heldToolPrefab"), new GUIContent("Held Tool Prefab"));
-
-        serializedObject.ApplyModifiedProperties();
-
-    }
-}
-#endif

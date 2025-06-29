@@ -2,7 +2,7 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class ItemHolder : MonoBehaviour {
+public class SlotItemHolder : MonoBehaviour {
 
     [Header("References")]
     protected ItemStack itemStack;
@@ -18,7 +18,7 @@ public class ItemHolder : MonoBehaviour {
 
         this.itemStack = itemStack;
 
-        itemIcon.sprite = itemStack.GetItem() == null ? emptyIcon : itemStack.GetItem().GetIcon(); // set the image sprite to the item's icon
+        itemIcon.sprite = itemStack.GetItem() == null ? emptyIcon : itemStack.GetItem().GetItemIcon(); // set the image sprite to the item's icon
 
         int count = itemStack.GetCount(); // get the count from the item stack
         countText.text = count.ToString(); // set the count text to the item's stack size or empty if no item

@@ -1,7 +1,7 @@
 using UnityEngine;
 using UnityEngine.EventSystems;
 
-public class DraggableItemHolder : ItemHolder, IBeginDragHandler, IDragHandler, IEndDragHandler {
+public class DraggableSlotItemHolder : SlotItemHolder, IBeginDragHandler, IDragHandler, IEndDragHandler {
 
     [Header("References")]
     private Slot initialSlot; // the parent slot to set after dragging ends
