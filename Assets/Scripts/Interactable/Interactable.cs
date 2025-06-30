@@ -16,6 +16,19 @@ public abstract class Interactable : MonoBehaviour {
 
     protected void Start() {
 
+        #region VALIDATION
+        // if requireHeldItem is true, requiredHeldItem must not be null or have a count of 0
+        if (requireHeldItem)
+            if (requiredHeldItem.GetItem() == null)
+                Debug.LogError($"Interactable {name} requires a held item but none was specified. Please assign a required item in the inspector.");
+            else if (requiredHeldItem.GetCount() <= 0)
+                Debug.LogError($"Interactable {name} requires a held item with a count greater than 0 but the specified item has a count of {requiredHeldItem.GetCount()}. Please assign a valid item in the inspector.");
+
+        // if requireBackpackItems is true, requiredBackpackItems must not be null or empty
+        if (requireBackpackItems && requiredBackpackItems.Length == 0)
+            Debug.LogError($"Interactable {name} requires backpack items but none were specified. Please assign required items in the inspector.");
+        #endregion
+
         hotbar = FindFirstObjectByType<Hotbar>();
         backpack = FindFirstObjectByType<Backpack>();
 
