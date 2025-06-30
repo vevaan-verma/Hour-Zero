@@ -50,11 +50,18 @@ public class PlayerController : MonoBehaviour {
     [SerializeField] private float breathingAmplitude;
     [SerializeField] private float breathingFrequency;
     [SerializeField, Tooltip("Deadzone for mouse movement to prevent jittering in sway effect")] private float mouseSwayDeadzone;
-    private ItemHolder slotItemHolder;
+    private ItemHolder itemHolder;
     private HeldItem currHeldItem;
 
+    [Header("Grabbing")]
+    [SerializeField] private float grabRange;
+    [SerializeField] private float followStiffness;
+    [SerializeField] private float throwForce;
+    private Rigidbody currGrabbedObject;
+    private float currGrabbedObjectDistance;
+
     [Header("Interacting")]
-    [SerializeField] private float interactDistance;
+    [SerializeField] private float interactRange;
 
     [Header("Ground Check")]
     [SerializeField] private Transform feet;
@@ -71,9 +78,9 @@ public class PlayerController : MonoBehaviour {
         uiManager = FindFirstObjectByType<UIManager>(); // find the UI manager in the scene
         rb = GetComponent<Rigidbody>();
         hotbar = FindFirstObjectByType<Hotbar>();
-        slotItemHolder = FindFirstObjectByType<ItemHolder>();
+        itemHolder = FindFirstObjectByType<ItemHolder>();
 
-        slotItemHolder.Initialize(swayAmount, swaySmoothness, rotationSwayAmount, rotationSwaySmoothness, breathingAmplitude, breathingFrequency, mouseSwayDeadzone); // initialize the held item sway with the settings
+        itemHolder.Initialize(swayAmount, swaySmoothness, rotationSwayAmount, rotationSwaySmoothness, breathingAmplitude, breathingFrequency, mouseSwayDeadzone); // initialize the held item sway with the settings
 
         defaultYPos = cameraPos.localPosition.y; // for headbob
 
@@ -134,10 +141,41 @@ public class PlayerController : MonoBehaviour {
         HandleHeadbob();
         #endregion
 
-        #region INTERACTING
-        RaycastHit hit;
+        #region GRABBING
+        // check if player is looking at a rigidbody within grab range and left mouse button is pressed; also make sure the rigidbody is not kinematic (so it can be grabbed)
+        if (Input.GetMouseButtonDown(0) && Physics.Raycast(cameraPos.position, cameraPos.forward, out RaycastHit hit, grabRange) && hit.rigidbody && !hit.rigidbody.isKinematic) {
 
-        if (Physics.Raycast(cameraPos.position, cameraPos.forward, out hit, interactDistance) && hit.collider.CompareTag("Interactable")) { // check if player is looking at interactable object within interact distance and is tagged as interactable
+            currGrabbedObject = hit.rigidbody; // store the grabbed rigidbody
+            currGrabbedObject.useGravity = false; // disable gravity on the grabbed object
+            currGrabbedObject.freezeRotation = true;
+            currGrabbedObjectDistance = hit.distance; // store the distance at which the object was grabbed
+
+        }
+
+        if (currGrabbedObject) { // check if there is a currently grabbed object
+
+            // Use the distance at which the object was grabbed instead of always using grabRange
+            Vector3 targetPos = cameraPos.position + cameraPos.forward * currGrabbedObjectDistance;
+            Vector3 toTarget = targetPos - currGrabbedObject.position;
+
+            // use a spring-damper approach for smooth following
+            float springStrength = followStiffness; // tune this for how "stiff" the follow is
+            float damper = Mathf.Sqrt(springStrength * currGrabbedObject.mass); // critical damping
+            Vector3 springForce = toTarget * springStrength - currGrabbedObject.linearVelocity * damper;
+            currGrabbedObject.AddForce(springForce, ForceMode.Force);
+
+            if (Input.GetMouseButtonUp(0)) { // if left mouse button is released
+
+                currGrabbedObject.freezeRotation = false; // allow rotation again
+                currGrabbedObject.useGravity = true; // enable gravity on the grabbed object
+                currGrabbedObject = null; // clear the grabbed object
+
+            }
+        }
+        #endregion
+
+        #region INTERACTING
+        if (Physics.Raycast(cameraPos.position, cameraPos.forward, out hit, interactRange) && hit.collider.CompareTag("Interactable")) { // check if player is looking at interactable object within interact distance and is tagged as interactable
 
             Interactable interactable = hit.collider.GetComponent<Interactable>();
 
@@ -195,9 +233,9 @@ public class PlayerController : MonoBehaviour {
 
         // if a menu is open, smoothly return the held item position to the center point
         if (menuOpen)
-            slotItemHolder.SmoothReturnToCenter();
+            itemHolder.SmoothReturnToCenter();
 
-        slotItemHolder.HandleSway(mouseX, mouseY, true, !menuOpen, !menuOpen); // handle the sway effect for the held item based on mouse movement; use LateUpdate to calculate sway to ensure the sway happens after all other updates, preventing jittering; the breathe effect is always enabled, headbob is enabled when not in a menu, and sway is enabled when not in a menu
+        itemHolder.HandleSway(mouseX, mouseY, true, !menuOpen, !menuOpen); // handle the sway effect for the held item based on mouse movement; use LateUpdate to calculate sway to ensure the sway happens after all other updates, preventing jittering; the breathe effect is always enabled, headbob is enabled when not in a menu, and sway is enabled when not in a menu
 
     }
 
@@ -225,12 +263,12 @@ public class PlayerController : MonoBehaviour {
     public void SetHeldItem(HeldItem heldItemPrefab) {
 
         // destroy any existing held item prefab at the held item position
-        foreach (Transform child in slotItemHolder.transform)
+        foreach (Transform child in itemHolder.transform)
             Destroy(child.gameObject);
 
         // instantiate the new held item prefab at the held item position if the heldItemPrefab is not null (a null parameter would clear the held item)
         if (heldItemPrefab)
-            currHeldItem = Instantiate(heldItemPrefab, slotItemHolder.transform.position, slotItemHolder.transform.rotation, slotItemHolder.transform); // instantiate the held item prefab at the held item position
+            currHeldItem = Instantiate(heldItemPrefab, itemHolder.transform.position, itemHolder.transform.rotation, itemHolder.transform); // instantiate the held item prefab at the held item position
         else
             currHeldItem = null; // clear the held item
 
