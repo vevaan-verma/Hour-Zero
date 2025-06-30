@@ -56,9 +56,9 @@ public class PlayerController : MonoBehaviour {
     [Header("Grabbing")]
     [SerializeField] private float grabRange;
     [SerializeField] private float followStiffness;
-    [SerializeField] private float throwForce;
     private Rigidbody currGrabbedObject;
     private float currGrabbedObjectDistance;
+    private LayerMask currGrabbedObjectLayer;
 
     [Header("Interacting")]
     [SerializeField] private float interactRange;
@@ -142,19 +142,21 @@ public class PlayerController : MonoBehaviour {
         #endregion
 
         #region GRABBING
-        // check if player is looking at a rigidbody within grab range and left mouse button is pressed; also make sure the rigidbody is not kinematic (so it can be grabbed)
-        if (Input.GetMouseButtonDown(0) && Physics.Raycast(cameraPos.position, cameraPos.forward, out RaycastHit hit, grabRange) && hit.rigidbody && !hit.rigidbody.isKinematic) {
+        // check if player is looking at a rigidbody within grab range and right mouse button is pressed; also make sure the rigidbody is not kinematic (so it can be grabbed)
+        if (Input.GetMouseButtonDown(1) && Physics.Raycast(cameraPos.position, cameraPos.forward, out RaycastHit hit, grabRange) && hit.rigidbody && !hit.rigidbody.isKinematic) {
 
             currGrabbedObject = hit.rigidbody; // store the grabbed rigidbody
             currGrabbedObject.useGravity = false; // disable gravity on the grabbed object
             currGrabbedObject.freezeRotation = true;
             currGrabbedObjectDistance = hit.distance; // store the distance at which the object was grabbed
+            currGrabbedObjectLayer = currGrabbedObject.gameObject.layer; // store the layer of the grabbed object
+            currGrabbedObject.gameObject.layer = LayerMask.NameToLayer("Ignore Raycast"); // change the layer of the grabbed object to Ignore Raycast to prevent it from being hit by raycasts while grabbed; this also prevents the player from jumping on the grabbed object to fly
 
         }
 
         if (currGrabbedObject) { // check if there is a currently grabbed object
 
-            // Use the distance at which the object was grabbed instead of always using grabRange
+            // use the distance at which the object was grabbed instead of always using grabRange
             Vector3 targetPos = cameraPos.position + cameraPos.forward * currGrabbedObjectDistance;
             Vector3 toTarget = targetPos - currGrabbedObject.position;
 
@@ -164,8 +166,9 @@ public class PlayerController : MonoBehaviour {
             Vector3 springForce = toTarget * springStrength - currGrabbedObject.linearVelocity * damper;
             currGrabbedObject.AddForce(springForce, ForceMode.Force);
 
-            if (Input.GetMouseButtonUp(0)) { // if left mouse button is released
+            if (Input.GetMouseButtonUp(1)) { // if right mouse button is released
 
+                currGrabbedObject.gameObject.layer = currGrabbedObjectLayer; // restore the original layer of the grabbed object
                 currGrabbedObject.freezeRotation = false; // allow rotation again
                 currGrabbedObject.useGravity = true; // enable gravity on the grabbed object
                 currGrabbedObject = null; // clear the grabbed object
@@ -177,7 +180,7 @@ public class PlayerController : MonoBehaviour {
         #region INTERACTING
         if (Physics.Raycast(cameraPos.position, cameraPos.forward, out hit, interactRange) && hit.collider.CompareTag("Interactable")) { // check if player is looking at interactable object within interact distance and is tagged as interactable
 
-            Interactable interactable = hit.collider.GetComponent<Interactable>();
+            Interactable interactable = hit.transform.GetComponentInParent<Interactable>(); // make sure to check parent for interactable component since that is how some interactables are set up
 
             if (interactable) {
 

@@ -32,12 +32,48 @@ public abstract class Interactable : MonoBehaviour {
         hotbar = FindFirstObjectByType<Hotbar>();
         backpack = FindFirstObjectByType<Backpack>();
 
-        transform.tag = "Interactable"; // ensure the object is tagged as Interactable
+        // ensure the object and all its children are tagged as Interactable
+        foreach (Transform child in GetComponentsInChildren<Transform>())
+            child.gameObject.tag = "Interactable";
 
     }
 
-    public abstract void Interact();
+    public virtual bool Interact() {
 
+        // if the interactable requires a held item, check if the player is holding the required item and enough of it
+        if (requireHeldItem) {
+
+            ItemStack selectedItemStack = hotbar.GetSelectedItemStack(); // get the item stack in the currently selected hotbar slot
+
+            // if the required item is not held or not enough of it is held, don't follow through with the interaction
+            if (selectedItemStack.GetItem() == null || !selectedItemStack.GetItem().Equals(requiredHeldItem.GetItem()))
+                return false;
+
+            // if the held item should be consumed, use the backpack inventory to remove as much of the item stack from the current selected hotbar slot as possible, then remove the remainder as normal
+            if (consumeHeldItem)
+                backpack.RemoveItemStack(new ItemStack(requiredHeldItem.GetItem(), requiredHeldItem.GetCount()), hotbar.GetSelectedIndex());
+
+        }
+
+        // if the interactable required items in the backpack, check if the player has those items and enough of them
+        if (requireBackpackItems) {
+
+            foreach (ItemStack requiredStack in requiredBackpackItems) {
+
+                // if the backpack does not contain the required item stack, don't follow through with the interaction
+                if (!backpack.ContainsItemStack(requiredStack))
+                    return false;
+
+                // if the backpack items should be consumed, remove the required amount from the backpack
+                if (consumeBackpackItems)
+                    backpack.RemoveItemStack(new ItemStack(requiredStack.GetItem(), requiredStack.GetCount()));
+
+            }
+        }
+
+        return true;
+
+    }
 }
 
 #if UNITY_EDITOR
@@ -48,6 +84,8 @@ public class InteractableEditor : UnityEditor.Editor {
     public override void OnInspectorGUI() {
 
         serializedObject.Update();
+
+        DrawPropertiesExcluding(serializedObject, "requireHeldItem", "requiredHeldItem", "consumeHeldItem", "requireBackpackItems", "requiredBackpackItems", "consumeBackpackItems");
 
         // only show the requiredHeldItem and consumeHeldItem fields if requireHeldItem is true
         UnityEditor.SerializedProperty requireHeldItemProp = serializedObject.FindProperty("requireHeldItem");

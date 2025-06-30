@@ -34,6 +34,14 @@ public class WanderingAI : AI {
 
         yield return new WaitForSeconds(waitTime);
 
+        // TODO: implement the following instead:
+        //ConstantPath path = ConstantPath.Construct(transform.position, searchLength);
+
+        //AstarPath.StartPath(path);
+        //path.BlockUntilCalculated();
+        //var singleRandomPoint = PathUtilities.GetPointsOnNodes(path.allNodes, 1)[0];
+        //var multipleRandomPoints = PathUtilities.GetPointsOnNodes(path.allNodes, 100);
+
         ai.destination = GetRandomPoint();
         ai.SearchPath();
         isWaiting = false;

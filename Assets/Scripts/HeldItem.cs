@@ -19,16 +19,19 @@ public class HeldItem : MonoBehaviour {
 
     private IEnumerator HandleAttack() {
 
-        animator.SetTrigger("attackWindUp"); // trigger the attack animation
+        animator.SetTrigger("attackWindUp"); // trigger the attack wind up animation
 
         yield return null; // wait for the animation to start
-        yield return new WaitForSeconds(animator.GetCurrentAnimatorStateInfo(0).length);
-
-        //animator.SetTrigger("attack"); // trigger the attack animation
+        yield return new WaitForSeconds(animator.GetCurrentAnimatorStateInfo(0).length); // wait for the wind up animation to finish
 
         // perform a raycast from the camera to check if there is an object in front of the player within the attack distance & apply impact force if it has a rigidbody
         if (Physics.Raycast(Camera.main.transform.position, Camera.main.transform.forward, out RaycastHit hit, item.GetAttackDistance()) && hit.rigidbody != null)
             hit.rigidbody.AddForceAtPosition(Camera.main.transform.forward * item.GetAttackForce(), hit.point, ForceMode.Impulse);
+
+        animator.SetTrigger("attackWindDown"); // trigger the attack wind down animation
+
+        yield return null; // wait for the animation to start
+        yield return new WaitForSeconds(animator.GetCurrentAnimatorStateInfo(0).length); // wait for the wind down animation to finish
 
         yield return new WaitForSeconds(item.GetAttackCooldown()); // wait for the attack cooldown before allowing another attack
 
