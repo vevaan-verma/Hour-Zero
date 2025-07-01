@@ -10,7 +10,7 @@ public class HeldItem : MonoBehaviour {
 
     private void Start() => animator = GetComponent<Animator>();
 
-    public void Attack() {
+    public void Use() {
 
         if (attackCoroutine != null) return; // if an attack is already in progress, do nothing
         attackCoroutine = StartCoroutine(HandleAttack());
@@ -25,7 +25,7 @@ public class HeldItem : MonoBehaviour {
         yield return new WaitForSeconds(animator.GetCurrentAnimatorStateInfo(0).length); // wait for the wind up animation to finish
 
         // perform a raycast from the camera to check if there is an object in front of the player within the attack distance & apply impact force if it has a rigidbody
-        if (Physics.Raycast(Camera.main.transform.position, Camera.main.transform.forward, out RaycastHit hit, item.GetAttackDistance()) && hit.rigidbody != null)
+        if (Physics.Raycast(Camera.main.transform.position, Camera.main.transform.forward, out RaycastHit hit, item.GetAttackDistance()) && hit.rigidbody)
             hit.rigidbody.AddForceAtPosition(Camera.main.transform.forward * item.GetAttackForce(), hit.point, ForceMode.Impulse);
 
         animator.SetTrigger("attackWindDown"); // trigger the attack wind down animation
