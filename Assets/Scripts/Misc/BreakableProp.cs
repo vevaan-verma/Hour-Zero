@@ -80,7 +80,7 @@ public class BreakableProp : MonoBehaviour {
 
     void Update() {
 
-        if ((durability <= 0 || Input.GetKeyDown(KeyCode.V)) && breakable && !broken)
+        if (durability <= 0 && breakable && !broken)
             BreakProp();
 
     }
