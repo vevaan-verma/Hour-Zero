@@ -31,7 +31,7 @@ public class HeldItem : MonoBehaviour {
 
             // if the object hit is a BreakableProp, damage it
             BreakablePropCollisionReporter prop = hit.rigidbody.gameObject.GetComponent<BreakablePropCollisionReporter>();
-            print(prop);
+
             if (prop != null)
                 prop.Hit(item.GetAttackForce());
 
