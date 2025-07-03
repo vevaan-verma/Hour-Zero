@@ -112,6 +112,7 @@ public class Hotbar : Inventory {
 
 }
 
+#if UNITY_EDITOR
 [UnityEditor.CustomEditor(typeof(Hotbar))]
 // using UnityEditor prefix to avoid needing to hide the import in the final build
 public class HotbarEditor : UnityEditor.Editor {
@@ -134,3 +135,4 @@ public class HotbarEditor : UnityEditor.Editor {
 
     }
 }
+#endif

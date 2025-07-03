@@ -75,8 +75,8 @@ public abstract class InventoryUI : MonoBehaviour {
 }
 
 #if UNITY_EDITOR
-// using UnityEditor prefix to avoid needing to hide the import in the final build
 [UnityEditor.CustomEditor(typeof(InventoryUI), true)]
+// using UnityEditor prefix to avoid needing to hide the import in the final build
 public class InventoryUIEditor : UnityEditor.Editor {
 
     public override void OnInspectorGUI() {
