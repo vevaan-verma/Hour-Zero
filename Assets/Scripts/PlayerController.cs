@@ -59,6 +59,7 @@ public class PlayerController : MonoBehaviour {
     private Rigidbody currGrabbedObject;
     private float currGrabbedObjectDistance;
     private LayerMask currGrabbedObjectLayer;
+    private Vector3 grabOffset; // offset from the grab point to the grabbed object's position
 
     [Header("Interacting")]
     [SerializeField] private float interactRange;
@@ -146,34 +147,23 @@ public class PlayerController : MonoBehaviour {
         if (Input.GetMouseButtonDown(1) && Physics.Raycast(cameraPos.position, cameraPos.forward, out RaycastHit hit, grabRange) && hit.rigidbody && !hit.rigidbody.isKinematic) {
 
             currGrabbedObject = hit.rigidbody; // store the grabbed rigidbody
+            Vector3 grabPoint = cameraPos.position + cameraPos.forward * hit.distance; // calculate the grab point based on the camera position and the distance to the hit point
+            grabOffset = currGrabbedObject.position - grabPoint; // calculate the offset from the grab point to the grabbed object's center (which is what rigidbody.position returns)
             currGrabbedObject.useGravity = false; // disable gravity on the grabbed object
             currGrabbedObject.freezeRotation = true;
             currGrabbedObjectDistance = hit.distance; // store the distance at which the object was grabbed
             currGrabbedObjectLayer = currGrabbedObject.gameObject.layer; // store the layer of the grabbed object
-            currGrabbedObject.gameObject.layer = LayerMask.NameToLayer("Ignore Raycast"); // change the layer of the grabbed object to Ignore Raycast to prevent it from being hit by raycasts while grabbed; this also prevents the player from jumping on the grabbed object to fly
+            currGrabbedObject.gameObject.layer = LayerMask.NameToLayer("Default"); // change the layer of the grabbed object to prevent the player from jumping on the grabbed object to fly
 
         }
 
-        if (currGrabbedObject) { // check if there is a currently grabbed object
+        if (currGrabbedObject && Input.GetMouseButtonUp(1)) { // check if there is a currently grabbed object and the right moues button is released
 
-            // use the distance at which the object was grabbed instead of always using grabRange
-            Vector3 targetPos = cameraPos.position + cameraPos.forward * currGrabbedObjectDistance;
-            Vector3 toTarget = targetPos - currGrabbedObject.position;
+            currGrabbedObject.gameObject.layer = currGrabbedObjectLayer; // restore the original layer of the grabbed object
+            currGrabbedObject.freezeRotation = false; // allow rotation again
+            currGrabbedObject.useGravity = true; // enable gravity on the grabbed object
+            currGrabbedObject = null; // clear the grabbed object
 
-            // use a spring-damper approach for smooth following
-            float springStrength = followStiffness; // tune this for how "stiff" the follow is
-            float damper = Mathf.Sqrt(springStrength * currGrabbedObject.mass); // critical damping
-            Vector3 springForce = toTarget * springStrength - currGrabbedObject.linearVelocity * damper;
-            currGrabbedObject.AddForce(springForce, ForceMode.Force);
-
-            if (Input.GetMouseButtonUp(1)) { // if right mouse button is released
-
-                currGrabbedObject.gameObject.layer = currGrabbedObjectLayer; // restore the original layer of the grabbed object
-                currGrabbedObject.freezeRotation = false; // allow rotation again
-                currGrabbedObject.useGravity = true; // enable gravity on the grabbed object
-                currGrabbedObject = null; // clear the grabbed object
-
-            }
         }
         #endregion
 
@@ -228,6 +218,13 @@ public class PlayerController : MonoBehaviour {
         else
             rb.AddForce(airMultiplier * moveSpeed * (transform.forward * verticalInput + transform.right * horizontalInput).normalized, ForceMode.Force);
 
+        if (currGrabbedObject) {
+
+            Vector3 targetPos = cameraPos.position + cameraPos.forward * currGrabbedObjectDistance + grabOffset; // calculate the target position for the grabbed object based on the camera position, forward direction, distance at which it was grabbed, and the grab offset
+            Vector3 toTarget = targetPos - currGrabbedObject.position; // calculate the vector from the grabbed object's position to the target position
+            currGrabbedObject.linearVelocity = toTarget * toTarget.magnitude * 10f; // set the grabbed object's velocity to move it towards the target position; this is a simple way to make the object follow the player without using physics forces
+
+        }
     }
 
     private void LateUpdate() {
