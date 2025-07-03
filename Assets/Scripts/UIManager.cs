@@ -23,6 +23,7 @@ public class UIManager : MonoBehaviour {
     [Header("Crosshair")]
     [SerializeField] private Image crosshair;
     [SerializeField] private Sprite interactCrosshair;
+    [SerializeField] private Sprite grabCrosshair;
     private Sprite defaultCrosshair;
 
     [Header("Time")]
@@ -130,6 +131,15 @@ public class UIManager : MonoBehaviour {
                 crosshair.sprite = interactCrosshair;
                 break;
 
+            case CrosshairType.Grab:
+                crosshair.sprite = grabCrosshair;
+                break;
+
+            default:
+                Debug.LogWarning($"Unknown crosshair type: {type}. Defaulting to default crosshair.");
+                crosshair.sprite = defaultCrosshair;
+                break;
+
         }
     }
 
@@ -167,6 +177,7 @@ public class UIManager : MonoBehaviour {
 public enum CrosshairType {
 
     Default,
-    Interact
+    Interact,
+    Grab
 
 }

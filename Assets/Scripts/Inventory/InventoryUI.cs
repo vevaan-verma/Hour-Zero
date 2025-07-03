@@ -18,6 +18,19 @@ public abstract class InventoryUI : MonoBehaviour {
     [SerializeField, Tooltip("Whether to show the item info widget when hovering over an item in the inventory")] protected bool showItemInfoWidgetOnHover;
     protected bool isInventoryOpen;
 
+    // runs before Initialize
+    private void OnEnable() {
+
+        // if the inventory is set, subscribe to the inventory's contents update event to refresh the UI when the contents change (done here too to ensure the event is always subscribed to; initialize only subscribes the first time)
+        // inventory isn't set the first time (when Initialize is called) so we check if it is set here
+        if (inventory) {
+
+            RefreshInventory(); // refresh the inventory slots to ensure they are up to date
+            inventory.onContentsUpdated += RefreshInventory; // subscribe to the inventory's contents update event to refresh the UI when the contents change
+
+        }
+    }
+
     public virtual void Initialize() {
 
         #region VALIDATION

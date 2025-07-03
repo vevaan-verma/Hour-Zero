@@ -217,6 +217,16 @@ public abstract class Inventory : MonoBehaviour {
 
     }
 
+    public void Clear() {
+
+        contents = new List<ItemStack>(currSlotCount);
+
+        // initialize the contents with empty ItemStacks
+        for (int i = 0; i < currSlotCount; i++)
+            contents.Add(new ItemStack(null, 0));
+
+    }
+
     // helper to get the effective stack limit for an item in a slot
     public virtual int GetEffectiveStackLimit(Item item) {
 

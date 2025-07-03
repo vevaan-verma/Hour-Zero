@@ -78,6 +78,7 @@ public class SystemRepairMenu : MonoBehaviour {
 
         CloseMenu(true); // close the menu when the repair inventory is full (with a flag that the repair requirements were met)
         bunkerManager.RepairSystem(systemType, repairPercent); // repair the system using the bunker manager
+        repairInventory.Clear();
 
         string formattedSystemType = Regex.Replace(systemType.ToString(), "(\\B[A-Z])", " $1").ToLower(); // format the system type to be more readable by adding spaces in between the words (e.g., "AirFiltration" -> "Air Filtration") and convert to lowercase
         alertManager.SendAlert(new Alert($"System {formattedSystemType} durability repaired ({repairPercent}%)", AlertType.Success));

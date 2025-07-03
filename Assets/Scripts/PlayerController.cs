@@ -90,7 +90,14 @@ public class PlayerController : MonoBehaviour {
     private void Update() {
 
         // prevent player from doing other actions while a menu is open
-        if (uiManager.IsMenuOpen()) return;
+        if (uiManager.IsMenuOpen()) {
+
+            if (currGrabbedObject)
+                DropGrabbedItem(); // if a menu is open, drop any grabbed object to prevent it from being stuck in the player's hand
+
+            return;
+
+        }
 
         #region GROUND CHECK
         isGrounded = Physics.CheckSphere(feet.position, groundCheckRadius, environmentMask);
@@ -144,26 +151,26 @@ public class PlayerController : MonoBehaviour {
 
         #region GRABBING
         // check if player is looking at a rigidbody within grab range and right mouse button is pressed; also make sure the rigidbody is not kinematic (so it can be grabbed)
-        if (Input.GetMouseButtonDown(1) && Physics.Raycast(cameraPos.position, cameraPos.forward, out RaycastHit hit, grabRange) && hit.rigidbody && !hit.rigidbody.isKinematic) {
+        if (Input.GetMouseButtonDown(1) && Physics.Raycast(cameraPos.position, cameraPos.forward, out RaycastHit hit, grabRange) && hit.rigidbody && !hit.rigidbody.isKinematic)
+            SetGrabbedItem(hit.rigidbody, hit.distance);
 
-            currGrabbedObject = hit.rigidbody; // store the grabbed rigidbody
-            Vector3 grabPoint = cameraPos.position + cameraPos.forward * hit.distance; // calculate the grab point based on the camera position and the distance to the hit point
-            grabOffset = currGrabbedObject.position - grabPoint; // calculate the offset from the grab point to the grabbed object's center (which is what rigidbody.position returns)
-            currGrabbedObject.useGravity = false; // disable gravity on the grabbed object
-            currGrabbedObject.freezeRotation = true;
-            currGrabbedObjectDistance = hit.distance; // store the distance at which the object was grabbed
-            currGrabbedObjectLayer = currGrabbedObject.gameObject.layer; // store the layer of the grabbed object
-            currGrabbedObject.gameObject.layer = LayerMask.NameToLayer("Default"); // change the layer of the grabbed object to prevent the player from jumping on the grabbed object to fly
+        if (currGrabbedObject) {
 
-        }
+            // check if there is a currently grabbed object and the right mouse button is released and drop the grabbed object if so
+            if (Input.GetMouseButtonUp(1))
+                DropGrabbedItem();
 
-        if (currGrabbedObject && Input.GetMouseButtonUp(1)) { // check if there is a currently grabbed object and the right moues button is released
+            // check if the grabbed object is still within grab range and if not, drop it
+            if (currGrabbedObject && Vector3.Distance(cameraPos.position, currGrabbedObject.position) > grabRange) {
 
-            currGrabbedObject.gameObject.layer = currGrabbedObjectLayer; // restore the original layer of the grabbed object
-            currGrabbedObject.freezeRotation = false; // allow rotation again
-            currGrabbedObject.useGravity = true; // enable gravity on the grabbed object
-            currGrabbedObject = null; // clear the grabbed object
+                DropGrabbedItem();
+                uiManager.SetCrosshairType(CrosshairType.Default); // reset crosshair to default when dropping the grabbed object
 
+            } else {
+
+                uiManager.SetCrosshairType(CrosshairType.Grab); // set crosshair to grab crosshair when holding an object
+
+            }
         }
         #endregion
 
@@ -271,6 +278,30 @@ public class PlayerController : MonoBehaviour {
             currHeldItem = Instantiate(heldItemPrefab, itemHolder.transform.position, itemHolder.transform.rotation, itemHolder.transform); // instantiate the held item prefab at the held item position
         else
             currHeldItem = null; // clear the held item
+
+    }
+
+    public void SetGrabbedItem(Rigidbody grabbedObject, float hitDistance) {
+
+        currGrabbedObject = grabbedObject; // store the grabbed rigidbody
+        Vector3 grabPoint = cameraPos.position + cameraPos.forward * hitDistance; // calculate the grab point based on the camera position and the distance to the hit point
+        grabOffset = currGrabbedObject.position - grabPoint; // calculate the offset from the grab point to the grabbed object's center (which is what rigidbody.position returns)
+        currGrabbedObject.useGravity = false; // disable gravity on the grabbed object
+        currGrabbedObject.freezeRotation = true;
+        currGrabbedObjectDistance = hitDistance; // store the distance at which the object was grabbed
+        currGrabbedObjectLayer = currGrabbedObject.gameObject.layer; // store the layer of the grabbed object
+        currGrabbedObject.gameObject.layer = LayerMask.NameToLayer("Default"); // change the layer of the grabbed object to prevent the player from jumping on the grabbed object to fly
+
+    }
+
+    public void DropGrabbedItem() {
+
+        if (!currGrabbedObject) return; // if there is no grabbed object, do nothing
+
+        currGrabbedObject.gameObject.layer = currGrabbedObjectLayer; // restore the original layer of the grabbed object
+        currGrabbedObject.freezeRotation = false; // allow rotation again
+        currGrabbedObject.useGravity = true; // enable gravity on the grabbed object
+        currGrabbedObject = null; // clear the grabbed object
 
     }
 
