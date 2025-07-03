@@ -41,7 +41,7 @@ public class BreakableProp : MonoBehaviour {
     [Header("\"Explosion\" Config")]
     [SerializeField][Range(0, 1)][Tooltip("When the prop breaks, the broken object pieces inherent the velocity of the intact object. This sets the min % of the velocity to inherit")] private float minInheritedVelocity;
     [SerializeField][Range(0, 1)][Tooltip("When the prop breaks, the broken object pieces inherent the velocity of the intact object. This sets the max % of the velocity to inherit")] private float maxInheritedVelocity;
-    [SerializeField][Min(0)][Tooltip("Higher = more explosive (but not nearly as chaotic as the force)")] private float explosionMaxTorque;
+    [SerializeField][Min(0)][Tooltip("Higher = more explosive. Tends to be more chaotic on small, light objects")] private float explosionMaxTorque;
     [SerializeField][Min(0)][Tooltip("Higher = more explosive")] private float explosionMaxForce;
     //[SerializeField][Tooltip("Make destructon effect force application consistent across the different broken parts by disregarding the masses of the objects")] private bool explosionIgnoresMass;
 
@@ -103,6 +103,8 @@ public class BreakableProp : MonoBehaviour {
                 brokenPart.linearVelocity = defaultObjectRb.linearVelocity * Random.Range(minInheritedVelocity, maxInheritedVelocity);
 
             HandleExplosion();
+
+            this.enabled = false;
 
         }
         else
