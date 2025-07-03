@@ -16,11 +16,11 @@ public class BreakableProp : MonoBehaviour {
     [Header("Constants")]
     // (damage = durability to subtract)
     // multiply horizontal collision velocity by this to calculate the damage to deal 
-    private const float horizontalVelocityDamageCoefficient = 0.85f;
+    private const float horizontalVelocityDamageCoefficient = 0.65f;
     // multiply vertical collision velocity by this to calculate the damage to deal 
-    private const float verticalVelocityDamageCoefficient = 2f;
+    private const float verticalVelocityDamageCoefficient = 1.25f;
     // multiply the attack force applied by the player onto the object by this to calculate the damage to deal 
-    private const float attackForceDamageCoefficient = 0.035f;
+    private const float attackForceDamageCoefficient = 0.045f;
 
 
     [Header("References")]
