@@ -22,12 +22,14 @@ public class UIManager : MonoBehaviour {
 
     [Header("Crosshair")]
     [SerializeField] private Image crosshair;
+    [SerializeField] private Sprite defaultCrosshair;
     [SerializeField] private Sprite interactCrosshair;
-    [SerializeField] private Sprite grabCrosshair;
-    private Sprite defaultCrosshair;
+    [SerializeField] private Sprite grabbableCrosshair;
+    [SerializeField] private Sprite grabbingCrosshair;
 
     [Header("Time")]
     [SerializeField] private TMP_Text timeText;
+    [SerializeField] private TMP_Text dayText;
 
     private void Start() {
 
@@ -58,9 +60,9 @@ public class UIManager : MonoBehaviour {
         systemRepairMenu = FindFirstObjectByType<SystemRepairMenu>();
         timeManager = FindFirstObjectByType<TimeManager>();
 
-        defaultCrosshair = crosshair.sprite;
+        crosshair.sprite = defaultCrosshair; // set the crosshair to the default crosshair at the start
 
-        UpdateTimeText(timeManager.GetHour(), timeManager.GetMinute(), timeManager.IsAM());
+        UpdateTimeHUD(timeManager.GetDay(), timeManager.GetHour(), timeManager.GetMinute(), timeManager.IsAM());
 
     }
 
@@ -79,7 +81,7 @@ public class UIManager : MonoBehaviour {
             else if (systemRepairMenu.IsMenuOpen()) // close system repair menu if it is open
                 CloseSystemRepairMenu();
 
-        UpdateTimeText(timeManager.GetHour(), timeManager.GetMinute(), timeManager.IsAM());
+        UpdateTimeHUD(timeManager.GetDay(), timeManager.GetHour(), timeManager.GetMinute(), timeManager.IsAM());
 
     }
 
@@ -131,8 +133,12 @@ public class UIManager : MonoBehaviour {
                 crosshair.sprite = interactCrosshair;
                 break;
 
-            case CrosshairType.Grab:
-                crosshair.sprite = grabCrosshair;
+            case CrosshairType.Grabbable:
+                crosshair.sprite = grabbableCrosshair;
+                break;
+
+            case CrosshairType.Grabbing:
+                crosshair.sprite = grabbingCrosshair;
                 break;
 
             default:
@@ -143,7 +149,12 @@ public class UIManager : MonoBehaviour {
         }
     }
 
-    private void UpdateTimeText(int hour, int minute, bool isAM) => timeText.text = $"{hour:00}:{minute:00} " + (isAM ? "AM" : "PM");
+    private void UpdateTimeHUD(int day, int hour, int minute, bool isAM) {
+
+        timeText.text = $"{hour:00}:{minute:00} " + (isAM ? "AM" : "PM");
+        dayText.text = $"Day {day}";
+
+    }
 
     private IEnumerator Fade(CanvasGroup ui, float targetAlpha, float duration) {
 
@@ -178,6 +189,7 @@ public enum CrosshairType {
 
     Default,
     Interact,
-    Grab
+    Grabbable,
+    Grabbing
 
 }

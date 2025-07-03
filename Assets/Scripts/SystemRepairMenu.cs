@@ -8,7 +8,7 @@ using UnityEngine.UI;
 public class SystemRepairMenu : MonoBehaviour {
 
     [Header("References")]
-    [SerializeField] private RepairInventory repairInventory;
+    private RepairInventory repairInventory;
     private Backpack backpack;
     private BunkerManager bunkerManager;
     private AlertManager alertManager;
@@ -26,7 +26,8 @@ public class SystemRepairMenu : MonoBehaviour {
 
     private void Start() {
 
-        backpack = FindFirstObjectByType<Backpack>(FindObjectsInactive.Include); // find the backpack in the scene
+        repairInventory = FindFirstObjectByType<RepairInventory>();
+        backpack = FindFirstObjectByType<Backpack>(FindObjectsInactive.Include);
         repairBackpackUI = FindObjectsByType<BackpackUI>(FindObjectsInactive.Include, FindObjectsSortMode.None).FirstOrDefault(ui => ui.GetBackpackType() == BackpackType.Repair); // find the repair backpack UI
         bunkerManager = FindFirstObjectByType<BunkerManager>();
         alertManager = FindFirstObjectByType<AlertManager>();

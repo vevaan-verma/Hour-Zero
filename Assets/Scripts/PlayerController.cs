@@ -33,14 +33,8 @@ public class PlayerController : MonoBehaviour {
     [Header("Hotbar")]
     private Hotbar hotbar;
 
-    [Header("Headbob")]
-    [SerializeField] private float walkBobSpeed;
-    [SerializeField] private float walkBobAmount;
-    [SerializeField] private float sprintBobSpeed;
-    [SerializeField] private float sprintBobAmount;
-    [SerializeField] private float bobMovementThreshold; // minimum velocity to start headbob
-    private float defaultYPos;
-    private float timer;
+    [Header("Interacting")]
+    [SerializeField] private float interactRange;
 
     [Header("Holding")]
     [SerializeField] private float swayAmount;
@@ -61,8 +55,14 @@ public class PlayerController : MonoBehaviour {
     private LayerMask currGrabbedObjectLayer;
     private Vector3 grabOffset; // offset from the grab point to the grabbed object's position
 
-    [Header("Interacting")]
-    [SerializeField] private float interactRange;
+    [Header("Headbob")]
+    [SerializeField] private float walkBobSpeed;
+    [SerializeField] private float walkBobAmount;
+    [SerializeField] private float sprintBobSpeed;
+    [SerializeField] private float sprintBobAmount;
+    [SerializeField] private float bobMovementThreshold; // minimum velocity to start headbob
+    private float defaultYPos;
+    private float timer;
 
     [Header("Ground Check")]
     [SerializeField] private Transform feet;
@@ -145,33 +145,17 @@ public class PlayerController : MonoBehaviour {
             currHeldItem.Use(); // call the use method on the held item
         #endregion
 
-        #region HEADBOB
-        HandleHeadbob();
-        #endregion
-
         #region GRABBING
         // check if player is looking at a rigidbody within grab range and right mouse button is pressed; also make sure the rigidbody is not kinematic (so it can be grabbed)
-        if (Input.GetMouseButtonDown(1) && Physics.Raycast(cameraPos.position, cameraPos.forward, out RaycastHit hit, grabRange) && hit.rigidbody && !hit.rigidbody.isKinematic)
-            SetGrabbedItem(hit.rigidbody, hit.distance);
+        if (Physics.Raycast(cameraPos.position, cameraPos.forward, out RaycastHit hit, grabRange) && hit.rigidbody && !hit.rigidbody.isKinematic)
+            if (Input.GetMouseButtonDown(1))
+                SetGrabbedItem(hit.rigidbody, hit.distance);
 
-        if (currGrabbedObject) {
-
-            // check if there is a currently grabbed object and the right mouse button is released and drop the grabbed object if so
-            if (Input.GetMouseButtonUp(1))
+        if (currGrabbedObject)
+            if (Input.GetMouseButtonUp(1)) // check if there is a currently grabbed object and the right mouse button is released and drop the grabbed object if so
                 DropGrabbedItem();
-
-            // check if the grabbed object is still within grab range and if not, drop it
-            if (currGrabbedObject && Vector3.Distance(cameraPos.position, currGrabbedObject.position) > grabRange) {
-
+            else if (Vector3.Distance(cameraPos.position, currGrabbedObject.position) > grabRange) // check if the grabbed object is still within grab range and if not, drop it (use else if here because if the other condition is true, the currGrabbedObject will be dropped anyway)
                 DropGrabbedItem();
-                uiManager.SetCrosshairType(CrosshairType.Default); // reset crosshair to default when dropping the grabbed object
-
-            } else {
-
-                uiManager.SetCrosshairType(CrosshairType.Grab); // set crosshair to grab crosshair when holding an object
-
-            }
-        }
         #endregion
 
         #region INTERACTING
@@ -179,23 +163,15 @@ public class PlayerController : MonoBehaviour {
 
             Interactable interactable = hit.transform.GetComponentInParent<Interactable>(); // make sure to check parent for interactable component since that is how some interactables are set up
 
-            if (interactable) {
-
-                uiManager.SetCrosshairType(CrosshairType.Interact); // set crosshair to interact crosshair
-
+            if (interactable)
                 if (Input.GetKeyDown(KeyCode.E))
                     interactable.Interact();
 
-            } else {
-
-                uiManager.SetCrosshairType(CrosshairType.Default); // set crosshair to default since interactable component was not found
-
-            }
-        } else {
-
-            uiManager.SetCrosshairType(CrosshairType.Default); // set crosshair to default since player is not looking at interactable object
-
         }
+        #endregion
+
+        #region HEADBOB
+        HandleHeadbob();
         #endregion
 
         #region SPEED & DRAG CONTROL
@@ -213,11 +189,15 @@ public class PlayerController : MonoBehaviour {
         else rb.linearDamping = airDrag;
         #endregion
 
+        #region CROSSHAIR
+        SetCrosshair();
+        #endregion
+
     }
 
     private void FixedUpdate() {
 
-        // prevent player from moving while a menu is open
+        // prevent player from moving or grabbing while a menu is open
         if (uiManager.IsMenuOpen()) return;
 
         if (isGrounded)
@@ -225,11 +205,15 @@ public class PlayerController : MonoBehaviour {
         else
             rb.AddForce(airMultiplier * moveSpeed * (transform.forward * verticalInput + transform.right * horizontalInput).normalized, ForceMode.Force);
 
-        if (currGrabbedObject) {
+        if (currGrabbedObject) { // check if the player is grabbing an object
 
-            Vector3 targetPos = cameraPos.position + cameraPos.forward * currGrabbedObjectDistance + grabOffset; // calculate the target position for the grabbed object based on the camera position, forward direction, distance at which it was grabbed, and the grab offset
-            Vector3 toTarget = targetPos - currGrabbedObject.position; // calculate the vector from the grabbed object's position to the target position
-            currGrabbedObject.linearVelocity = toTarget * toTarget.magnitude * 10f; // set the grabbed object's velocity to move it towards the target position; this is a simple way to make the object follow the player without using physics forces
+            Vector3 targetPos = cameraPos.position + cameraPos.forward * currGrabbedObjectDistance + grabOffset;
+            Vector3 toTarget = targetPos - currGrabbedObject.position;
+
+            // make the force inversely proportional to the object's mass
+            float grabStrength = 30f / currGrabbedObject.mass; // 50f is the original strength, now divided by mass
+
+            currGrabbedObject.linearVelocity = toTarget * toTarget.magnitude * grabStrength;
 
         }
     }
@@ -247,25 +231,6 @@ public class PlayerController : MonoBehaviour {
     }
 
     private void Jump() => rb.linearVelocity = new Vector3(rb.linearVelocity.x, jumpHeight, rb.linearVelocity.z);
-
-    private void HandleHeadbob() {
-
-        Vector3 flatVel = new Vector3(rb.linearVelocity.x, 0f, rb.linearVelocity.z); // get flat velocity (no y value)
-
-        if (!isGrounded || flatVel.magnitude < bobMovementThreshold) return; // make sure player is grounded and moving fast enough to bob
-
-        if (horizontalInput != 0f || verticalInput != 0f) {
-
-            timer += Time.deltaTime * (moveSpeed == walkSpeed ? walkBobSpeed : sprintBobSpeed);
-            cameraPos.localPosition = new Vector3(cameraPos.localPosition.x, defaultYPos + Mathf.Sin(timer) * (moveSpeed == walkSpeed ? walkBobAmount : sprintBobAmount), cameraPos.localPosition.z);
-
-        } else {
-
-            timer = 0f;
-            cameraPos.localPosition = new Vector3(cameraPos.localPosition.x, Mathf.Lerp(cameraPos.localPosition.y, defaultYPos, Time.deltaTime * (moveSpeed == walkSpeed ? walkBobSpeed : sprintBobSpeed)), cameraPos.localPosition.z);
-
-        }
-    }
 
     public void SetHeldItem(HeldItem heldItemPrefab) {
 
@@ -305,6 +270,43 @@ public class PlayerController : MonoBehaviour {
 
     }
 
+    private void HandleHeadbob() {
+
+        Vector3 flatVel = new Vector3(rb.linearVelocity.x, 0f, rb.linearVelocity.z); // get flat velocity (no y value)
+
+        if (!isGrounded || flatVel.magnitude < bobMovementThreshold) return; // make sure player is grounded and moving fast enough to bob
+
+        if (horizontalInput != 0f || verticalInput != 0f) {
+
+            timer += Time.deltaTime * (moveSpeed == walkSpeed ? walkBobSpeed : sprintBobSpeed);
+            cameraPos.localPosition = new Vector3(cameraPos.localPosition.x, defaultYPos + Mathf.Sin(timer) * (moveSpeed == walkSpeed ? walkBobAmount : sprintBobAmount), cameraPos.localPosition.z);
+
+        } else {
+
+            timer = 0f;
+            cameraPos.localPosition = new Vector3(cameraPos.localPosition.x, Mathf.Lerp(cameraPos.localPosition.y, defaultYPos, Time.deltaTime * (moveSpeed == walkSpeed ? walkBobSpeed : sprintBobSpeed)), cameraPos.localPosition.z);
+
+        }
+    }
+
     public float GetHeadbobOffset() => cameraPos.localPosition.y - defaultYPos; // returns the headbob offset from the default position
 
+    public void SetCrosshair() {
+
+        // order of priority:
+        // 1. grabbing crosshair
+        // 2. interact crosshair
+        // 3. grabbable crosshair
+        // 4. default crosshair
+
+        if (currGrabbedObject)
+            uiManager.SetCrosshairType(CrosshairType.Grabbing);
+        else if (Physics.Raycast(cameraPos.position, cameraPos.forward, out RaycastHit hit, interactRange) && hit.collider.CompareTag("Interactable"))
+            uiManager.SetCrosshairType(CrosshairType.Interact);
+        else if (Physics.Raycast(cameraPos.position, cameraPos.forward, out hit, interactRange) && hit.rigidbody && !hit.rigidbody.isKinematic)
+            uiManager.SetCrosshairType(CrosshairType.Grabbable);
+        else
+            uiManager.SetCrosshairType(CrosshairType.Default);
+
+    }
 }

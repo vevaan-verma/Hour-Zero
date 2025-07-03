@@ -8,7 +8,6 @@ public class BunkerPanelManager : MonoBehaviour {
 
     [Header("References")]
     [SerializeField] private BunkerSystem[] bunkerSystems;
-    private Coroutine refreshCoroutine;
 
     [Header("UI References")]
     [SerializeField] private BunkerSystemUI[] bunkerSystemUIs;
@@ -102,7 +101,7 @@ public class BunkerPanelManager : MonoBehaviour {
         }
         #endregion
 
-        refreshCoroutine = StartCoroutine(HandlePanelRefresh());
+        StartCoroutine(HandlePanelRefresh());
 
     }
 

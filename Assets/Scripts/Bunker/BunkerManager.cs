@@ -6,9 +6,6 @@ public class BunkerManager : MonoBehaviour {
     [Header("References")]
     private Dictionary<BunkerSystemType, BunkerSystem> bunkerSystems;
 
-    [Header("Settings")]
-    [SerializeField] private BunkerType bunkerType;
-
     private void Start() {
 
         bunkerSystems = new Dictionary<BunkerSystemType, BunkerSystem>();
@@ -48,11 +45,5 @@ public class BunkerManager : MonoBehaviour {
     public void RepairSystem(BunkerSystemType systemType, int repairPercent) => bunkerSystems[systemType].Repair(repairPercent);
 
     public BunkerSystem GetBunkerSystem(BunkerSystemType systemType) => bunkerSystems[systemType];
-
-}
-
-public enum BunkerType {
-
-    City, Mountain
 
 }

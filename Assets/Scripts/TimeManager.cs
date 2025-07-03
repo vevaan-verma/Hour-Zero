@@ -6,6 +6,7 @@ public class TimeManager : MonoBehaviour {
     [Header("Time")]
     [SerializeField, Tooltip("How many real seconds per in-game minute. 1 = real time, 0.5 = 2x speed, etc."), Min(0.01f)] private float realSecondsPerGameMinute;
     [SerializeField] private TimePreset startTimePreset; // preset time to start at
+    private int day;
     private int hour;
     private int minute;
     private bool isAM;
@@ -16,6 +17,8 @@ public class TimeManager : MonoBehaviour {
     [SerializeField] private float sunSmoothing;
 
     private void Start() {
+
+        day = 1; // start at day 1
 
         // set time to preset time
         hour = startTimePreset.GetHour();
@@ -53,9 +56,14 @@ public class TimeManager : MonoBehaviour {
             if (hour > 12f)
                 hour = 1;
 
-            if (hour == 12f)
+            if (hour == 12f) {
+
                 isAM = !isAM;
 
+                if (isAM)
+                    day++; // increment day when switching from PM to AM
+
+            }
         }
     }
 
@@ -74,6 +82,8 @@ public class TimeManager : MonoBehaviour {
         sunLight.transform.rotation = Quaternion.Slerp(sunLight.transform.rotation, Quaternion.Euler(new Vector3(sunAngle - 90f, 170f, 0)), Time.deltaTime * sunSmoothing);
 
     }
+
+    public int GetDay() => day;
 
     public int GetHour() => hour;
 
