@@ -87,9 +87,10 @@ public class UIManager : MonoBehaviour {
 
     public void OpenPrimaryBackpack() {
 
-        if (IsMenuOpen() || primaryBackpackUI.IsInventoryOpen()) return; // do nothing if another menu is open or if the primary backpack is already open
+        if (IsMenuOpen()) return; // do nothing if a menu is open
 
         hotbarUI.CloseInventory(); // close the hotbar UI if it is open (this is done to ensure the hotbar is not visible when the primary backpack is open)
+        crosshair.gameObject.SetActive(false); // hide the crosshair when the primary backpack is open
         primaryBackpackUI.OpenInventory(); // open the primary backpack UI
 
     }
@@ -99,25 +100,28 @@ public class UIManager : MonoBehaviour {
         if (!primaryBackpackUI.IsInventoryOpen()) return; // do nothing if the primary backpack is not open
 
         hotbarUI.OpenInventory(); // re-open the hotbar UI
+        crosshair.gameObject.SetActive(true); // show the crosshair when the primary backpack is closed
         primaryBackpackUI.CloseInventory(); // close the primary backpack UI
 
     }
 
     public void OpenSystemRepairMenu(ItemStack[] repairStacks, int repairPercent, BunkerSystemType systemType) {
 
-        if (IsMenuOpen() || systemRepairMenu.IsMenuOpen()) return; // do nothing if another menu is open or if the system repair menu is already open
+        if (IsMenuOpen()) return; // do nothing if a menu is open
 
         hotbarUI.CloseInventory(); // close the hotbar UI if it is open (this is done to ensure the hotbar is not visible when the system repair menu is open)
+        crosshair.gameObject.SetActive(false); // hide the crosshair when the system repair menu is open
         systemRepairMenu.OpenMenu(repairStacks, repairPercent, systemType); // open the system repair menu
 
     }
 
-    public void CloseSystemRepairMenu() {
+    public void CloseSystemRepairMenu(bool repairRequirementsMet = false) {
 
         if (!systemRepairMenu.IsMenuOpen()) return; // do nothing if the system repair menu is not open
 
         hotbarUI.OpenInventory(); // re-open the hotbar UI
-        systemRepairMenu.CloseMenu(); // close the system repair menu
+        crosshair.gameObject.SetActive(true); // show the crosshair when the system repair menu is closed
+        systemRepairMenu.CloseMenu(repairRequirementsMet); // close the system repair menu
 
     }
 

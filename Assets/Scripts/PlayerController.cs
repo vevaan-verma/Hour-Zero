@@ -49,7 +49,7 @@ public class PlayerController : MonoBehaviour {
 
     [Header("Grabbing")]
     [SerializeField] private float grabRange;
-    [SerializeField] private float followStiffness;
+    [SerializeField] private float grabStrength;
     private Rigidbody currGrabbedObject;
     private float currGrabbedObjectDistance;
     private LayerMask currGrabbedObjectLayer;
@@ -210,10 +210,9 @@ public class PlayerController : MonoBehaviour {
             Vector3 targetPos = cameraPos.position + cameraPos.forward * currGrabbedObjectDistance + grabOffset;
             Vector3 toTarget = targetPos - currGrabbedObject.position;
 
-            // make the force inversely proportional to the object's mass
-            float grabStrength = 30f / currGrabbedObject.mass; // 50f is the original strength, now divided by mass
+            float grabVelocityMultiplier = grabStrength / currGrabbedObject.mass; // make the grab velocity multiplier inversely proportional to the mass of the grabbed object, so lighter objects are easier to grab and throw
 
-            currGrabbedObject.linearVelocity = toTarget * toTarget.magnitude * grabStrength;
+            currGrabbedObject.linearVelocity = toTarget * toTarget.magnitude * grabVelocityMultiplier;
 
         }
     }

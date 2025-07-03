@@ -8,9 +8,11 @@ public class HeldItem : MonoBehaviour {
     private Animator animator;
     private Coroutine attackCoroutine;
 
-    private void Start() => animator = GetComponent<Animator>();
+    private void Awake() => animator = GetComponent<Animator>();
 
     public void Use() {
+
+        if (animator == null) return; // prevent attempts to use the item before the animator is set
 
         if (attackCoroutine != null) return; // if an attack is already in progress, do nothing
         attackCoroutine = StartCoroutine(HandleAttack());

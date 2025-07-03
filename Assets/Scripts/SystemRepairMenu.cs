@@ -12,6 +12,7 @@ public class SystemRepairMenu : MonoBehaviour {
     private Backpack backpack;
     private BunkerManager bunkerManager;
     private AlertManager alertManager;
+    private UIManager uiManager;
 
     [Header("UI References")]
     [SerializeField] private CanvasGroup menuPanel;
@@ -31,8 +32,9 @@ public class SystemRepairMenu : MonoBehaviour {
         repairBackpackUI = FindObjectsByType<BackpackUI>(FindObjectsInactive.Include, FindObjectsSortMode.None).FirstOrDefault(ui => ui.GetBackpackType() == BackpackType.Repair); // find the repair backpack UI
         bunkerManager = FindFirstObjectByType<BunkerManager>();
         alertManager = FindFirstObjectByType<AlertManager>();
+        uiManager = FindFirstObjectByType<UIManager>();
 
-        closeRepairMenuButton.onClick.AddListener(() => CloseMenu()); // add listener to close menu button
+        closeRepairMenuButton.onClick.AddListener(() => uiManager.CloseSystemRepairMenu()); // add listener to close menu button; call the UIManager method to close the system repair menu rather than this class directly to ensure the extra logic is executed (e.g., re-opening the hotbar UI)
 
         menuPanel.gameObject.SetActive(false); // make sure the menu is hidden by default
 
@@ -52,7 +54,7 @@ public class SystemRepairMenu : MonoBehaviour {
 
     }
 
-    public void CloseMenu(bool repairRequirementsMet = false) {
+    public void CloseMenu(bool repairRequirementsMet) {
 
         // if the repair requirements are not met, return all the items in the repair inventory back to the backpack
         if (!repairRequirementsMet) {
@@ -77,7 +79,7 @@ public class SystemRepairMenu : MonoBehaviour {
     // when the repair requirements are met, the player has put all the necessary items in the repair inventory to repair the system
     public void OnRepairRequirementsMet(int repairPercent, BunkerSystemType systemType) {
 
-        CloseMenu(true); // close the menu when the repair inventory is full (with a flag that the repair requirements were met)
+        uiManager.CloseSystemRepairMenu(true); // close the menu when the repair inventory is full (with a flag that the repair requirements were met); don't call CloseMenu() directly to ensure the UIManager logic is executed (e.g., re-opening the hotbar UI)
         bunkerManager.RepairSystem(systemType, repairPercent); // repair the system using the bunker manager
         repairInventory.Clear();
 
