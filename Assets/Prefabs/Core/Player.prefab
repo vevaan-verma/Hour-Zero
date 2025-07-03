@@ -255,11 +255,7 @@ MonoBehaviour:
   bottomCameraClamp: 75
   jumpHeight: 12
   fallMultiplier: 2
-  walkBobSpeed: 10
-  walkBobAmount: 0.08
-  sprintBobSpeed: 15
-  sprintBobAmount: 0.08
-  bobMovementThreshold: 0.5
+  interactRange: 4
   swayAmount: 0.02
   swaySmoothness: 6
   rotationSwayAmount: 4
@@ -268,8 +264,12 @@ MonoBehaviour:
   breathingFrequency: 1.5
   mouseSwayDeadzone: 0.01
   grabRange: 5
-  followStiffness: 1000
-  interactRange: 4
+  grabStrength: 40
+  walkBobSpeed: 10
+  walkBobAmount: 0.08
+  sprintBobSpeed: 15
+  sprintBobAmount: 0.08
+  bobMovementThreshold: 0.5
   feet: {fileID: 9201363252189034877}
   groundCheckRadius: 0.25
   environmentMask:
