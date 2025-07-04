@@ -1,6 +1,7 @@
 using System.Collections;
 using UnityEngine;
 
+[RequireComponent(typeof(Rigidbody))]
 public class BreakablePropCollisionReporter : MonoBehaviour {
 
     /// This script is placed on the intact version of a breakable prop (the defaultObject) 

@@ -79,7 +79,7 @@ public enum ItemType {
 #if UNITY_EDITOR
 [UnityEditor.CustomEditor(typeof(Item), true)]
 // using UnityEditor prefix to avoid needing to hide the import in the final build
-public class ItemUIEditor : UnityEditor.Editor {
+public class ItemEditor : UnityEditor.Editor {
 
     public override void OnInspectorGUI() {
 

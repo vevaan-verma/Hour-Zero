@@ -1,0 +1,123 @@
+using UnityEngine;
+
+public abstract class Strikable : MonoBehaviour {
+
+    [Header("References")]
+    protected Hotbar hotbar;
+    protected Backpack backpack;
+
+    [Header("Settings")]
+    [SerializeField, Tooltip("Whether to require an item stack to be held to strike this object")] protected bool requireHeldItem;
+    [SerializeField, Tooltip("The item stack that must be held to strike this object")] protected ItemStack requiredHeldItem;
+    [SerializeField, Tooltip("Whether to consume the specified held item stack after striking")] protected bool consumeHeldItem;
+    [SerializeField, Tooltip("Whether to require specific item stacks in the backpack to strike this object")] protected bool requireBackpackItems;
+    [SerializeField, Tooltip("The item stacks that must be in the backpack to strike this object")] protected ItemStack[] requiredBackpackItems;
+    [SerializeField, Tooltip("Whether to consume the backpack item stacks after striking")] protected bool consumeBackpackItems;
+
+    protected void Start() {
+
+        #region VALIDATION
+        // if requireHeldItem is true, requiredHeldItem must not be null or have a count of 0
+        if (requireHeldItem)
+            if (requiredHeldItem.GetItem() == null)
+                Debug.LogError($"Strikable {name} requires a held item but none was specified. Please assign a required item in the inspector.");
+            else if (requiredHeldItem.GetCount() <= 0)
+                Debug.LogError($"Strikable {name} requires a held item with a count greater than 0 but the specified item has a count of {requiredHeldItem.GetCount()}. Please assign a valid item in the inspector.");
+
+        // if requireBackpackItems is true, requiredBackpackItems must not be null or empty
+        if (requireBackpackItems && requiredBackpackItems.Length == 0)
+            Debug.LogError($"Strikable {name} requires backpack items but none were specified. Please assign required items in the inspector.");
+        #endregion
+
+        hotbar = FindFirstObjectByType<Hotbar>();
+        backpack = FindFirstObjectByType<Backpack>();
+
+        // ensure the object and all its children are tagged as Strikable
+        foreach (Transform child in GetComponentsInChildren<Transform>())
+            child.gameObject.tag = "Strikable";
+
+    }
+
+    public virtual bool Strike() {
+
+        // if the strikable requires a held item, check if the player is holding the required item and enough of it
+        if (requireHeldItem) {
+
+            ItemStack selectedItemStack = hotbar.GetItemStack(hotbar.GetSelectedIndex()); // get the item stack in the currently selected hotbar slot
+
+            // if the required item is not held or not enough of it is held, don't follow through with the strike
+            if (selectedItemStack.GetItem() == null || !selectedItemStack.GetItem().Equals(requiredHeldItem.GetItem()))
+                return false;
+
+            // if the held item should be consumed, use the backpack inventory to remove as much of the item stack from the current selected hotbar slot as possible, then remove the remainder as normal
+            if (consumeHeldItem)
+                backpack.RemoveItemStack(new ItemStack(requiredHeldItem.GetItem(), requiredHeldItem.GetCount()), hotbar.GetSelectedIndex());
+
+        }
+
+        // if the strikable required items in the backpack, check if the player has those items and enough of them
+        if (requireBackpackItems) {
+
+            foreach (ItemStack requiredStack in requiredBackpackItems) {
+
+                // if the backpack does not contain the required item stack, don't follow through with the strike
+                if (!backpack.ContainsItemStack(requiredStack))
+                    return false;
+
+                // if the backpack items should be consumed, remove the required amount from the backpack
+                if (consumeBackpackItems)
+                    backpack.RemoveItemStack(new ItemStack(requiredStack.GetItem(), requiredStack.GetCount()));
+
+            }
+        }
+
+        return true;
+
+    }
+}
+
+#if UNITY_EDITOR
+// using UnityEditor prefix to avoid needing to hide the import in the final build
+[UnityEditor.CustomEditor(typeof(Strikable), true)]
+public class StrikableEditor : UnityEditor.Editor {
+
+    public override void OnInspectorGUI() {
+
+        serializedObject.Update();
+
+        DrawPropertiesExcluding(serializedObject, "requireHeldItem", "requiredHeldItem", "consumeHeldItem", "requireBackpackItems", "requiredBackpackItems", "consumeBackpackItems");
+
+        // only show the requiredHeldItem and consumeHeldItem fields if requireHeldItem is true
+        UnityEditor.SerializedProperty requireHeldItemProp = serializedObject.FindProperty("requireHeldItem");
+        UnityEditor.EditorGUILayout.PropertyField(requireHeldItemProp);
+
+        if (requireHeldItemProp.boolValue) {
+
+            UnityEditor.SerializedProperty requiredHeldItemProp = serializedObject.FindProperty("requiredHeldItem");
+            UnityEditor.EditorGUILayout.PropertyField(requiredHeldItemProp);
+
+            UnityEditor.SerializedProperty consumeHeldItemsProp = serializedObject.FindProperty("consumeHeldItem");
+            UnityEditor.EditorGUILayout.PropertyField(consumeHeldItemsProp);
+
+        }
+
+        // only show the requiredBackpackItems and consumeBackpackItems fields if requireBackpackItems is true
+        UnityEditor.SerializedProperty requireBackpackItemsProp = serializedObject.FindProperty("requireBackpackItems");
+        UnityEditor.EditorGUILayout.PropertyField(requireBackpackItemsProp);
+
+        if (requireBackpackItemsProp.boolValue) {
+
+            UnityEditor.SerializedProperty requiredBackpackItemsProp = serializedObject.FindProperty("requiredBackpackItems");
+            UnityEditor.EditorGUILayout.PropertyField(requiredBackpackItemsProp, true); // true to show children since it's an array
+
+            UnityEditor.SerializedProperty consumeBackpackItemsProp = serializedObject.FindProperty("consumeBackpackItems");
+            UnityEditor.EditorGUILayout.PropertyField(consumeBackpackItemsProp);
+
+        }
+
+        serializedObject.ApplyModifiedProperties();
+
+    }
+}
+#endif
+

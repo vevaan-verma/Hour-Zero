@@ -10,7 +10,7 @@ public class HeldItem : MonoBehaviour {
 
     private void Awake() => animator = GetComponent<Animator>();
 
-    public void Use() {
+    public void Attack() {
 
         if (animator == null) return; // prevent attempts to use the item before the animator is set
 
@@ -27,15 +27,18 @@ public class HeldItem : MonoBehaviour {
         yield return new WaitForSeconds(animator.GetCurrentAnimatorStateInfo(0).length); // wait for the wind up animation to finish
 
         // perform a raycast from the camera to check if there is an object in front of the player within the attack distance & apply impact force if it has a rigidbody
-        if (Physics.Raycast(Camera.main.transform.position, Camera.main.transform.forward, out RaycastHit hit, item.GetAttackDistance()) && hit.rigidbody) {
+        if (Physics.Raycast(Camera.main.transform.position, Camera.main.transform.forward, out RaycastHit hit, item.GetAttackDistance())) {
 
-            hit.rigidbody.AddForceAtPosition(Camera.main.transform.forward * item.GetAttackForce(), hit.point, ForceMode.Impulse);
+            if (hit.rigidbody) { // check if the hit object has a rigidbody
 
-            // if the object hit is a BreakableProp, damage it
-            BreakablePropCollisionReporter prop = hit.rigidbody.gameObject.GetComponent<BreakablePropCollisionReporter>();
+                // both of the below lines require the hit object to have a rigidbody
 
-            if (prop != null)
-                prop.Hit(item.GetAttackForce());
+                hit.rigidbody.AddForceAtPosition(Camera.main.transform.forward * item.GetAttackForce(), hit.point, ForceMode.Impulse);
+                hit.rigidbody.GetComponent<BreakablePropCollisionReporter>()?.Hit(item.GetAttackForce()); // if the hit object has a BreakablePropCollisionReporter component, call its Hit method with the attack force
+
+            }
+
+            hit.transform.GetComponent<Strikable>()?.Strike(); // if the hit object has a Strikable component, call its Strike method; this doesn't require a rigidbody to be present on the hit object
 
         }
 
