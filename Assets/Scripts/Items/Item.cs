@@ -15,6 +15,9 @@ public class Item : ScriptableObject {
     [SerializeField] private float attackDistance;
     [SerializeField] private float attackForce;
     [SerializeField] private float attackCooldown;
+    [Space]
+    [SerializeField, Tooltip("Whether this item is a dropoff item that can be used in the DoomsdayDropoff task")] private bool isDropoffItem;
+    [SerializeField, Min(1), Tooltip("The amount of this item that need to be dropped off in the DoomsdayDropoff task")] private int dropoffCount;
 
     public string GetName() => itemName;
 
@@ -33,6 +36,10 @@ public class Item : ScriptableObject {
     public float GetAttackForce() => attackForce;
 
     public float GetAttackCooldown() => attackCooldown;
+
+    public bool IsDropoffItem() => isDropoffItem;
+
+    public int GetDropoffCount() => dropoffCount;
 
     public override bool Equals(object other) => other is Item item && itemName == item.itemName && itemDescription == item.itemDescription && itemIcon == item.itemIcon && itemType == item.itemType;
 
@@ -68,3 +75,24 @@ public enum ItemType {
     Tool
 
 }
+
+#if UNITY_EDITOR
+[UnityEditor.CustomEditor(typeof(Item), true)]
+// using UnityEditor prefix to avoid needing to hide the import in the final build
+public class ItemUIEditor : UnityEditor.Editor {
+
+    public override void OnInspectorGUI() {
+
+        serializedObject.Update();
+
+        DrawPropertiesExcluding(serializedObject, "dropoffCount"); // draw all properties except dropoffCount
+
+        // conditionally draw the dropoff count field based on the isDropoffItem property
+        if (serializedObject.FindProperty("isDropoffItem").boolValue == true)
+            UnityEditor.EditorGUILayout.PropertyField(serializedObject.FindProperty("dropoffCount"));
+
+        serializedObject.ApplyModifiedProperties();
+
+    }
+}
+#endif

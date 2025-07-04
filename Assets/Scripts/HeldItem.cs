@@ -39,8 +39,6 @@ public class HeldItem : MonoBehaviour {
 
         }
 
-
-
         animator.SetTrigger("attackWindDown"); // trigger the attack wind down animation
 
         yield return null; // wait for the animation to start

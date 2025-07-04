@@ -85,10 +85,32 @@ public class Hotbar : Inventory {
 
     public override int RemoveItemStack(ItemStack itemStack, int? slotIndex = null) {
 
-        // no point implementing this method since there isn't really a situation where you would want to remove an item stack from the hotbar directly; instead, items should be removed through the backpack
+        int remainder = 0;
 
-        Debug.LogError("Cannot remove ItemStack directly from the hotbar. Please remove items through the backpack."); // output error because ItemStacks cannot be removed from the hotbar directly, they must go through the backpack instead
-        return -1;
+        // go through each slot, starting with the selected slot, then go through the slots from first to last (left to right)
+        for (int i = 0; i < currSlotCount; i++) {
+
+            remainder = backpack.RemoveItemStack(itemStack, selectedIndex); // start with the selected slot
+
+            // if the item stack was removed successfully, return 0
+            if (remainder == 0)
+                return 0;
+
+            // if there is still a remainder, remove the item stack from the rest of the hotbar slots starting from the first slot, skipping the selected slot
+            for (int j = 0; j < currSlotCount; j++) {
+
+                if (j == selectedIndex) continue; // skip the selected slot
+
+                remainder = backpack.RemoveItemStack(itemStack, j); // remove the item stack from the current slot
+
+                // if the item stack was removed successfully, return 0
+                if (remainder == 0)
+                    return 0;
+
+            }
+        }
+
+        return remainder;
 
     }
 
@@ -107,8 +129,6 @@ public class Hotbar : Inventory {
     public override ItemStack GetItemStack(int index) => backpack.GetItemStack(index); // return the item stack from the backpack at the given index; backpack is used since the hotbar is a part of the backpack (the top row)
 
     public int GetSelectedIndex() => selectedIndex;
-
-    public ItemStack GetSelectedItemStack() => backpack.GetItemStack(selectedIndex); // get the item stack in the selected slot of the backpack; backpack is used since the hotbar is a part of the backpack (the top row)
 
 }
 

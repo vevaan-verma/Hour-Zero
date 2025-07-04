@@ -43,7 +43,7 @@ public abstract class Interactable : MonoBehaviour {
         // if the interactable requires a held item, check if the player is holding the required item and enough of it
         if (requireHeldItem) {
 
-            ItemStack selectedItemStack = hotbar.GetSelectedItemStack(); // get the item stack in the currently selected hotbar slot
+            ItemStack selectedItemStack = hotbar.GetItemStack(hotbar.GetSelectedIndex()); // get the item stack in the currently selected hotbar slot
 
             // if the required item is not held or not enough of it is held, don't follow through with the interaction
             if (selectedItemStack.GetItem() == null || !selectedItemStack.GetItem().Equals(requiredHeldItem.GetItem()))

@@ -100,7 +100,7 @@ public class InventoryUIEditor : UnityEditor.Editor {
 
         // conditionally draw the quick transfer inventory field based on the quickTransferEnabled property
         if (serializedObject.FindProperty("quickTransferEnabled").boolValue == true)
-            UnityEditor.EditorGUILayout.PropertyField(serializedObject.FindProperty("quickTransferInventory"), new GUIContent("Quick Transfer Inventory"));
+            UnityEditor.EditorGUILayout.PropertyField(serializedObject.FindProperty("quickTransferInventory"));
 
         serializedObject.ApplyModifiedProperties();
 

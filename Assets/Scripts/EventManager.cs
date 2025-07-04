@@ -6,24 +6,7 @@ public class EventManager : MonoBehaviour {
 
         switch (eventType) {
 
-            case EventType.BringItem:
-
-                break;
-
-            case EventType.HammerObject:
-
-                break;
-
             case EventType.DanceOff:
-
-                break;
-
-            case EventType.CrowbarTherapy:
-
-                break;
-
-            case EventType.AcademicFraud:
-
                 break;
 
             default:
@@ -36,6 +19,6 @@ public class EventManager : MonoBehaviour {
 
 public enum EventType {
 
-    BringItem, HammerObject, DanceOff, CrowbarTherapy, AcademicFraud
+    DanceOff
 
 }

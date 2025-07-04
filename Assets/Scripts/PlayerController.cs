@@ -44,6 +44,7 @@ public class PlayerController : MonoBehaviour {
     [SerializeField] private float breathingAmplitude;
     [SerializeField] private float breathingFrequency;
     [SerializeField, Tooltip("Deadzone for mouse movement to prevent jittering in sway effect")] private float mouseSwayDeadzone;
+    [SerializeField] private LayerMask heldItemMask;
     private ItemHolder itemHolder;
     private HeldItem currHeldItem;
 
@@ -238,11 +239,19 @@ public class PlayerController : MonoBehaviour {
             Destroy(child.gameObject);
 
         // instantiate the new held item prefab at the held item position if the heldItemPrefab is not null (a null parameter would clear the held item)
-        if (heldItemPrefab)
+        if (heldItemPrefab) {
+
             currHeldItem = Instantiate(heldItemPrefab, itemHolder.transform.position, itemHolder.transform.rotation, itemHolder.transform); // instantiate the held item prefab at the held item position
-        else
+
+            // set the layer of the held item and its children to the held item layer so it can be shown over the other objects in the scene to prevent clipping
+            foreach (Transform child in currHeldItem.GetComponentsInChildren<Transform>())
+                child.gameObject.layer = LayerMask.NameToLayer("HeldItem");
+
+        } else {
+
             currHeldItem = null; // clear the held item
 
+        }
     }
 
     public void SetGrabbedItem(Rigidbody grabbedObject, float hitDistance) {

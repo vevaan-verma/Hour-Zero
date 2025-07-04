@@ -115,7 +115,7 @@ public abstract class Inventory : MonoBehaviour {
             }
         }
 
-        // then, try to add to empty slots (including whatever wasn't able to be stacked)
+        // then, try to add to empty slots (including whatever wasn't able to be stacked), starting from the first slot (top left to bottom right)
         for (int i = 0; i < contents.Count; i++) {
 
             ItemStack stack = contents[i];
