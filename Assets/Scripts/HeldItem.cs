@@ -7,8 +7,14 @@ public class HeldItem : MonoBehaviour {
     [SerializeField] private Item item;
     private Animator animator;
     private Coroutine attackCoroutine;
+    private AudioPlayer audioPlayer;
 
-    private void Awake() => animator = GetComponent<Animator>();
+    private void Awake() {
+
+        animator = GetComponent<Animator>();
+        audioPlayer = GetComponent<AudioPlayer>();
+
+    }
 
     public void Attack() {
 
@@ -35,6 +41,7 @@ public class HeldItem : MonoBehaviour {
 
                 hit.rigidbody.AddForceAtPosition(Camera.main.transform.forward * item.GetAttackForce(), hit.point, ForceMode.Impulse);
                 hit.rigidbody.GetComponent<BreakablePropCollisionReporter>()?.Hit(item.GetAttackForce()); // if the hit object has a BreakablePropCollisionReporter component, call its Hit method with the attack force
+                audioPlayer.Play(item.GetHitSound());
 
             }
 

@@ -28,6 +28,7 @@ public class BreakableProp : MonoBehaviour {
     [SerializeField][Tooltip("Empty parent of the broken pieces. \n!!! KEEP AT 0, 0, 0 !!!")] private GameObject brokenObject;
     private List<Rigidbody> brokenObjectRbs = new List<Rigidbody>();
     private Rigidbody defaultObjectRb;
+    private AudioPlayer audioPlayer;
 
     [Header("Prop Sturdiness")]
     [SerializeField] private bool breakable;
@@ -45,6 +46,9 @@ public class BreakableProp : MonoBehaviour {
     [SerializeField][Min(0)][Tooltip("Higher = more explosive")] private float explosionMaxForce;
     //[SerializeField][Tooltip("Make destructon effect force application consistent across the different broken parts by disregarding the masses of the objects")] private bool explosionIgnoresMass;
 
+    [Header("Sound Effects")]
+    [SerializeField] private SFXLib.Sounds breakSound;
+
     [Header("Debug")]
     [SerializeField] private bool logDamage;
     [SerializeField] private bool logCollisionSpeed;
@@ -60,6 +64,7 @@ public class BreakableProp : MonoBehaviour {
         }
 
         defaultObjectRb = defaultObject.GetComponent<Rigidbody>();
+        audioPlayer = GetComponent<AudioPlayer>();
 
         // get the rb's of the broken pieces
         for (int c = 0; c < brokenObject.transform.childCount; c++)
@@ -103,6 +108,8 @@ public class BreakableProp : MonoBehaviour {
                 brokenPart.linearVelocity = defaultObjectRb.linearVelocity * Random.Range(minInheritedVelocity, maxInheritedVelocity);
 
             HandleExplosion();
+
+            audioPlayer.Play(breakSound, false, brokenObject);
 
             this.enabled = false;
 

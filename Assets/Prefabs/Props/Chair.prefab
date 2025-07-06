@@ -10,6 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1347863493396637493}
   - component: {fileID: 1573582781787585161}
+  - component: {fileID: 4842880540262217386}
   m_Layer: 0
   m_Name: Chair
   m_TagString: Untagged
@@ -53,12 +54,25 @@ MonoBehaviour:
   totalDurability: 14
   minColSpeedHorizontal: 4
   minColSpeedVertical: 12.5
-  minInheritedVelocity: 0.8
+  minInheritedVelocity: 0.569
   maxInheritedVelocity: 1
   explosionMaxTorque: 400
   explosionMaxForce: 350
+  breakSound: 1
   logDamage: 0
   logCollisionSpeed: 0
+--- !u!114 &4842880540262217386
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 208784188577373685}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f7be6f1ab43efd74f90a10be906d53e5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &4973415090698117703
 GameObject:
   m_ObjectHideFlags: 0
@@ -271,6 +285,7 @@ GameObject:
   m_Component:
   - component: {fileID: 4139599551870857353}
   - component: {fileID: 4714929492537639706}
+  - component: {fileID: 7265132671704019116}
   - component: {fileID: 4448586721346257734}
   - component: {fileID: 8490202188827904131}
   - component: {fileID: 3226234562829635318}
@@ -296,7 +311,7 @@ Transform:
   m_GameObject: {fileID: 6559972985752192759}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: -0}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 0.80532134, y: 0.80532134, z: 0.80532134}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -316,6 +331,18 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   prop: {fileID: 1573582781787585161}
   ignorePlayerCollisions: 1
+--- !u!114 &7265132671704019116
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6559972985752192759}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f7be6f1ab43efd74f90a10be906d53e5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!54 &4448586721346257734
 Rigidbody:
   m_ObjectHideFlags: 0

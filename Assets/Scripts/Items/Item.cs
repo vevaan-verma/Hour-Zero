@@ -11,6 +11,7 @@ public class Item : ScriptableObject {
     [SerializeField, Tooltip("The maximum number of items that can be stacked in this item. If set to 0, it will either use the slot's stack limit, or if that is set to 0, an infinite limit"), Min(0)] private int stackLimit;
     [SerializeField] private ItemType itemType;
     [SerializeField] private HeldItem heldItemPrefab;
+    [SerializeField] private SFXLib.Sounds hitSound;
     [Space]
     [SerializeField] private float attackDistance;
     [SerializeField] private float attackForce;
@@ -30,6 +31,8 @@ public class Item : ScriptableObject {
     public ItemType GetItemType() => itemType;
 
     public HeldItem GetHeldItemPrefab() => heldItemPrefab;
+
+    public SFXLib.Sounds GetHitSound() => hitSound;
 
     public float GetAttackDistance() => attackDistance;
 

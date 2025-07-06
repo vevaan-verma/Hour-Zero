@@ -1,4 +1,3 @@
-using System.Collections;
 using UnityEngine;
 
 [RequireComponent(typeof(Rigidbody))]
@@ -8,9 +7,15 @@ public class BreakablePropCollisionReporter : MonoBehaviour {
     /// it reports collision data to the BreakableProp, so the prop can break when collided with
     /// it also is the thing that gets hit by the player and then reports that to the prop 
 
+    /// TODO: 
+    /// -make this a more multifunctional "CollsionListener" script that also plays sounds on collision
+    /// -put the timer in FixedUpdate or Update instead of a Coroutine 
+
     [Header("Constants")]
     // prevents spammy and broken collision detections and makes the behavior more reliable
     private const float collisionRegisterDelay = 0.1f;
+
+    private float cooldown;
 
     [Header("References")]
     [SerializeField] private BreakableProp prop;
@@ -19,13 +24,11 @@ public class BreakablePropCollisionReporter : MonoBehaviour {
     [Header("Settings")]
     [SerializeField] private bool ignorePlayerCollisions;
 
-    private bool registerCollision;
-
     void Start() {
 
         rb = GetComponent<Rigidbody>();
 
-        StartCoroutine(WaitForCollisionRegisterDelay());
+        cooldown = collisionRegisterDelay;
 
         if (prop == null) {
 
@@ -46,10 +49,10 @@ public class BreakablePropCollisionReporter : MonoBehaviour {
 
         // if the BreakableProp is defined and the collision cooldown is up
         //     and, if ignorePlayerCollisions, then this isnt a player collision
-        if (prop != null && registerCollision && !(collisionTag == "Player" && ignorePlayerCollisions)) {
+        if (prop != null && cooldown <= 0f && !(collisionTag == "Player" && ignorePlayerCollisions)) {
 
             // start cd
-            StartCoroutine(WaitForCollisionRegisterDelay());
+            cooldown = collisionRegisterDelay;
 
             prop.ReportCollision(collision.relativeVelocity);
 
@@ -57,13 +60,11 @@ public class BreakablePropCollisionReporter : MonoBehaviour {
 
     }
 
-    private IEnumerator WaitForCollisionRegisterDelay() {
+    private void FixedUpdate() {
 
-        registerCollision = false;
-
-        yield return new WaitForSeconds(collisionRegisterDelay);
-
-        registerCollision = true;
+        // do cd timer
+        if (cooldown > 0f)
+            cooldown -= Time.fixedDeltaTime;
 
     }
 

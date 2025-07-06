@@ -3579,6 +3579,7 @@ GameObject:
   m_Component:
   - component: {fileID: 2669276784684587891}
   - component: {fileID: 4677866702275147313}
+  - component: {fileID: -7040120636167261948}
   m_Layer: 0
   m_Name: Block of fun deluxe!
   m_TagString: Untagged
@@ -3626,8 +3627,21 @@ MonoBehaviour:
   maxInheritedVelocity: 1
   explosionMaxTorque: 3000
   explosionMaxForce: 8000
+  breakSound: 3
   logDamage: 0
   logCollisionSpeed: 0
+--- !u!114 &-7040120636167261948
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5740437765651458183}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f7be6f1ab43efd74f90a10be906d53e5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &5992862535419573255
 GameObject:
   m_ObjectHideFlags: 0
