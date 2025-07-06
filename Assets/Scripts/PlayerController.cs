@@ -263,7 +263,7 @@ public class PlayerController : MonoBehaviour {
         currGrabbedObject.freezeRotation = true;
         currGrabbedObjectDistance = hitDistance; // store the distance at which the object was grabbed
         currGrabbedObjectLayer = currGrabbedObject.gameObject.layer; // store the layer of the grabbed object
-        currGrabbedObject.gameObject.layer = LayerMask.NameToLayer("Default"); // change the layer of the grabbed object to prevent the player from jumping on the grabbed object to fly
+        currGrabbedObject.gameObject.layer = LayerMask.NameToLayer("Grabbed"); // change the layer of the grabbed object to prevent the player from jumping on the grabbed object to fly; this layer doesn't collide with the player
 
     }
 
