@@ -9,6 +9,9 @@ public class PopupSound : Popup {
     //      PopupSounds it spawned in that are active. The PopupSound tells the AudioPlayer when it is done existing. 
     private AudioPlayer owner;
     private SFXLib sfx;
+    // Simiular to above, each of these SoundPopups needs to know what key it corresponds to in the SFXLib.
+    // note that the SFXLib can only have each popup appear once, meaning no two keys have any popups in common
+    private SFXLib.Sounds? key;
 
     /// <summary>
     /// 
@@ -26,7 +29,14 @@ public class PopupSound : Popup {
 
     }
 
+    // set the AudioPlayer to report back to when done playing
     public void SetOwner(AudioPlayer owner) => this.owner = owner;
+
+    // tell this PopupSound which key from SFXLib it corresponds to
+    public void SetKey(SFXLib.Sounds key) => this.key = key;
+
+    // check which key this PopupSound corresponds to in the SFXLib
+    public SFXLib.Sounds? GetKey() => key;
 
     // replace this's AudioSource
     // with the ones from other
@@ -43,7 +53,7 @@ public class PopupSound : Popup {
         AudioSource otherAudioSource = otherPopupSound.GetComponent<AudioSource>();
 
         duration = otherPopupSound.duration;
-        owner = otherPopupSound.owner;
+        // owner and key are not swapped out here, they are assigned in AudioPlayer.Play
 
         audioSource.resource = otherAudioSource.resource;
         audioSource.outputAudioMixerGroup = otherAudioSource.outputAudioMixerGroup;
@@ -67,13 +77,6 @@ public class PopupSound : Popup {
         owner = otherPopupSound.owner;
 
     }
-
-    public SFXLib.Sounds? GetKey() {
-
-        return sfx.GetKey(this);
-
-    }
-
     protected override void OnFinish() {
 
         owner.OnSoundComplete(this);
@@ -88,6 +91,5 @@ public class PopupSound : Popup {
         duration = ((AudioClip)audioSource.resource).length;
 
     }
-
 
 }

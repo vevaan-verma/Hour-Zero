@@ -50,7 +50,9 @@ public class AudioPlayer : MonoBehaviour {
 
             // tell the PopupSound which AudioPlayer created it, so the PopupSound can later tell this AudioPlayer to stop tracking it when it finishes playing
             playing.SetOwner(this);
-            print(this);
+            // let it know what its key is
+            // consider removing the key field in PopupSound and rely entirely on SFXLib.GetKey();
+            playing.SetKey(sound);
 
         }
         else
@@ -91,6 +93,6 @@ public class AudioPlayer : MonoBehaviour {
 
     }
 
-
+    public List<PopupSound> Playing() => currentlyPlaying;
 
 }

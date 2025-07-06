@@ -13,17 +13,45 @@ public class SFXLib : MonoBehaviour {
 
     public enum Sounds {
 
-        // Item sounds
-        Item_CrowbarHit,
+        #region Item Sounds
 
-        // Object Sounds
+        Item_CrowbarHit,
+        Item_KeyJangle,
+
+        #endregion
+
+        #region Object Sounds
+
         Object_WoodenBreak,
 
-        // Music
+        #endregion
+
+        #region Music
+
         Music_RadioSong1,
+        Music_RadioSong2,
+        Music_RadioSong3,
+        Music_RadioSong4,
+
+        #endregion
+
+        #region General
+
+        //General
+        General_Thump,
+
+        #endregion
+
+        #region Misc
 
         //Misc
         Misc_Test
+
+        #endregion
+    }
+    private void Start() {
+
+        ValidateDict(true);
 
     }
 
@@ -33,12 +61,8 @@ public class SFXLib : MonoBehaviour {
         ValidateDict(logWarningsOnValidate);
 
     }
-    private void Start() {
 
-        ValidateDict(true);
-
-    }
-
+    // make sure the library looks how it should (?)
     private void ValidateDict(bool logWarnings) {
 
         // array of each enum in Sounds
@@ -48,10 +72,10 @@ public class SFXLib : MonoBehaviour {
         HashSet<Sounds> existingEntries = soundDict.Select(entry => entry.Key).ToHashSet();
 
         // check for missing and add it
-        // also report dupes
 
-
-        foreach (var sound in allSounds) {
+        ///                                                                         BIG TODO: THIS BREAKS THE LIBRARY AND MESSES SOME REFERENCES UP!!!
+        ///                                                                         remove?
+      /*  foreach (Sounds sound in allSounds) {
 
             if (!existingEntries.Contains(sound)) {
 
@@ -60,11 +84,12 @@ public class SFXLib : MonoBehaviour {
 
             }
 
-        }
+        }*/
 
         // automatically alphabetize
-        soundDict = soundDict.OrderBy(entry => entry.Key.ToString()).ToList();
+        //soundDict = soundDict.OrderBy(entry => entry.Key.ToString()).ToList();
 
+        // check for dupe keys and popups in the library, as well as keys with no popup references
         if (logWarnings) {
 
             // check for duped keys 
@@ -124,6 +149,7 @@ public class SFXLib : MonoBehaviour {
 
     }
 
+    // get [a] popup associated with a key (one from the list of popups that key is associated with)
     public PopupSound GetPopup(Sounds key) {
 
         foreach (SFXEntry entry in soundDict)
@@ -134,19 +160,18 @@ public class SFXLib : MonoBehaviour {
 
     }
 
+    // find which key a popup corresponds to
     public Sounds? GetKey(PopupSound popup) {
 
-        foreach (SFXEntry entry in soundDict) {
+        // this only works because two keys cannot refer to the same PopupSound. that is a big limitation of the system 
+        // to work around this limitation, the code for PopupSound would need to be changed. 
+        // in AudioPlayer.Stop(), the AudioPlayer uses a key to determine which Popup to stop. So, it has to check the key of the popup. 
+        // Therefore, ech PopupSound needs a way to know which key it belongs to. If there are conflicts, AudioPlayer.Stop() can break. 
 
-            // this only works because two keys cannot refer to the same PopupSound. that is a big limitation of the system 
-            // to work around this limitation, the code for PopupSound would need to be changed. 
-            // in AudioPlayer.Stop(), the AudioPlayer uses a key to determine which Popup to stop. So, it has to check the key of the popup. 
-            // Therefore, ech PopupSound needs a way to know which key it belongs to. If there are conflicts, AudioPlayer.Stop() can break. 
-            if (entry.Sounds.Contains(popup))
-                return entry.Key;
-
-        }
-
+        foreach (SFXEntry entry in soundDict)
+            foreach (PopupSound sound in entry.Sounds)
+                if (sound == popup)
+                    return entry.Key;
 
         return null;
 
