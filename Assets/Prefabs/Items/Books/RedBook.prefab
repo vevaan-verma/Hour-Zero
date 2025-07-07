@@ -14,6 +14,8 @@ GameObject:
   - component: {fileID: 7557431584971375239}
   - component: {fileID: 5302387189691099146}
   - component: {fileID: 2631190244201348859}
+  - component: {fileID: -1976793403112535407}
+  - component: {fileID: 4676842871342897042}
   m_Layer: 0
   m_Name: RedBook
   m_TagString: Untagged
@@ -160,3 +162,30 @@ MonoBehaviour:
   item: {fileID: 11400000, guid: 45307c4ad447ef9429fc9061083152a6, type: 2}
   itemCount: 1
   destroyDuration: 0.1
+--- !u!114 &-1976793403112535407
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2522774307947805074}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 56427b6021941a348bbd3f964a3b1ea8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  colSound: 0
+  breakableProp: {fileID: 0}
+  ignorePlayerCollisions: 0
+--- !u!114 &4676842871342897042
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2522774307947805074}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f7be6f1ab43efd74f90a10be906d53e5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 

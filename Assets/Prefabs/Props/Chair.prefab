@@ -89,6 +89,8 @@ GameObject:
   - component: {fileID: 4787699733067000356}
   - component: {fileID: 6655896570379581921}
   - component: {fileID: 2299715115800744406}
+  - component: {fileID: 1526743748798685528}
+  - component: {fileID: 8606971117852964045}
   m_Layer: 0
   m_Name: Seat
   m_TagString: Untagged
@@ -275,6 +277,33 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 4973415090698117703}
   m_Mesh: {fileID: -6827640314013697367, guid: 05a3988d931318641b957ff91330e9e4, type: 3}
+--- !u!114 &1526743748798685528
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4973415090698117703}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f7be6f1ab43efd74f90a10be906d53e5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &8606971117852964045
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4973415090698117703}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 56427b6021941a348bbd3f964a3b1ea8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  colSound: 0
+  breakableProp: {fileID: 0}
+  ignorePlayerCollisions: 0
 --- !u!1 &6559972985752192759
 GameObject:
   m_ObjectHideFlags: 0
@@ -329,7 +358,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 56427b6021941a348bbd3f964a3b1ea8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  prop: {fileID: 1573582781787585161}
+  colSound: 0
+  breakableProp: {fileID: 1573582781787585161}
   ignorePlayerCollisions: 1
 --- !u!114 &7265132671704019116
 MonoBehaviour:
@@ -597,6 +627,8 @@ GameObject:
   - component: {fileID: 38026940630461390}
   - component: {fileID: 6786484808973617610}
   - component: {fileID: 7024155892945511095}
+  - component: {fileID: 6891940230709633215}
+  - component: {fileID: 3198433445648576076}
   m_Layer: 0
   m_Name: Back.001
   m_TagString: Untagged
@@ -721,6 +753,33 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
+--- !u!114 &6891940230709633215
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6889113277687167141}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f7be6f1ab43efd74f90a10be906d53e5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &3198433445648576076
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6889113277687167141}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 56427b6021941a348bbd3f964a3b1ea8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  colSound: 0
+  breakableProp: {fileID: 0}
+  ignorePlayerCollisions: 0
 --- !u!1 &7893765063638334948
 GameObject:
   m_ObjectHideFlags: 0
@@ -734,6 +793,8 @@ GameObject:
   - component: {fileID: 6774940851982736870}
   - component: {fileID: 453051663601434406}
   - component: {fileID: 3314266528530466681}
+  - component: {fileID: 5436965233700305906}
+  - component: {fileID: 3452525810812429752}
   m_Layer: 0
   m_Name: BrokenLeg
   m_TagString: Untagged
@@ -857,3 +918,30 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
+--- !u!114 &5436965233700305906
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7893765063638334948}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f7be6f1ab43efd74f90a10be906d53e5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &3452525810812429752
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7893765063638334948}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 56427b6021941a348bbd3f964a3b1ea8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  colSound: 0
+  breakableProp: {fileID: 0}
+  ignorePlayerCollisions: 0

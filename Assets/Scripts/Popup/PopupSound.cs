@@ -88,7 +88,8 @@ public class PopupSound : Popup {
     private void OnValidate() {
 
         audioSource = GetComponent<AudioSource>();
-        duration = ((AudioClip)audioSource.resource).length;
+        if (audioSource.resource != null)
+            duration = ((AudioClip)audioSource.resource).length;
 
     }
 

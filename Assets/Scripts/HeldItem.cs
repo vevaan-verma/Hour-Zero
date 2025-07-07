@@ -40,7 +40,7 @@ public class HeldItem : MonoBehaviour {
                 // both of the below lines require the hit object to have a rigidbody
 
                 hit.rigidbody.AddForceAtPosition(Camera.main.transform.forward * item.GetAttackForce(), hit.point, ForceMode.Impulse);
-                hit.rigidbody.GetComponent<BreakablePropCollisionReporter>()?.Hit(item.GetAttackForce()); // if the hit object has a BreakablePropCollisionReporter component, call its Hit method with the attack force
+                hit.rigidbody.GetComponent<CollisionListener>()?.Hit(item.GetAttackForce()); // if the hit object has a CollisionListener component, call its Hit method with the attack force
                 audioPlayer.Play(item.GetHitSound());
 
             }
