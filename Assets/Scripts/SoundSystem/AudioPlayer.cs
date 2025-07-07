@@ -77,7 +77,7 @@ public class AudioPlayer : MonoBehaviour {
 
         // stop the sound from playing. Note that this will call Popup.OnFinish() which calls this.OnSoundComplete()
         if (toRemove != null)
-            toRemove.Stop();
+            toRemove.StopPlaying();
         if (toRemove == null)
             Debug.LogError("No such sound " + key + " is currently acknowledged by " + gameObject.name + "'s AudioPlayer");
 

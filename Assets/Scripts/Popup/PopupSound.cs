@@ -24,6 +24,7 @@ public class PopupSound : Popup {
         audioSource = GetComponent<AudioSource>();
         sfx = FindAnyObjectByType<SFXLib>();
         audioSource.mute = false;
+        ForceSetDuration();
 
         gameObject.name = "Popup Sound";
 
@@ -39,7 +40,7 @@ public class PopupSound : Popup {
     public SFXLib.Sounds? GetKey() => key;
 
     // replace this's AudioSource
-    // with the ones from other
+    // with the one from other
     override public void SwapPopup(Popup other) {
 
         if (other is not PopupSound) {
@@ -79,7 +80,10 @@ public class PopupSound : Popup {
     }
     protected override void OnFinish() {
 
-        owner.OnSoundComplete(this);
+        base.OnFinish();
+
+        if (owner != null)
+            owner.OnSoundComplete(this);
 
     }
 
@@ -88,8 +92,16 @@ public class PopupSound : Popup {
     private void OnValidate() {
 
         audioSource = GetComponent<AudioSource>();
+        ForceSetDuration();
+
+    }
+
+    private void ForceSetDuration() {
+
         if (audioSource.resource != null)
             duration = ((AudioClip)audioSource.resource).length;
+        else
+            duration = 0;
 
     }
 

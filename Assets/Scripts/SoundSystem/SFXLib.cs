@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
+[ExecuteAlways]
 public class SFXLib : MonoBehaviour {
 
     [Header("Library")]
@@ -52,6 +53,12 @@ public class SFXLib : MonoBehaviour {
     private void Start() {
 
         ValidateDict(modifyDict: false);
+
+    }
+
+    private void OnValidate() {
+
+        hasErrors = false;
 
     }
 

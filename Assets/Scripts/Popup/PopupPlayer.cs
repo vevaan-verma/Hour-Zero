@@ -3,6 +3,8 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+
+[ExecuteAlways]
 public class PopupPlayer : MonoBehaviour {
 
     /// <summary>
@@ -16,11 +18,14 @@ public class PopupPlayer : MonoBehaviour {
     /// later calls to PlayPopup will prefer reactivating a pooled popup over making a new one
     /// new popup objects are only created when nothing in the pool is available for use
     /// 
+    /// PopupPlayer also creates a bunch of Popups on Start, saving memory.
+    /// 
     /// </summary>
 
     [Header("Pool")]
-    [SerializeField] private GameObject poolParent;
-    [SerializeField][Tooltip("Set to zero for no max. Reccomended to leave at zero unless memory is super expensive (mobile game, or super heavy popups")][Min(0)] private int maxPoolSize;
+    [SerializeField][Tooltip("All popups are children of this GameObject's transform")] private GameObject poolParent;
+    [SerializeField][Tooltip("Reccomended to leave this on unless using really expensive popups or are in a very memory-tight scenario")] private bool infinitePool;
+    [SerializeField][Tooltip("Will start deleting Popups after the pool reaches this size")][Range(0, 1000)] private int maxPoolSize;
     [SerializeField][Tooltip("Use to spawn pooled popups on Start. Each entry should contain a different type of Popup Prefab, probably the ones in /[Prefabs]/Popups/Init")] private PopupPoolConfigurator[] poolInit;
 
     [Header("Debug")]
@@ -28,16 +33,13 @@ public class PopupPlayer : MonoBehaviour {
     int trackedMaxSize;
     float timeSinceLastMax;
 
-    // the pool is primarily accessed using poolParent, with all of its children being pooled items and all pooled items being one of its children 
-    // this Stack is only used to facilitate destroying pooled items when a maxPoolSize is set
-    // given the nature of a Stack, the oldest popup will be the one to be destroyed when a new one needs to be made and the max has been reached
-    private Stack<GameObject> pool;
+    private Dictionary<Type, Queue<GameObject>> pool;
 
     #region Pooling 
 
     private void Start() {
 
-        pool = new Stack<GameObject>();
+        pool = new(); // sus little shortcut
 
         trackedMaxSize = 0;
         timeSinceLastMax = 0;
@@ -47,8 +49,12 @@ public class PopupPlayer : MonoBehaviour {
 
             trackedMaxSize += config.NumToSpawn;
 
-            for (int i = 0; i < config.NumToSpawn; i++)
-                SpawnNewPopup(config.Popup).gameObject.SetActive(false);
+            for (int i = 0; i < config.NumToSpawn; i++) {
+
+                Popup spawned = SpawnNewPopup(config.Popup);
+                Pool(spawned);
+
+            }
 
         }
 
@@ -56,50 +62,67 @@ public class PopupPlayer : MonoBehaviour {
 
     private void Update() {
 
-        if (maxPoolSize != 0 && pool.Count > maxPoolSize) {
+        // destroy pooled objects when max pool size is reached, and log metrics
 
-            GameObject pooledItem = pool.Pop();
+        // don't waste time on any of Update if the pool is infinite and you doesn't want metrics
+        // the null check on pool is mainly just because i don't want this to run with [AlwaysExecute], i just want OnValidate
+        if (pool != null && (logMetrics || !infinitePool)) {
 
-            StartCoroutine(QueueForDestruction(pooledItem));
+            // get total pool size
+            // also figure out which type of popup has the most stuff in it
+            int poolSize = 0;
+            int maxPoolStackSize = 0;
+            Type maxPoolStackType = null;
 
+            foreach (Type key in pool.Keys) {
+
+                int poolStackSize = pool[key].Count;
+
+                poolSize += poolStackSize;
+
+                if (poolStackSize > maxPoolStackSize) {
+
+                    maxPoolStackSize = poolStackSize;
+                    maxPoolStackType = key;
+
+                }
+            }
+
+            // if pool does not have inf size, the pool has surpassed the max pool size, and the Queue is not empty or missing for the most pool-hogging Type
+            if (!infinitePool && poolSize > maxPoolSize && maxPoolStackType != null && pool[maxPoolStackType].Count == 0)
+                StartCoroutine(QueueForDestruction(pool[maxPoolStackType].Dequeue()));
+
+            if (logMetrics && poolSize > trackedMaxSize) {
+
+                trackedMaxSize = pool.Count;
+
+                Debug.Log("New max pool size reached: " + trackedMaxSize + ". Last max occured " + timeSinceLastMax + "s ago");
+
+                timeSinceLastMax = 0;
+
+            }
+
+            timeSinceLastMax += Time.deltaTime;
         }
-        if (pool.Count > trackedMaxSize) {
-
-            trackedMaxSize = pool.Count;
-
-            Debug.Log("New max pool size reached: " + trackedMaxSize + ". Last max occured " + timeSinceLastMax + "s ago");
-
-            timeSinceLastMax = 0;
-
-        }
-
-        timeSinceLastMax += Time.deltaTime;
 
     }
 
-    // try to get a pooled item of a specific Popup type 
-    // for type, pass in a child class of Popup (ex: PopupIcon)
-    private Popup GetPooledItem(Type type) {
+    public void Pool(Popup popup) {
 
-        int itemCount = poolParent.transform.childCount;
+        Type key = popup.GetType();
 
-        for (int i = 0; i < itemCount; i++) {
+        if (pool.ContainsKey(key))
+            pool[key].Enqueue(popup.gameObject);
+        else {
 
-            Popup item = poolParent.transform.GetChild(i).GetComponent<Popup>();
-
-            // we want an INACTIVE one, meaning it is not currently playing
-            if (!item.gameObject.activeSelf && item.GetType() == type)
-                return item;
+            pool.Add(key, new Queue<GameObject>());
+            pool[key].Enqueue(popup.gameObject);
 
         }
-
-        return null;
 
     }
 
     // allows a Popup to finish playing then destroys it
-    // note that Popups are only active when playing 
-    // they deactivate when they are done playing and want to swim in the pool
     private IEnumerator QueueForDestruction(GameObject pooledItem) {
 
         while (pooledItem.activeSelf == true)
@@ -109,17 +132,24 @@ public class PopupPlayer : MonoBehaviour {
 
     }
 
+    // spawn and initialize a new Popup, then pool it. returns the spawned Popup. it is inactive by default
     private Popup SpawnNewPopup(Popup popup) {
 
         Popup spawned = Instantiate(popup, poolParent.transform);
 
         spawned.Initialize();
 
-        pool.Push(spawned.gameObject);
+        //Pool(spawned);
 
         return spawned;
 
     }
+
+    // try to get a pooled item of a specific Popup type 
+    // for type, pass in a child class of Popup (ex: PopupIcon)
+    // popups are dequeued on play, requeued when told to by the popup
+    // check that a Queue of that type exists in the pool dict, and that it has stuff in it. if so, give me something from it!!
+    private Popup GetPooledItem(Type type) => pool.TryGetValue(type, out Queue<GameObject> typeQueue) && typeQueue.Count > 0 ? typeQueue.Dequeue().GetComponent<Popup>() : null;
 
     #endregion
 
@@ -155,6 +185,7 @@ public class PopupPlayer : MonoBehaviour {
 
         Popup toPlay = GetPooledItem(popup.GetType());
 
+        // got popup from pool
         if (toPlay != null)
             toPlay.SwapPopup(popup);
         else
@@ -170,6 +201,63 @@ public class PopupPlayer : MonoBehaviour {
         return toPlay;
 
     }
+
+    #endregion
+
+    #region Util
+
+    // if pool has limited size then force the max size to be at least as big as the total number of popups spawned on Start (or else ur using the system wrong)
+    private void OnValidate() {
+
+        if (!infinitePool) {
+
+            int initPoolSize = 0;
+
+            foreach (PopupPoolConfigurator config in poolInit)
+                initPoolSize += config.NumToSpawn;
+
+            if (maxPoolSize < initPoolSize) {
+                Debug.LogWarning("Max pool size cannot be lower than the configured initial pool size. The value has been automatically adjusted");
+                maxPoolSize = initPoolSize;
+            }
+
+        }
+
+    }
+
+#if UNITY_EDITOR
+
+    // hide the maxPoolSize field if infinitePool = true
+    // using UnityEditor prefix to avoid needing to hide the import in the final build -vv
+    [UnityEditor.CustomEditor(typeof(PopupPlayer), true)]
+    public class InteractableEditor : UnityEditor.Editor {
+
+        public override void OnInspectorGUI() {
+
+            serializedObject.Update();
+
+            // make sure its in the right order
+            UnityEditor.SerializedProperty poolParentProp = serializedObject.FindProperty("poolParent");
+            UnityEditor.SerializedProperty infinitePoolProp = serializedObject.FindProperty("infinitePool");
+            UnityEditor.SerializedProperty maxPoolSizeProp = serializedObject.FindProperty("maxPoolSize");
+            UnityEditor.SerializedProperty poolInitProp = serializedObject.FindProperty("poolInit");
+            UnityEditor.SerializedProperty logMetricsProp = serializedObject.FindProperty("logMetrics");
+
+            UnityEditor.EditorGUILayout.PropertyField(poolParentProp);
+
+            UnityEditor.EditorGUILayout.PropertyField(infinitePoolProp);
+
+            if (!infinitePoolProp.boolValue)
+                UnityEditor.EditorGUILayout.PropertyField(maxPoolSizeProp);
+
+            UnityEditor.EditorGUILayout.PropertyField(poolInitProp, true);
+            UnityEditor.EditorGUILayout.PropertyField(logMetricsProp);
+
+            serializedObject.ApplyModifiedProperties();
+
+        }
+    }
+#endif
 
     #endregion
 

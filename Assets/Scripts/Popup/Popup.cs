@@ -8,6 +8,7 @@ public abstract class Popup : MonoBehaviour {
     [Header("Default Duration")]
     [SerializeField] protected float duration;
 
+    private PopupPlayer popups;
 
     // switches the component configuration of this popup to that of Popup other
     // ex: for a PopupItem, wwap out the sprite and the runtime animation controller
@@ -25,15 +26,15 @@ public abstract class Popup : MonoBehaviour {
         float remaining = overrideDuration ?? duration;
         gameObject.SetActive(true);
 
-        if (persistent) {
+        if (persistent)
             while (gameObject.activeSelf) {
                 if (target != null)
                     transform.position = target.transform.position;
 
                 yield return new WaitForEndOfFrame();
             }
-        }
         else {
+
             while (remaining > 0f) {
                 if (target != null)
                     transform.position = target.transform.position;
@@ -49,17 +50,25 @@ public abstract class Popup : MonoBehaviour {
 
     }
 
-    // used for manual pooling or just to end a popup early
     // deactivate object if its active
+    public void StopPlaying() {
 
-    public void Stop() {
-
+        // Popups are deactivated when not playing, and you cant stop a stopped Popup
         if (gameObject.activeSelf)
             gameObject.SetActive(false);
 
     }
 
-    protected virtual void OnFinish() { }
+    // repool this Popup. override to enable special behavior on finish.
+    // WHEN REIMPLEMENTING, MAKE SURE TO CALL base.OnFinish()!!!!!!!!!!
+    protected virtual void OnFinish() {
+
+        if (popups == null)
+            popups = FindAnyObjectByType<PopupPlayer>();
+
+        popups.Pool(this);
+
+    }
 
     #region Legacy
 
