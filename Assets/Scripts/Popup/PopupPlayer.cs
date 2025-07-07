@@ -20,7 +20,13 @@ public class PopupPlayer : MonoBehaviour {
 
     [Header("Pool")]
     [SerializeField] private GameObject poolParent;
-    [SerializeField][Tooltip("Set to zero for no max")][Range(0, 300)] private int maxPoolSize;
+    [SerializeField][Tooltip("Set to zero for no max. Reccomended to leave at zero unless memory is super expensive (mobile game, or super heavy popups")][Min(0)] private int maxPoolSize;
+    [SerializeField][Tooltip("Use to spawn pooled popups on Start. Each entry should contain a different type of Popup Prefab, probably the ones in /[Prefabs]/Popups/Init")] private PopupPoolConfigurator[] poolInit;
+
+    [Header("Debug")]
+    [SerializeField] private bool logMetrics;
+    int trackedMaxSize;
+    float timeSinceLastMax;
 
     // the pool is primarily accessed using poolParent, with all of its children being pooled items and all pooled items being one of its children 
     // this Stack is only used to facilitate destroying pooled items when a maxPoolSize is set
@@ -33,6 +39,19 @@ public class PopupPlayer : MonoBehaviour {
 
         pool = new Stack<GameObject>();
 
+        trackedMaxSize = 0;
+        timeSinceLastMax = 0;
+
+        // spawn initial pool
+        foreach (PopupPoolConfigurator config in poolInit) {
+
+            trackedMaxSize += config.NumToSpawn;
+
+            for (int i = 0; i < config.NumToSpawn; i++)
+                SpawnNewPopup(config.Popup).gameObject.SetActive(false);
+
+        }
+
     }
 
     private void Update() {
@@ -44,6 +63,17 @@ public class PopupPlayer : MonoBehaviour {
             StartCoroutine(QueueForDestruction(pooledItem));
 
         }
+        if (pool.Count > trackedMaxSize) {
+
+            trackedMaxSize = pool.Count;
+
+            Debug.Log("New max pool size reached: " + trackedMaxSize + ". Last max occured " + timeSinceLastMax + "s ago");
+
+            timeSinceLastMax = 0;
+
+        }
+
+        timeSinceLastMax += Time.deltaTime;
 
     }
 
@@ -76,6 +106,18 @@ public class PopupPlayer : MonoBehaviour {
             yield return new WaitForEndOfFrame();
 
         Destroy(pooledItem);
+
+    }
+
+    private Popup SpawnNewPopup(Popup popup) {
+
+        Popup spawned = Instantiate(popup, poolParent.transform);
+
+        spawned.Initialize();
+
+        pool.Push(spawned.gameObject);
+
+        return spawned;
 
     }
 
@@ -115,13 +157,8 @@ public class PopupPlayer : MonoBehaviour {
 
         if (toPlay != null)
             toPlay.SwapPopup(popup);
-        else {
-
-            toPlay = Instantiate(popup, poolParent.transform);
-            toPlay.Initialize();
-            pool.Push(toPlay.gameObject);
-
-        }
+        else
+            toPlay = SpawnNewPopup(popup);
 
         if (target != null)
             toPlay.transform.position = target.transform.position;
