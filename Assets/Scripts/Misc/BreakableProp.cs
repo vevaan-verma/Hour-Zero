@@ -76,7 +76,11 @@ public class BreakableProp : MonoBehaviour {
         durability = totalDurability;
 
         broken = startBroken;
-        brokenObject.SetActive(startBroken);
+        brokenObject.SetActive(true);
+        defaultObject.SetActive(!startBroken);
+        foreach (Rigidbody rb in brokenObjectRbs)
+            rb.gameObject.SetActive(startBroken);
+
         defaultObject.SetActive(!startBroken);
 
         if (broken)
@@ -87,6 +91,13 @@ public class BreakableProp : MonoBehaviour {
 
         if (durability <= 0 && breakable && !broken)
             BreakProp();
+
+        if (!broken) {
+
+            brokenObject.transform.position = defaultObject.transform.position;
+            brokenObject.transform.rotation = defaultObject.transform.rotation;
+
+        }
 
     }
 
@@ -99,7 +110,8 @@ public class BreakableProp : MonoBehaviour {
 
             defaultObject.SetActive(false);
 
-            brokenObject.SetActive(true);
+            foreach (Rigidbody rb in brokenObjectRbs)
+                rb.gameObject.SetActive(true);
 
             // copy the kinematic state of the object onto the broken pieces
             brokenObject.transform.position = defaultObject.transform.position;
