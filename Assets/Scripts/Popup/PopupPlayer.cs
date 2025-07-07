@@ -3,8 +3,6 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-
-[ExecuteAlways]
 public class PopupPlayer : MonoBehaviour {
 
     /// <summary>
@@ -43,6 +41,20 @@ public class PopupPlayer : MonoBehaviour {
 
         trackedMaxSize = 0;
         timeSinceLastMax = 0;
+
+        if (!infinitePool) {
+
+            int initPoolSize = 0;
+
+            foreach (PopupPoolConfigurator config in poolInit)
+                initPoolSize += config.NumToSpawn;
+
+            if (maxPoolSize < initPoolSize) {
+                Debug.LogWarning("The max PopupPlayer pool size is lower than the configured initial pool size: the max pool size has been automatically adjusted.");
+                maxPoolSize = initPoolSize;
+            }
+
+        }
 
         // spawn initial pool
         foreach (PopupPoolConfigurator config in poolInit) {
@@ -204,26 +216,7 @@ public class PopupPlayer : MonoBehaviour {
 
     #endregion
 
-    #region Util
-
-    // if pool has limited size then force the max size to be at least as big as the total number of popups spawned on Start (or else ur using the system wrong)
-    private void OnValidate() {
-
-        if (!infinitePool) {
-
-            int initPoolSize = 0;
-
-            foreach (PopupPoolConfigurator config in poolInit)
-                initPoolSize += config.NumToSpawn;
-
-            if (maxPoolSize < initPoolSize) {
-                Debug.LogWarning("Max pool size cannot be lower than the configured initial pool size. The value has been automatically adjusted");
-                maxPoolSize = initPoolSize;
-            }
-
-        }
-
-    }
+    #region Custom Editor
 
 #if UNITY_EDITOR
 
