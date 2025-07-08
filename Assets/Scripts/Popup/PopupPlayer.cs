@@ -65,6 +65,7 @@ public class PopupPlayer : MonoBehaviour {
 
                 Popup spawned = SpawnNewPopup(config.Popup);
                 Pool(spawned);
+                spawned.gameObject.SetActive(false);
 
             }
 

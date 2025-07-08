@@ -98,9 +98,7 @@ public class BreakableProp : MonoBehaviour {
             brokenObject.transform.rotation = defaultObject.transform.rotation;
 
         }
-
     }
-
     // replace default prop with broken version, set state to broken
     private void BreakProp() {
 

@@ -1611,6 +1611,7 @@ GameObject:
   - component: {fileID: 2454963017769643028}
   - component: {fileID: 6946223905400006466}
   - component: {fileID: 8625111200644653022}
+  - component: {fileID: 4014912214931219350}
   m_Layer: 0
   m_Name: 'Size 1 '
   m_TagString: Untagged
@@ -1693,7 +1694,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 56427b6021941a348bbd3f964a3b1ea8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  colSound: 0
+  colSound: 10
   breakableProp: {fileID: 4677866702275147313}
   ignorePlayerCollisions: 0
 --- !u!54 &8625111200644653022
@@ -1723,6 +1724,18 @@ Rigidbody:
   m_Interpolate: 1
   m_Constraints: 0
   m_CollisionDetection: 2
+--- !u!114 &4014912214931219350
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2261545136620040178}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f7be6f1ab43efd74f90a10be906d53e5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &2377008525028540265
 GameObject:
   m_ObjectHideFlags: 0
@@ -4056,7 +4069,7 @@ MonoBehaviour:
   brokenObject: {fileID: 7718154655309346462}
   breakable: 1
   startBroken: 0
-  totalDurability: 7
+  totalDurability: 8
   minColSpeedHorizontal: 7
   minColSpeedVertical: 10
   minInheritedVelocity: 1

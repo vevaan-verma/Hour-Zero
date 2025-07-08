@@ -46,7 +46,8 @@ public class SFXLib : MonoBehaviour {
 
         //Misc
         Misc_Test,
-        Misc_NoSound
+        Misc_NoSound,
+        Misc_Oof
 
         #endregion
     }
@@ -101,6 +102,8 @@ public class SFXLib : MonoBehaviour {
         HashSet<PopupSound> seenSounds = new HashSet<PopupSound>();
         Dictionary<PopupSound, string> duplicateSoundLog = new Dictionary<PopupSound, string>();
 
+        HashSet<string> missingRefLog = new HashSet<string>();
+
         for (int i = 0; i < soundDict.Count; i++) {
             SFXEntry entry = soundDict[i];
 
@@ -128,7 +131,9 @@ public class SFXLib : MonoBehaviour {
 
             // check if missing sound
             if (entrySounds == null || entrySounds.Count == 0)
-                Debug.LogError("The SFXLib's soundDict entry for " + entry.Key + " is missing a reference to a PopupSound (Index " + i + ")");
+                missingRefLog.Add("The SFXLib's soundDict entry for " + entry.Key + " is missing a reference to a PopupSound (Index " + i + ")");
+
+
             else {
 
                 // check for dupes
@@ -152,20 +157,23 @@ public class SFXLib : MonoBehaviour {
 
         }
 
-        int totalErrors = duplicateKeyLog.Count + duplicateSoundLog.Count;
+        int totalErrors = duplicateKeyLog.Count + duplicateSoundLog.Count + missingRefLog.Count;
         hasErrors = totalErrors > 0;
 
         if (!hasErrors && modifyDict)
             Debug.Log("SFXLib has no errors: good to go!");
         else if (hasErrors) {
 
-
             Debug.LogWarning("The SFXLib has " + totalErrors + " errors.\n\t\t(Debug tip: Remove duplicate keys first)");
 
             foreach (Sounds key in duplicateKeyLog.Keys)
                 Debug.LogError(duplicateKeyLog[key]);
+
             foreach (PopupSound key in duplicateSoundLog.Keys)
                 Debug.LogError(duplicateSoundLog[key]);
+
+            foreach (string err in missingRefLog)
+                Debug.LogError(err);
 
         }
     }
