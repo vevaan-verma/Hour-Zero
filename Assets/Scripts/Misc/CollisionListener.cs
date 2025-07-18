@@ -21,17 +21,20 @@ public class CollisionListener : MonoBehaviour {
 
     private float cooldown;
 
-    [Header("Sound")]
+    [Header("Collision Sound")]
     [SerializeField] private SFXLib.Sounds colSound;
 
     [Header("Breakable Prop")]
+    [SerializeField] private bool linkedToBreakableProp;
     [SerializeField] private BreakableProp breakableProp;
 
-    [Header("Settings")]
+    [Header("Misc")]
     [SerializeField] private bool ignorePlayerCollisions;
 
     private Rigidbody rb;
     private AudioPlayer audioPlayer;
+
+    #region
 
     void Start() {
 
@@ -39,6 +42,9 @@ public class CollisionListener : MonoBehaviour {
         audioPlayer = GetComponent<AudioPlayer>();
 
         cooldown = collisionRegisterDelay;
+
+        if (linkedToBreakableProp == true && breakableProp == null)
+            Debug.LogError("CollisionListener " + gameObject.name + " (Parent: " + transform.parent.gameObject.name + ") is set as linked to a breakable prop, but no breakable prop has been assigned to it.");
 
     }
 
@@ -56,7 +62,7 @@ public class CollisionListener : MonoBehaviour {
             if (audioPlayer != null && collision.relativeVelocity.magnitude > minSpeedForSound)
                 audioPlayer.Play(colSound);
 
-            if (breakableProp != null)
+            if (linkedToBreakableProp)
                 breakableProp.ReportCollision(collision.relativeVelocity);
 
         }
@@ -74,9 +80,47 @@ public class CollisionListener : MonoBehaviour {
     // called when this gets hit
     public void Hit(float attackForce) {
 
-        if (breakableProp != null)
+        if (linkedToBreakableProp)
             breakableProp.ReportHit(attackForce);
 
     }
+
+    #endregion
+
+    #region Custom Editor
+
+#if UNITY_EDITOR
+
+    // hide the breakableProp field if 
+    // using UnityEditor prefix to avoid needing to hide the import in the final build -vv
+    [UnityEditor.CustomEditor(typeof(CollisionListener), true)]
+    public class InteractableEditor : UnityEditor.Editor {
+
+        public override void OnInspectorGUI() {
+
+            serializedObject.Update();
+
+            // make sure its in the right order
+            UnityEditor.SerializedProperty _colSound = serializedObject.FindProperty("colSound");
+            UnityEditor.SerializedProperty _linkedToBreakableProp = serializedObject.FindProperty("linkedToBreakableProp");
+            UnityEditor.SerializedProperty _breakableProp = serializedObject.FindProperty("breakableProp");
+            UnityEditor.SerializedProperty _ignorePlayerCollisions = serializedObject.FindProperty("ignorePlayerCollisions");
+
+            UnityEditor.EditorGUILayout.PropertyField(_colSound);
+
+            UnityEditor.EditorGUILayout.PropertyField(_linkedToBreakableProp);
+            if (_linkedToBreakableProp.boolValue)
+                UnityEditor.EditorGUILayout.PropertyField(_breakableProp);
+
+            UnityEditor.EditorGUILayout.PropertyField(_ignorePlayerCollisions);
+
+            serializedObject.ApplyModifiedProperties();
+
+        }
+    }
+#endif
+
+    #endregion
+
 
 }
