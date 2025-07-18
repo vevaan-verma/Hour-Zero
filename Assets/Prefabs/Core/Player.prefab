@@ -9,7 +9,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 9201363252189034877}
-  m_Layer: 2
+  m_Layer: 6
   m_Name: Feet
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -40,7 +40,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 2894038558208127171}
-  m_Layer: 2
+  m_Layer: 6
   m_Name: HoldPos
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -71,7 +71,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 4336792574799851453}
-  m_Layer: 2
+  m_Layer: 6
   m_Name: CameraPos
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -108,7 +108,7 @@ GameObject:
   - component: {fileID: 2282526092997653608}
   - component: {fileID: 7465638746457633178}
   - component: {fileID: 7633378405668028502}
-  m_Layer: 2
+  m_Layer: 6
   m_Name: Player
   m_TagString: Player
   m_Icon: {fileID: 0}
@@ -246,6 +246,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   cameraPos: {fileID: 4336792574799851453}
+  nonPlayerMask:
+    serializedVersion: 2
+    m_Bits: 447
   walkSpeed: 3500
   sprintSpeed: 5250
   airMultiplier: 0.4
@@ -274,7 +277,7 @@ MonoBehaviour:
   sprintBobAmount: 0.08
   bobMovementThreshold: 0.5
   feet: {fileID: 9201363252189034877}
-  groundCheckRadius: 0.25
+  groundCheckDistance: 0.25
   environmentMask:
     serializedVersion: 2
     m_Bits: 8

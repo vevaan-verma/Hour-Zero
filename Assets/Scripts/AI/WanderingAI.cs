@@ -13,9 +13,7 @@ public class WanderingAI : AI {
     [SerializeField, Tooltip("Minimum wait time at each destination")] private float minWaitTime;
     [SerializeField, Tooltip("Maximum wait time at each destination")] private float maxWaitTime;
 
-    private new void Update() {
-
-        base.Update();
+    private void Update() {
 
         #region WAITING/PATHFINDING
         if (!isWaiting && !ai.pathPending && (ai.reachedEndOfPath || !ai.hasPath)) {
@@ -25,6 +23,7 @@ public class WanderingAI : AI {
 
         }
         #endregion
+
     }
 
     private IEnumerator WaitAndSetNewDestination() {

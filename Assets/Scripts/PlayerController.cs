@@ -1,10 +1,10 @@
 using UnityEngine;
-using UnityEngine.UI;
 
 public class PlayerController : MonoBehaviour {
 
     [Header("References")]
     [SerializeField] private Transform cameraPos;
+    [SerializeField] private LayerMask nonPlayerMask; // mask for raycasts that should not hit the player
     private UIManager uiManager;
     private Rigidbody rb;
 
@@ -67,7 +67,7 @@ public class PlayerController : MonoBehaviour {
 
     [Header("Ground Check")]
     [SerializeField] private Transform feet;
-    [SerializeField] private float groundCheckRadius;
+    [SerializeField] private float groundCheckDistance;
     [SerializeField] private LayerMask environmentMask;
     private bool isGrounded;
 
@@ -101,7 +101,7 @@ public class PlayerController : MonoBehaviour {
         }
 
         #region GROUND CHECK
-        isGrounded = Physics.CheckSphere(feet.position, groundCheckRadius, environmentMask);
+        isGrounded = Physics.CheckSphere(feet.position, groundCheckDistance, environmentMask);
         #endregion
 
         #region MOVEMENT INPUT
@@ -309,9 +309,9 @@ public class PlayerController : MonoBehaviour {
 
         if (currGrabbedObject)
             uiManager.SetCrosshairType(CrosshairType.Grabbing);
-        else if (Physics.Raycast(cameraPos.position, cameraPos.forward, out RaycastHit hit, interactRange) && hit.collider.CompareTag("Interactable"))
+        else if (Physics.Raycast(cameraPos.position, cameraPos.forward, out RaycastHit hit, interactRange, nonPlayerMask) && hit.collider.CompareTag("Interactable"))
             uiManager.SetCrosshairType(CrosshairType.Interact);
-        else if (Physics.Raycast(cameraPos.position, cameraPos.forward, out hit, interactRange) && hit.rigidbody && !hit.rigidbody.isKinematic)
+        else if (Physics.Raycast(cameraPos.position, cameraPos.forward, out hit, interactRange, nonPlayerMask) && hit.rigidbody && !hit.rigidbody.isKinematic)
             uiManager.SetCrosshairType(CrosshairType.Grabbable);
         else
             uiManager.SetCrosshairType(CrosshairType.Default);

@@ -1,15 +1,26 @@
+using Pathfinding;
 using UnityEngine;
 
-public class NPCInteractable : Interactable {
+public class NPCController : Interactable {
 
     [Header("References")]
     private TaskManager taskManager;
     private TaskType? assignedTask;
+    private Animator animator;
+    private NPCFootIKController footIKController;
+    private Seeker seeker;
+    private AIPath aiPath;
+    private WanderingAI wanderingAI;
 
     private new void Start() {
 
         base.Start();
         taskManager = FindFirstObjectByType<TaskManager>();
+        animator = GetComponent<Animator>();
+        footIKController = GetComponent<NPCFootIKController>();
+        seeker = GetComponent<Seeker>();
+        aiPath = GetComponent<AIPath>();
+        wanderingAI = GetComponent<WanderingAI>();
 
     }
 
@@ -38,6 +49,23 @@ public class NPCInteractable : Interactable {
         assignedTask = randomTaskType;
 
         return true;
+
+    }
+
+    private void OnCollisionEnter(Collision collision) {
+
+        if (collision.gameObject.CompareTag("Player"))
+            EnableRagdoll(); // enable ragdoll physics when colliding with the player
+
+    }
+
+    private void EnableRagdoll() {
+
+        animator.enabled = false;
+        footIKController.enabled = false;
+        seeker.enabled = false;
+        aiPath.enabled = false;
+        wanderingAI.enabled = false;
 
     }
 }
