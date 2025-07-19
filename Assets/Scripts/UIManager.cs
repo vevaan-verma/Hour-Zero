@@ -78,22 +78,6 @@ public class UIManager : MonoBehaviour {
             else if (systemRepairMenu.IsMenuOpen()) // close system repair menu if it is open
                 CloseSystemRepairMenu();
 
-        if (Input.GetKeyDown(KeyCode.P)) {
-
-            phoneManager.CyclePhoneState(); // toggle phone state when P is pressed
-
-            if (phoneManager.IsPhoneToFace()) {
-
-                hotbarUI.CloseInventory(); // close the hotbar UI if the phone is to face
-                crosshair.gameObject.SetActive(false); // hide the crosshair when the phone is to face
-
-            } else {
-
-                hotbarUI.OpenInventory(); // re-open the hotbar UI if the phone is not to face
-                crosshair.gameObject.SetActive(true); // show the crosshair when the phone is not to face
-
-            }
-        }
     }
 
     public void OpenPrimaryBackpack() {
@@ -160,6 +144,21 @@ public class UIManager : MonoBehaviour {
         crosshair.gameObject.SetActive(true); // show the crosshair when the NPC menu is closed
         npcMenu.CloseMenu(); // close the NPC menu
 
+    }
+
+    public void OnPhoneStateCycle() {
+
+        if (phoneManager.IsPhoneToFace()) {
+
+            hotbarUI.CloseInventory(); // close the hotbar UI if the phone is to face
+            crosshair.gameObject.SetActive(false); // hide the crosshair when the phone is to face
+
+        } else {
+
+            hotbarUI.OpenInventory(); // re-open the hotbar UI if the phone is not to face
+            crosshair.gameObject.SetActive(true); // show the crosshair when the phone is not to face
+
+        }
     }
 
     public void SetCrosshairType(CrosshairType type) {

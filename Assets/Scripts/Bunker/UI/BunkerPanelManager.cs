@@ -8,6 +8,8 @@ public class BunkerPanelManager : MonoBehaviour {
 
     [Header("References")]
     [SerializeField] private BunkerSystem[] bunkerSystems;
+    public Action onRefreshTextUpdate; // event to notify when the refresh text is updated
+    public Action onPanelRefresh; // event to notify when the panel is refreshed
 
     [Header("UI References")]
     [SerializeField] private BunkerSystemUI[] bunkerSystemUIs;
@@ -112,11 +114,14 @@ public class BunkerPanelManager : MonoBehaviour {
             refreshText.text = "Refreshing...";
             RefreshPanel();
             RefreshLayout(panelRectTransform);
+            onRefreshTextUpdate?.Invoke(); // notify subscribers that the refresh text has been updated
+            onPanelRefresh?.Invoke(); // notify subscribers that the panel has been refreshed
             yield return new WaitForSeconds(1f); // simulate time taken to refresh
 
             int timeUntilNextRefresh = refreshInterval - 1; // -1 because we already waited 1 second above
 
             refreshText.text = "Refreshes in " + timeUntilNextRefresh + "s...";
+            onRefreshTextUpdate?.Invoke(); // notify subscribers that the refresh text has been updated
             RefreshLayout(panelRectTransform);
 
             while (timeUntilNextRefresh > 0) {
@@ -124,6 +129,7 @@ public class BunkerPanelManager : MonoBehaviour {
                 yield return new WaitForSeconds(1f);
                 timeUntilNextRefresh--;
                 refreshText.text = "Refreshes in " + timeUntilNextRefresh + "s...";
+                onRefreshTextUpdate?.Invoke(); // notify subscribers that the refresh text has been updated
 
             }
         }
@@ -156,10 +162,15 @@ public class BunkerPanelManager : MonoBehaviour {
 
     private void RefreshLayout(RectTransform root) {
 
-        foreach (var layoutGroup in root.GetComponentsInChildren<LayoutGroup>())
+        foreach (LayoutGroup layoutGroup in root.GetComponentsInChildren<LayoutGroup>())
             LayoutRebuilder.ForceRebuildLayoutImmediate(layoutGroup.GetComponent<RectTransform>());
 
     }
+
+    public BunkerSystem[] GetBunkerSystems() => bunkerSystems;
+
+    public string GetRefreshText() => refreshText.text;
+
 }
 
 [Serializable]

@@ -16,7 +16,8 @@ public class Item : ScriptableObject {
     [SerializeField] private float attackDistance;
     [SerializeField] private float attackForce;
     [SerializeField] private float attackCooldown;
-    [Space]
+
+    [Header("Tasks")]
     [SerializeField, Tooltip("Whether this item is a dropoff item that can be used in the DoomsdayDropoff task")] private bool isDropoffItem;
     [SerializeField, Min(1), Tooltip("The amount of this item that need to be dropped off in the DoomsdayDropoff task")] private int dropoffCount;
 
