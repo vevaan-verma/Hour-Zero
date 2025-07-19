@@ -1,13 +1,9 @@
-using System.Collections;
 using System.Linq;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
 public class UIManager : MonoBehaviour {
-
-    [Header("References")]
-    private TimeManager timeManager;
 
     [Header("Hotbar")]
     private HotbarUI hotbarUI;
@@ -23,16 +19,15 @@ public class UIManager : MonoBehaviour {
     [Header("NPC")]
     private NPCMenu npcMenu; // reference to the NPC menu (used for opening the menu when interacting with an NPC)
 
+    [Header("Phone")]
+    private PhoneManager phoneManager;
+
     [Header("Crosshair")]
     [SerializeField] private Image crosshair;
     [SerializeField] private Sprite defaultCrosshair;
     [SerializeField] private Sprite interactCrosshair;
     [SerializeField] private Sprite grabbableCrosshair;
     [SerializeField] private Sprite grabbingCrosshair;
-
-    [Header("Time")]
-    [SerializeField] private TMP_Text timeText;
-    [SerializeField] private TMP_Text dayText;
 
     private void Start() {
 
@@ -62,11 +57,9 @@ public class UIManager : MonoBehaviour {
         primaryBackpackUI = FindObjectsByType<BackpackUI>(FindObjectsSortMode.None).FirstOrDefault(ui => ui.GetBackpackType() == BackpackType.Primary); // find the primary backpack UI
         systemRepairMenu = FindFirstObjectByType<SystemRepairMenu>();
         npcMenu = FindFirstObjectByType<NPCMenu>();
-        timeManager = FindFirstObjectByType<TimeManager>();
+        phoneManager = FindFirstObjectByType<PhoneManager>();
 
         crosshair.sprite = defaultCrosshair; // set the crosshair to the default crosshair at the start
-
-        UpdateTimeHUD(timeManager.GetDay(), timeManager.GetHour(), timeManager.GetMinute(), timeManager.IsAM());
 
     }
 
@@ -85,8 +78,22 @@ public class UIManager : MonoBehaviour {
             else if (systemRepairMenu.IsMenuOpen()) // close system repair menu if it is open
                 CloseSystemRepairMenu();
 
-        UpdateTimeHUD(timeManager.GetDay(), timeManager.GetHour(), timeManager.GetMinute(), timeManager.IsAM());
+        if (Input.GetKeyDown(KeyCode.P)) {
 
+            phoneManager.CyclePhoneState(); // toggle phone state when P is pressed
+
+            if (phoneManager.IsPhoneToFace()) {
+
+                hotbarUI.CloseInventory(); // close the hotbar UI if the phone is to face
+                crosshair.gameObject.SetActive(false); // hide the crosshair when the phone is to face
+
+            } else {
+
+                hotbarUI.OpenInventory(); // re-open the hotbar UI if the phone is not to face
+                crosshair.gameObject.SetActive(true); // show the crosshair when the phone is not to face
+
+            }
+        }
     }
 
     public void OpenPrimaryBackpack() {
@@ -183,16 +190,7 @@ public class UIManager : MonoBehaviour {
         }
     }
 
-    private void UpdateTimeHUD(int day, int hour, int minute, bool isAM) {
-
-        timeText.text = $"{hour:00}:{minute:00} " + (isAM ? "AM" : "PM");
-        dayText.text = $"Day {day}";
-
-    }
-
-    public bool IsPrimaryBackpackOpen() => primaryBackpackUI.IsInventoryOpen();
-
-    public bool IsMenuOpen() => primaryBackpackUI.IsInventoryOpen() || systemRepairMenu.IsMenuOpen() || npcMenu.IsMenuOpen();
+    public bool IsMenuOpen() => primaryBackpackUI.IsInventoryOpen() || systemRepairMenu.IsMenuOpen() || npcMenu.IsMenuOpen() || phoneManager.IsPhoneToFace();
 
 }
 
