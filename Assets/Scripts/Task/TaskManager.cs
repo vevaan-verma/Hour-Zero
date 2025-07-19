@@ -118,7 +118,7 @@ public class DoomsdayDropoffTask : BaseTask {
         this.hotbar = hotbar;
 
     }
-    
+
     public override bool CheckCompletion() {
 
         ItemStack heldItemStack = hotbar.GetItemStack(hotbar.GetSelectedIndex());

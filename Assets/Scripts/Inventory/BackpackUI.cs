@@ -69,7 +69,7 @@ public class BackpackUI : InventoryUI {
         closeBackpackButton.interactable = true; // enable close button to allow closing backpack
         uiPanel.gameObject.SetActive(true); // make sure the backpack panel is active while opening
 
-        animator.SetTrigger("openBackpack"); // trigger open animation
+        animator.SetTrigger("openMenu"); // trigger open animation
 
         Cursor.lockState = CursorLockMode.None; // unlock cursor
         Cursor.visible = true; // make cursor visible
@@ -84,7 +84,7 @@ public class BackpackUI : InventoryUI {
         closeBackpackButton.interactable = false; // disable close button to prevent multiple clicks (as this could mess with the toggle logic)
         uiPanel.gameObject.SetActive(true); // make sure the backpack panel is active while closing
 
-        animator.SetTrigger("closeBackpack"); // trigger close animation
+        animator.SetTrigger("closeMenu"); // trigger close animation
 
         Cursor.lockState = CursorLockMode.Locked; // lock cursor
         Cursor.visible = false; // hide cursor

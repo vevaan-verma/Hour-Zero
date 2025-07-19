@@ -18,7 +18,10 @@ public class UIManager : MonoBehaviour {
     private BackpackUI primaryBackpackUI; // this is the backpack UI used for the opening the backpack itself, not exchange menus
 
     [Header("System Repair")]
-    [SerializeField] private SystemRepairMenu systemRepairMenu; // reference to the system repair menu (used for opening the menu when interacting with a system interactable)
+    private SystemRepairMenu systemRepairMenu; // reference to the system repair menu (used for opening the menu when interacting with a system interactable)
+
+    [Header("NPC")]
+    private NPCMenu npcMenu; // reference to the NPC menu (used for opening the menu when interacting with an NPC)
 
     [Header("Crosshair")]
     [SerializeField] private Image crosshair;
@@ -58,6 +61,7 @@ public class UIManager : MonoBehaviour {
         hotbarUI = FindFirstObjectByType<HotbarUI>();
         primaryBackpackUI = FindObjectsByType<BackpackUI>(FindObjectsSortMode.None).FirstOrDefault(ui => ui.GetBackpackType() == BackpackType.Primary); // find the primary backpack UI
         systemRepairMenu = FindFirstObjectByType<SystemRepairMenu>();
+        npcMenu = FindFirstObjectByType<NPCMenu>();
         timeManager = FindFirstObjectByType<TimeManager>();
 
         crosshair.sprite = defaultCrosshair; // set the crosshair to the default crosshair at the start
@@ -125,6 +129,32 @@ public class UIManager : MonoBehaviour {
 
     }
 
+    public void OpenNPCMenu(NPCController npcController) {
+
+        if (IsMenuOpen()) return; // do nothing if a menu is open
+
+        Cursor.lockState = CursorLockMode.None; // unlock the cursor when the NPC menu is open
+        Cursor.visible = true; // make the cursor visible when the NPC menu is open
+
+        hotbarUI.CloseInventory(); // close the hotbar UI if it is open (this is done to ensure the hotbar is not visible when the NPC menu is open)
+        crosshair.gameObject.SetActive(false); // hide the crosshair when the NPC menu is open
+        npcMenu.OpenMenu(npcController); // open the NPC menu
+
+    }
+
+    public void CloseNPCMenu() {
+
+        if (!npcMenu.IsMenuOpen()) return; // do nothing if the NPC menu is not open
+
+        Cursor.lockState = CursorLockMode.Locked; // lock the cursor when the NPC menu is closed
+        Cursor.visible = false; // hide the cursor when the NPC menu is closed
+
+        hotbarUI.OpenInventory(); // re-open the hotbar UI
+        crosshair.gameObject.SetActive(true); // show the crosshair when the NPC menu is closed
+        npcMenu.CloseMenu(); // close the NPC menu
+
+    }
+
     public void SetCrosshairType(CrosshairType type) {
 
         switch (type) {
@@ -160,32 +190,9 @@ public class UIManager : MonoBehaviour {
 
     }
 
-    private IEnumerator Fade(CanvasGroup ui, float targetAlpha, float duration) {
-
-        float currentTime = 0f;
-        float startAlpha = ui.alpha;
-
-        ui.gameObject.SetActive(true); // ensure UI is active before fading
-
-        while (currentTime < duration) {
-
-            currentTime += Time.deltaTime;
-            ui.alpha = Mathf.Lerp(startAlpha, targetAlpha, currentTime / duration);
-            yield return null;
-
-        }
-
-        ui.alpha = targetAlpha; // ensure final alpha is set
-
-        // if the target alpha is 0, disable the UI
-        if (targetAlpha == 0f)
-            ui.gameObject.SetActive(false);
-
-    }
-
     public bool IsPrimaryBackpackOpen() => primaryBackpackUI.IsInventoryOpen();
 
-    public bool IsMenuOpen() => primaryBackpackUI.IsInventoryOpen() || systemRepairMenu.IsMenuOpen();
+    public bool IsMenuOpen() => primaryBackpackUI.IsInventoryOpen() || systemRepairMenu.IsMenuOpen() || npcMenu.IsMenuOpen();
 
 }
 

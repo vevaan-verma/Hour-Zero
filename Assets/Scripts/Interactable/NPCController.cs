@@ -1,26 +1,43 @@
 using Pathfinding;
+using System.Collections;
 using UnityEngine;
 
 public class NPCController : Interactable {
 
     [Header("References")]
-    private TaskManager taskManager;
-    private TaskType? assignedTask;
-    private Animator animator;
-    private NPCFootIKController footIKController;
-    private Seeker seeker;
+    private UIManager uiManager;
     private AIPath aiPath;
-    private WanderingAI wanderingAI;
+    private Animator animator;
+    private Transform player;
+    private Coroutine lookCoroutine;
+
+    [Header("Settings")]
+    [SerializeField] private NPCType npcType;
+    [SerializeField] private Gender gender;
+    [SerializeField, Tooltip("How quickly the NPC should look at the player when interacting")] private float lookSpeed;
+    [SerializeField, Tooltip("How high above the ground the foot should be positioned")] private float footHeightOffset;
+    [SerializeField] private LayerMask environmentMask;
+    private bool isInteracting; // whether the NPC is currently interacting with the player
+
+    [Header("Ground Check")]
+    [SerializeField] private float raycastDistance; // distance to raycast down from the foot position
 
     private new void Start() {
 
         base.Start();
-        taskManager = FindFirstObjectByType<TaskManager>();
-        animator = GetComponent<Animator>();
-        footIKController = GetComponent<NPCFootIKController>();
-        seeker = GetComponent<Seeker>();
+        uiManager = FindFirstObjectByType<UIManager>();
         aiPath = GetComponent<AIPath>();
-        wanderingAI = GetComponent<WanderingAI>();
+        animator = GetComponent<Animator>();
+        player = FindFirstObjectByType<PlayerController>().transform;
+
+    }
+
+    private void Update() => animator.SetFloat("speed", aiPath.canMove ? aiPath.velocity.magnitude : 0f); // update the animator speed based on the NPC's velocity
+
+    private void OnAnimatorIK(int layerIndex) {
+
+        AdjustFootIK(AvatarIKGoal.LeftFoot);
+        AdjustFootIK(AvatarIKGoal.RightFoot);
 
     }
 
@@ -28,44 +45,78 @@ public class NPCController : Interactable {
 
         if (!base.Interact()) return false; // if the base interaction fails, do not proceed
 
-        if (assignedTask != null) {
-
-            bool taskCompleted = taskManager.CheckTaskCompletion();
-
-            if (taskCompleted)
-                assignedTask = null;// reset the assigned task if it was completed
-
-            return taskCompleted; // return whether the task was completed or not
-
-        }
-
-        // at this point, there is no assigned task, so we can assign a new one
-
-        // assign a random task to the player
-        TaskType[] taskTypes = (TaskType[]) System.Enum.GetValues(typeof(TaskType));
-        TaskType randomTaskType = taskTypes[Random.Range(0, taskTypes.Length)];
-
-        taskManager.AssignTask(randomTaskType);
-        assignedTask = randomTaskType;
+        isInteracting = true;
+        aiPath.canMove = false; // stop the NPC from moving while the menu is open
+        uiManager.OpenNPCMenu(this); // open the NPC menu with the current NPC controller and data
+        lookCoroutine = StartCoroutine(LookAtPlayer()); // start looking at the player
 
         return true;
 
     }
 
-    private void OnCollisionEnter(Collision collision) {
+    private void AdjustFootIK(AvatarIKGoal foot) {
 
-        if (collision.gameObject.CompareTag("Player"))
-            EnableRagdoll(); // enable ragdoll physics when colliding with the player
+        Vector3 footPos = animator.GetIKPosition(foot); // get the current IK position of the foot
+        Vector3 rayOrigin = footPos + Vector3.up * 0.1f; // start raycast slightly above the foot position
+
+        if (Physics.Raycast(rayOrigin, Vector3.down, out RaycastHit hit, raycastDistance, environmentMask)) { // use a raycast to check if the foot is on the ground
+
+            Vector3 footTargetPos = hit.point + Vector3.up * footHeightOffset; // adjust the target position to be above the ground hit point
+
+            Quaternion footRot = animator.GetIKRotation(foot); // get the current IK rotation of the foot
+            Vector3 projectedForward = Vector3.ProjectOnPlane(transform.forward, hit.normal).normalized; // project the body's forward direction onto the ground plane to align the foot with the ground normal (using the body's forward direction is more accurate than the foot's forward direction)
+            Quaternion targetRot = Quaternion.LookRotation(projectedForward, hit.normal); // create a rotation that aligns the foot's forward direction with the ground normal
+
+            float distanceToGround = hit.distance - footHeightOffset; // calculate the distance from the foot to the ground hit point, adjusted by the foot height offset
+            float ikWeight = Mathf.Clamp01(1f - (distanceToGround / raycastDistance)); // calculate the IK weight based on the distance to the ground, clamped between 0 and 1; close = 1, far = 0
+
+            // set the IK position and rotation for the foot with weighting
+            animator.SetIKPositionWeight(foot, ikWeight);
+            animator.SetIKRotationWeight(foot, ikWeight);
+            animator.SetIKPosition(foot, Vector3.Lerp(footPos, footTargetPos, ikWeight));
+            animator.SetIKRotation(foot, Quaternion.Slerp(footRot, targetRot, ikWeight));
+
+        } else {
+
+            // if the raycast did not hit the ground, reset the IK position and rotation weights to zero
+            animator.SetIKPositionWeight(foot, 0f);
+            animator.SetIKRotationWeight(foot, 0f);
+
+        }
+    }
+
+    private IEnumerator LookAtPlayer() {
+
+        while (isInteracting) {
+
+            Vector3 direction = player.position - transform.position;
+            direction.y = 0; // keep rotation on horizontal plane
+
+            if (direction.sqrMagnitude > 0.01f) {
+
+                Quaternion targetRotation = Quaternion.LookRotation(direction);
+                transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, Time.deltaTime * lookSpeed);
+
+            }
+
+            yield return null;
+
+        }
+
+        lookCoroutine = null; // reset coroutine reference
 
     }
 
-    private void EnableRagdoll() {
+    public NPCType GetNPCType() => npcType;
 
-        animator.enabled = false;
-        footIKController.enabled = false;
-        seeker.enabled = false;
-        aiPath.enabled = false;
-        wanderingAI.enabled = false;
+    public Gender GetGender() => gender;
 
-    }
+}
+
+public enum NPCType {
+
+    Scavenger,
+    Medic,
+    Guard
+
 }

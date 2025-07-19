@@ -17,7 +17,7 @@ public class SystemRepairMenu : MonoBehaviour {
     [Header("UI References")]
     [SerializeField] private CanvasGroup menuPanel;
     [SerializeField] private RepairInventoryUI repairInventoryUI; // reference to the repair inventory UI
-    [SerializeField] private Button closeRepairMenuButton;
+    [SerializeField] private Button closeMenuButton;
     private BackpackUI repairBackpackUI; // reference to the backpack UI used for repairing systems
     private bool isMenuOpen;
     private Coroutine fadeCoroutine;
@@ -34,7 +34,7 @@ public class SystemRepairMenu : MonoBehaviour {
         alertManager = FindFirstObjectByType<AlertManager>();
         uiManager = FindFirstObjectByType<UIManager>();
 
-        closeRepairMenuButton.onClick.AddListener(() => uiManager.CloseSystemRepairMenu()); // add listener to close menu button; call the UIManager method to close the system repair menu rather than this class directly to ensure the extra logic is executed (e.g., re-opening the hotbar UI)
+        closeMenuButton.onClick.AddListener(() => uiManager.CloseSystemRepairMenu()); // add listener to close menu button; call the UIManager method to close the system repair menu rather than this class directly to ensure the extra logic is executed (e.g., re-opening the hotbar UI)
 
         menuPanel.gameObject.SetActive(false); // make sure the menu is hidden by default
 
@@ -75,7 +75,7 @@ public class SystemRepairMenu : MonoBehaviour {
         fadeCoroutine = StartCoroutine(Fade(menuPanel, 0f, menuFadeDuration)); // fade out the menu
 
     }
-
+    
     // when the repair requirements are met, the player has put all the necessary items in the repair inventory to repair the system
     public void OnRepairRequirementsMet(int repairPercent, BunkerSystemType systemType) {
 

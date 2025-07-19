@@ -5,6 +5,7 @@ public class PlayerController : MonoBehaviour {
     [Header("References")]
     [SerializeField] private Transform cameraPos;
     [SerializeField] private LayerMask nonPlayerMask; // mask for raycasts that should not hit the player
+    private TaskManager taskManager;
     private UIManager uiManager;
     private Rigidbody rb;
 
@@ -65,6 +66,9 @@ public class PlayerController : MonoBehaviour {
     private float defaultYPos;
     private float timer;
 
+    [Header("Tasks")]
+    private TaskType? assignedTask;
+
     [Header("Ground Check")]
     [SerializeField] private Transform feet;
     [SerializeField] private float groundCheckDistance;
@@ -77,7 +81,8 @@ public class PlayerController : MonoBehaviour {
 
     private void Start() {
 
-        uiManager = FindFirstObjectByType<UIManager>(); // find the UI manager in the scene
+        taskManager = FindFirstObjectByType<TaskManager>();
+        uiManager = FindFirstObjectByType<UIManager>();
         rb = GetComponent<Rigidbody>();
         hotbar = FindFirstObjectByType<Hotbar>();
         itemHolder = FindFirstObjectByType<ItemHolder>();
@@ -299,6 +304,36 @@ public class PlayerController : MonoBehaviour {
 
     public float GetHeadbobOffset() => cameraPos.localPosition.y - defaultYPos; // returns the headbob offset from the default position
 
+    public bool AssignRandomTask() {
+
+        if (assignedTask != null) return false; // if there is already an assigned task, return false
+
+        // at this point, there is no assigned task, so we can assign a new one
+
+        // assign a random task to the player
+        TaskType[] taskTypes = (TaskType[]) System.Enum.GetValues(typeof(TaskType));
+        TaskType randomTaskType = taskTypes[Random.Range(0, taskTypes.Length)];
+
+        taskManager.AssignTask(randomTaskType);
+        assignedTask = randomTaskType;
+
+        return true;
+
+    }
+
+    public bool CheckTaskCompletion() {
+
+        if (assignedTask == null) return false; // if there is no assigned task, return false
+
+        bool taskCompleted = taskManager.CheckTaskCompletion(); // check if the task was completed
+
+        if (taskCompleted)
+            assignedTask = null; // reset the assigned task if it was completed
+
+        return taskCompleted; // return whether the task was completed or not
+
+    }
+
     public void SetCrosshair() {
 
         // order of priority:
@@ -317,4 +352,7 @@ public class PlayerController : MonoBehaviour {
             uiManager.SetCrosshairType(CrosshairType.Default);
 
     }
+
+    public TaskType? GetAssignedTask() => assignedTask; // returns the currently assigned task, or null if there is no assigned task
+
 }
