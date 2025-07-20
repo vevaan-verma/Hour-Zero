@@ -1,27 +1,23 @@
 using System;
 using TMPro;
 using UnityEngine;
-using UnityEngine.UI;
 
-public class BunkaAppManager : MonoBehaviour {
+public class BunkaAppManager : AppManager {
 
     [Header("References")]
     private BunkerPanelManager bunkerPanelManager;
     private BunkerSystem[] bunkerSystems; // array of bunker systems managed by the panel
+    private RectTransform rectTransform;
 
     [Header("UI References")]
     [SerializeField] private BunkerSystemUI[] bunkerSystemUIs;
     [SerializeField] private TMP_Text refreshText;
 
-    private void OnEnable() {
+    // use Awake for validation to ensure all systems are initialized before any UI updates/app refreshes, which happen in Start
+    private void Awake() {
 
         bunkerPanelManager = FindFirstObjectByType<BunkerPanelManager>();
-        bunkerPanelManager.onPanelRefresh += RefreshApp;
-        bunkerPanelManager.onRefreshTextUpdate += UpdateRefreshText;
-
-    }
-
-    private void Start() {
+        rectTransform = GetComponent<RectTransform>();
 
         #region VALIDATION
         // make sure each bunker system type has a corresponding UI
@@ -57,7 +53,26 @@ public class BunkaAppManager : MonoBehaviour {
 
     }
 
-    public void RefreshApp() {
+    private void OnEnable() {
+
+        // subscribe to events from the bunker panel manager to update the app UI
+        bunkerPanelManager.onPanelRefresh += RefreshApp;
+        bunkerPanelManager.onRefreshTextUpdate += UpdateRefreshText;
+
+        RefreshApp(); // initial refresh to set up the UI with current system statuses
+        UpdateRefreshText(); // initial update of the refresh text
+
+    }
+
+    private void OnDisable() {
+
+        // unsubscribe from events to avoid memory leaks
+        bunkerPanelManager.onPanelRefresh -= RefreshApp;
+        bunkerPanelManager.onRefreshTextUpdate -= UpdateRefreshText;
+
+    }
+
+    public override void RefreshApp() {
 
         foreach (BunkerSystemUI slider in bunkerSystemUIs) {
 
@@ -66,16 +81,10 @@ public class BunkaAppManager : MonoBehaviour {
 
         }
 
-        RefreshLayout(transform.parent.GetComponent<RectTransform>()); // refresh the layout of the app UI
+        RefreshLayout(rectTransform); // refresh the layout of the app UI
 
     }
 
     public void UpdateRefreshText() => refreshText.text = bunkerPanelManager.GetRefreshText(); // update the refresh text from the bunker panel manager
 
-    private void RefreshLayout(RectTransform root) {
-
-        foreach (LayoutGroup layoutGroup in root.GetComponentsInChildren<LayoutGroup>())
-            LayoutRebuilder.ForceRebuildLayoutImmediate(layoutGroup.GetComponent<RectTransform>());
-
-    }
 }

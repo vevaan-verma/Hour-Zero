@@ -12,8 +12,9 @@ public class Hotbar : Inventory {
     private int lastSelectedIndex; // used to avoid re-updating the held item when the selected item and index are the same as the last selected item and index; essentially, this means the same item was re-equipped (prevents playing the equip animation each time the backpack contents are updated)
     private Item lastSelectedItem; // used to avoid re-updating the held item when the selected item and index are the same as the last selected item and index; essentially, this means the same item was re-equipped (prevents playing the equip animation each time the backpack contents are updated)
 
-    [Header("Data")]
+    [Header("Actions")]
     public Action onSlotSelected;
+
     // don't use the hotbar's contents array to get the item stacks, use the backpack's contents array instead
 
     public override void Initialize() {

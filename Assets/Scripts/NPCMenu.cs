@@ -7,12 +7,10 @@ using UnityEngine.UI;
 public class NPCMenu : MonoBehaviour {
 
     [Header("References")]
-    private PlayerController playerController;
+    private TaskManager taskManager;
     private UIManager uiManager;
-    private NameDatabase nameDatabase;
-    private TaskDatabase taskDatabase;
-    private NPCController currNPCController; // reference to the currently interacted NPC controller
     private Animator animator;
+    private NPCData currNPCData; // the current NPC data for this menu, set when the menu is opened
 
     [Header("UI References")]
     [SerializeField] private CanvasGroup menuPanel;
@@ -44,20 +42,18 @@ public class NPCMenu : MonoBehaviour {
 
     private void Start() {
 
-        playerController = FindFirstObjectByType<PlayerController>();
+        taskManager = FindFirstObjectByType<TaskManager>();
         uiManager = FindFirstObjectByType<UIManager>();
         animator = GetComponent<Animator>();
         dialogueDatabase = FindFirstObjectByType<DialogueDatabase>();
-        nameDatabase = FindFirstObjectByType<NameDatabase>();
-        taskDatabase = FindFirstObjectByType<TaskDatabase>();
 
         teamButton.onClick.AddListener(() => {
 
             interactSection.SetActive(false); // hide the interact section
             dialogueSection.SetActive(true); // show the dialogue section
 
-            if (playerController.AssignRandomTask())
-                currDialogueSequence = taskDatabase.GetTaskData((TaskType) playerController.GetAssignedTask()).GetRandomDialogueSequence().GetDialogueLines();
+            if (taskManager.AssignRandomTask(currNPCData))
+                currDialogueSequence = taskManager.GetActiveTask().GetTaskData().GetRandomDialogueSequence().GetDialogueLines();
             else
                 currDialogueSequence = alreadyAssignedTaskSequences[Random.Range(0, alreadyAssignedTaskSequences.Length)].GetDialogueLines(); // get a random dialogue sequence for already assigned tasks
 
@@ -90,9 +86,9 @@ public class NPCMenu : MonoBehaviour {
 
     }
 
-    public void OpenMenu(NPCController npcController) {
+    public void OpenMenu(NPCData npcData) {
 
-        this.currNPCController = npcController; // store the current NPC controller
+        currNPCData = npcData; // set the NPC data for this menu
 
         isMenuOpen = true; // set the menu state to open
         menuPanel.gameObject.SetActive(true); // make sure the menu is active
@@ -100,7 +96,7 @@ public class NPCMenu : MonoBehaviour {
         dialogueSection.SetActive(false); // ensure the dialogue section is hidden by default
         interactSection.SetActive(true); // ensure the interact section is active by default
 
-        npcNameText.text = nameDatabase.GetRandomName(npcController.GetGender()) + " (" + npcController.GetNPCType() + ")"; // set the NPC name text based on the NPC's gender and type
+        npcNameText.text = npcData.GetName() + " (" + npcData.GetNPCType() + ")"; // set the NPC name text based on the NPC's sex and type
 
         animator.SetTrigger("openMenu"); // trigger the open menu animation
 

@@ -19,7 +19,7 @@ public class Item : ScriptableObject {
 
     [Header("Tasks")]
     [SerializeField, Tooltip("Whether this item is a dropoff item that can be used in the DoomsdayDropoff task")] private bool isDropoffItem;
-    [SerializeField, Min(1), Tooltip("The amount of this item that need to be dropped off in the DoomsdayDropoff task")] private int dropoffCount;
+    [Tooltip("The amount of this item that need to be dropped off in the DoomsdayDropoff task")] private const int dropoffCount = 1; // this is fixed to 1 currently; if this needs to be changed through the inspector, remember to reserialize the field and un-comment out the code in the custom Item editor class below
 
     public string GetName() => itemName;
 
@@ -85,18 +85,18 @@ public enum ItemType {
 // using UnityEditor prefix to avoid needing to hide the import in the final build
 public class ItemEditor : UnityEditor.Editor {
 
-    public override void OnInspectorGUI() {
+    //public override void OnInspectorGUI() {
 
-        serializedObject.Update();
+    //    serializedObject.Update();
 
-        DrawPropertiesExcluding(serializedObject, "dropoffCount"); // draw all properties except dropoffCount
+    //    DrawPropertiesExcluding(serializedObject, "dropoffCount"); // draw all properties except dropoffCount
 
-        // conditionally draw the dropoff count field based on the isDropoffItem property
-        if (serializedObject.FindProperty("isDropoffItem").boolValue == true)
-            UnityEditor.EditorGUILayout.PropertyField(serializedObject.FindProperty("dropoffCount"));
+    //    // conditionally draw the dropoff count field based on the isDropoffItem property
+    //    if (serializedObject.FindProperty("isDropoffItem").boolValue == true)
+    //        UnityEditor.EditorGUILayout.PropertyField(serializedObject.FindProperty("dropoffCount"));
 
-        serializedObject.ApplyModifiedProperties();
+    //    serializedObject.ApplyModifiedProperties();
 
-    }
+    //}
 }
 #endif

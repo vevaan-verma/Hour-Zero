@@ -129,7 +129,7 @@ public class UIManager : MonoBehaviour {
 
         hotbarUI.CloseInventory(); // close the hotbar UI if it is open (this is done to ensure the hotbar is not visible when the NPC menu is open)
         crosshair.gameObject.SetActive(false); // hide the crosshair when the NPC menu is open
-        npcMenu.OpenMenu(npcController); // open the NPC menu
+        npcMenu.OpenMenu(npcController.GetNPCData()); // open the NPC menu
 
     }
 

@@ -224,7 +224,7 @@ public class PopupPlayer : MonoBehaviour {
     // hide the maxPoolSize field if infinitePool = true
     // using UnityEditor prefix to avoid needing to hide the import in the final build -vv
     [UnityEditor.CustomEditor(typeof(PopupPlayer), true)]
-    public class InteractableEditor : UnityEditor.Editor {
+    public class PopupPlayerEditor : UnityEditor.Editor {
 
         public override void OnInspectorGUI() {
 

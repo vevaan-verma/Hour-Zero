@@ -23,10 +23,13 @@ public class TaskData {
 
     [Header("Data")]
     [SerializeField] private TaskType taskType;
-    [SerializeField, Tooltip("Use ___ as a placeholder for the item name")] private DialogueSequence[] taskDialogueSequences;
+    [SerializeField] private DialogueSequence[] taskDialogueSequences;
+    [SerializeField, Tooltip("Text to display in the task list UI.\nThe following placeholders are supported:\n- {npcName} for the NPC name\n- {taskType} for the task type\n- {itemName}* for the required item name\n- {itemCount}* for the required item count\n* onnly supported by tasks that require items to be returned")] private string[] todoTaskTexts; // text to display in the Todo app task list UI
 
     public TaskType GetTaskType() => taskType;
 
-    public DialogueSequence GetRandomDialogueSequence() => taskDialogueSequences[UnityEngine.Random.Range(0, taskDialogueSequences.Length)];
+    public DialogueSequence GetRandomDialogueSequence() => taskDialogueSequences[UnityEngine.Random.Range(0, taskDialogueSequences.Length)]; // returns a random dialogue sequence from the task dialogue sequences array
+
+    public string GetRandomTodoTaskText() => todoTaskTexts[UnityEngine.Random.Range(0, todoTaskTexts.Length)]; // returns a random text from the todo task texts array
 
 }

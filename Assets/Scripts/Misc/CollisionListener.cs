@@ -94,7 +94,7 @@ public class CollisionListener : MonoBehaviour {
     // hide the breakableProp field if 
     // using UnityEditor prefix to avoid needing to hide the import in the final build -vv
     [UnityEditor.CustomEditor(typeof(CollisionListener), true)]
-    public class InteractableEditor : UnityEditor.Editor {
+    public class CollisionListenerEditor : UnityEditor.Editor {
 
         public override void OnInspectorGUI() {
 

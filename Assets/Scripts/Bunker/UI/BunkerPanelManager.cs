@@ -8,8 +8,7 @@ public class BunkerPanelManager : MonoBehaviour {
 
     [Header("References")]
     [SerializeField] private BunkerSystem[] bunkerSystems;
-    public Action onRefreshTextUpdate; // event to notify when the refresh text is updated
-    public Action onPanelRefresh; // event to notify when the panel is refreshed
+    private Coroutine refreshLayoutCoroutine; // reference to the coroutine that handles refreshing the layout
 
     [Header("UI References")]
     [SerializeField] private BunkerSystemUI[] bunkerSystemUIs;
@@ -21,6 +20,10 @@ public class BunkerPanelManager : MonoBehaviour {
 
     [Header("Status")]
     [SerializeField] private BunkerSystemStatusProperties[] bunkerSystemStatusProperties;
+
+    [Header("Actions")]
+    public Action onRefreshTextUpdate; // event to notify when the refresh text is updated
+    public Action onPanelRefresh; // event to notify when the panel is refreshed
 
     private void Start() {
 
@@ -162,8 +165,19 @@ public class BunkerPanelManager : MonoBehaviour {
 
     private void RefreshLayout(RectTransform root) {
 
+        if (refreshLayoutCoroutine != null) StopCoroutine(refreshLayoutCoroutine); // stop any existing layout refresh coroutine
+        refreshLayoutCoroutine = StartCoroutine(HandleRefreshLayout(root));
+
+    }
+
+    private IEnumerator HandleRefreshLayout(RectTransform root) {
+
+        yield return null; // wait for the end of the frame to ensure all UI elements are properly initialized
+
         foreach (LayoutGroup layoutGroup in root.GetComponentsInChildren<LayoutGroup>())
             LayoutRebuilder.ForceRebuildLayoutImmediate(layoutGroup.GetComponent<RectTransform>());
+
+        refreshLayoutCoroutine = null; // reset the coroutine reference after completion
 
     }
 

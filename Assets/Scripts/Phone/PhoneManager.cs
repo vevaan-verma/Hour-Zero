@@ -10,6 +10,7 @@ public class PhoneManager : MonoBehaviour {
     private TimeManager timeManager;
     private UIManager uiManager;
     private Animator animator;
+    private Coroutine refreshLayoutCoroutine;
 
     [Header("UI References")]
     [SerializeField] private Transform homeMenu;
@@ -51,7 +52,12 @@ public class PhoneManager : MonoBehaviour {
 
         RefreshLayout(homeMenu.GetComponent<RectTransform>()); // refresh the layout of the home menu to fit the new buttons
 
-        homeButton.onClick.AddListener(() => openedApp?.CloseApp());
+        homeButton.onClick.AddListener(() => {
+
+            openedApp?.CloseApp();
+            animator.SetTrigger("pressHomeButton"); // trigger the animation to press the home button
+
+        });
 
         phoneState = PhoneState.PutAway; // initialize phone state to PutAway by default
         animator.SetTrigger("putAwayPhone"); // set the initial animation state to put away the phone
@@ -113,8 +119,19 @@ public class PhoneManager : MonoBehaviour {
 
     private void RefreshLayout(RectTransform root) {
 
+        if (refreshLayoutCoroutine != null) StopCoroutine(refreshLayoutCoroutine); // stop any existing layout refresh coroutine
+        refreshLayoutCoroutine = StartCoroutine(HandleRefreshLayout(root));
+
+    }
+
+    private IEnumerator HandleRefreshLayout(RectTransform root) {
+
+        yield return null; // wait for the end of the frame to ensure all UI elements are properly initialized
+
         foreach (LayoutGroup layoutGroup in root.GetComponentsInChildren<LayoutGroup>())
             LayoutRebuilder.ForceRebuildLayoutImmediate(layoutGroup.GetComponent<RectTransform>());
+
+        refreshLayoutCoroutine = null; // reset the coroutine reference after completion
 
     }
 }

@@ -8,9 +8,9 @@ public class NameDatabase : MonoBehaviour {
     [Header("Data")]
     [SerializeField] private NameData[] nameData;
 
-    public string GetRandomName(Gender gender) {
+    public string GetRandomName(Sex sex) {
 
-        NameData[] filteredNames = nameData.Where(n => n.GetGender() == gender).ToArray();
+        NameData[] filteredNames = nameData.Where(n => n.GetSex() == sex).ToArray();
         return filteredNames[UnityEngine.Random.Range(0, filteredNames.Length)].GetName();
 
     }
@@ -21,15 +21,15 @@ public class NameData {
 
     [Header("Data")]
     [SerializeField] private string name;
-    [SerializeField] private Gender gender;
+    [SerializeField] private Sex sex;
 
     public string GetName() => name;
 
-    public Gender GetGender() => gender;
+    public Sex GetSex() => sex;
 
 }
 
-public enum Gender {
+public enum Sex {
 
     Male, Female
 

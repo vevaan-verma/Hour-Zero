@@ -17,6 +17,8 @@ public abstract class Inventory : MonoBehaviour {
 
     [Header("Data")]
     protected List<ItemStack> contents; // a list is used because the inventory size can change
+
+    [Header("Actions")]
     public Action onContentsUpdated;
 
     public virtual void Initialize() {

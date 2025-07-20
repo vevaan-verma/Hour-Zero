@@ -1,19 +1,29 @@
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
 public class TaskManager : MonoBehaviour {
 
     [Header("References")]
+    private TaskDatabase taskDatabase;
     private Hotbar hotbar;
     private List<Item> dropoffItems;
     private BaseTask activeTask;
+    private List<BaseTask> completedTasks;
 
     [Header("Task Specifics")]
     private ItemStack dropoffItemStack; // the item stack that needs to be dropped off in the DoomsdayDropoff task
 
+    [Header("Actions")]
+    public Action onTaskAssigned; // event to notify when a task is assigned
+    public Action onTaskCompleted; // event to notify when a task is completed
+
     private void Start() {
 
+        taskDatabase = FindFirstObjectByType<TaskDatabase>();
         hotbar = FindFirstObjectByType<Hotbar>();
+
+        completedTasks = new List<BaseTask>();
 
         // initialize the dropoff items by looking in the Resources/Items folder but only storing all the items that are marked as dropoff items
         Item[] allItems = Resources.LoadAll<Item>("Items");
@@ -25,67 +35,80 @@ public class TaskManager : MonoBehaviour {
 
     }
 
-    public void AssignTask(TaskType taskType) {
+    public bool AssignTask(TaskType taskType, NPCData npcData) {
 
-        if (activeTask != null) {
-
-            Debug.LogWarning("A task is already active. Completing the current task before assigning a new one.");
-            return;
-
-        }
+        if (activeTask != null)
+            return false;
 
         switch (taskType) {
 
             case TaskType.DoomsdayDropoff:
 
-                Item item = dropoffItems[Random.Range(0, dropoffItems.Count)]; // randomly select a dropoff item from the list
+                Item item = dropoffItems[UnityEngine.Random.Range(0, dropoffItems.Count)]; // randomly select a dropoff item from the list
                 dropoffItemStack = new ItemStack(item, item.GetDropoffCount()); // create a new item stack with the selected item and its dropoff count
-                Debug.Log("Assigned DoomsdayDropoff task with item: " + item.GetName());
-                activeTask = new DoomsdayDropoffTask(dropoffItemStack, hotbar);
+                activeTask = new DoomsdayDropoffTask(npcData, taskDatabase.GetTaskData(TaskType.DoomsdayDropoff), dropoffItemStack, hotbar);
                 break;
 
             case TaskType.LastMinuteRepairs:
-
+                activeTask = new LastMinuteRepairsTask(npcData, taskDatabase.GetTaskData(TaskType.LastMinuteRepairs));
                 break;
 
             case TaskType.DanceOff:
-
+                activeTask = new DanceOffTask(npcData, taskDatabase.GetTaskData(TaskType.DanceOff));
                 break;
 
             case TaskType.CrowbarTherapy:
-
+                activeTask = new CrowbarTherapyTask(npcData, taskDatabase.GetTaskData(TaskType.CrowbarTherapy));
                 break;
 
             case TaskType.AcademicFraud:
-
+                activeTask = new AcademicFraudTask(npcData, taskDatabase.GetTaskData(TaskType.AcademicFraud));
                 break;
 
             default:
-                Debug.LogError("Unknown event type: " + taskType);
+                Debug.LogError("Unknown task type: " + taskType);
                 break;
 
         }
+
+        onTaskAssigned?.Invoke(); // invoke the task assigned event to notify any listeners that a task has been assigned
+        return true;
+
+    }
+
+    public bool AssignRandomTask(NPCData npcData) {
+
+        TaskType[] taskTypes = (TaskType[]) Enum.GetValues(typeof(TaskType));
+        TaskType randomTaskType = taskTypes[UnityEngine.Random.Range(0, taskTypes.Length)];
+        return AssignTask(TaskType.DoomsdayDropoff, npcData); // return whether the task was successfully assigned or not
+
+        // TODO: change task type back to random
+
     }
 
     public bool CheckTaskCompletion() {
 
-        if (activeTask == null) {
-
-            Debug.LogWarning("No active task to check completion for.");
+        if (activeTask == null)
             return false;
-
-        }
 
         bool isCompleted = activeTask.CheckCompletion();
 
-        if (isCompleted)
+        if (isCompleted) {
+
+            completedTasks.Add(activeTask); // add the completed task to the list of completed tasks
             activeTask = null; // reset the active task after completion
-        else
-            Debug.Log("Task not completed yet");
+            onTaskCompleted?.Invoke(); // invoke the task completed event to notify any listeners that a task has been completed
+
+        }
 
         return isCompleted;
 
     }
+
+    public BaseTask GetActiveTask() => activeTask;
+
+    public List<BaseTask> GetCompletedTasks() => completedTasks;
+
 }
 
 public enum TaskType {
@@ -100,7 +123,26 @@ public enum TaskType {
 
 public abstract class BaseTask {
 
+    [Header("Data")]
+    private readonly NPCData npcData; // data of the NPC associated with the task
+    private readonly TaskData taskData; // data associated with the task
+
+    public BaseTask(NPCData npcData, TaskData taskData) {
+
+        this.npcData = npcData;
+        this.taskData = taskData;
+
+    }
+
+    public NPCData GetNPCData() => npcData; // getter for the NPC data
+
+    public TaskData GetTaskData() => taskData; // getter for the task data
+
     public abstract bool CheckCompletion(); // check if the task is completed
+
+    public abstract TaskType GetTaskType(); // get the type of the task
+
+    public abstract Sprite GetTaskIcon(); // get the icon of the task, if applicable
 
 }
 
@@ -112,7 +154,7 @@ public class DoomsdayDropoffTask : BaseTask {
     [Header("Data")]
     private readonly ItemStack dropoffItemStack;
 
-    public DoomsdayDropoffTask(ItemStack dropoffItemStack, Hotbar hotbar) {
+    public DoomsdayDropoffTask(NPCData npcData, TaskData taskData, ItemStack dropoffItemStack, Hotbar hotbar) : base(npcData, taskData) {
 
         this.dropoffItemStack = dropoffItemStack;
         this.hotbar = hotbar;
@@ -135,6 +177,97 @@ public class DoomsdayDropoffTask : BaseTask {
         }
 
         return false; // task not completed, player is not holding the correct item or not enough of it
+
+    }
+
+    public override TaskType GetTaskType() => TaskType.DoomsdayDropoff; // return the type of the task
+
+    public override Sprite GetTaskIcon() => dropoffItemStack.GetItem().GetItemIcon(); // return the icon of the item to be dropped off
+
+    public ItemStack GetDropoffItemStack() => dropoffItemStack; // getter for the item stack to be dropped off
+
+}
+
+public class LastMinuteRepairsTask : BaseTask {
+
+    public LastMinuteRepairsTask(NPCData npcData, TaskData taskData) : base(npcData, taskData) { }
+
+    public override bool CheckCompletion() {
+
+        // implement the logic to check if the Last Minute Repairs task is completed
+        return false; // placeholder return value
+
+    }
+
+    public override TaskType GetTaskType() => TaskType.LastMinuteRepairs;
+
+    public override Sprite GetTaskIcon() {
+
+        // return the icon for the Last Minute Repairs task
+        return null; // placeholder return value
+
+    }
+}
+
+public class DanceOffTask : BaseTask {
+
+    public DanceOffTask(NPCData npcData, TaskData taskData) : base(npcData, taskData) { }
+
+    public override bool CheckCompletion() {
+
+        // implement the logic to check if the Dance Off task is completed
+        return false; // placeholder return value
+
+    }
+
+    public override TaskType GetTaskType() => TaskType.DanceOff;
+
+    public override Sprite GetTaskIcon() {
+
+        // return the icon for the Dance Off task
+        return null; // placeholder return value
+
+    }
+}
+
+public class CrowbarTherapyTask : BaseTask {
+
+    public CrowbarTherapyTask(NPCData npcData, TaskData taskData) : base(npcData, taskData) { }
+
+    public override bool CheckCompletion() {
+
+        // implement the logic to check if the Crowbar Therapy task is completed
+        return false; // placeholder return value
+
+    }
+
+    public override TaskType GetTaskType() => TaskType.CrowbarTherapy;
+
+    public override Sprite GetTaskIcon() {
+
+        // return the icon for the Crowbar Therapy task
+        return null; // placeholder return value
+
+    }
+}
+
+public class AcademicFraudTask : BaseTask {
+
+    public AcademicFraudTask(NPCData npcData, TaskData taskData) : base(npcData, taskData) { }
+
+    public override bool CheckCompletion() {
+
+        // implement the logic to check if the Academic Fraud task is completed
+        return false; // placeholder return value
+
+    }
+
+    public override TaskType GetTaskType() => TaskType.AcademicFraud;
+
+    public override Sprite GetTaskIcon() {
+
+        // return the icon for the Academic Fraud task
+        return null; // placeholder return value
 
     }
 }

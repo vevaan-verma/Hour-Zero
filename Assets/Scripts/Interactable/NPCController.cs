@@ -1,10 +1,13 @@
 using Pathfinding;
+using System;
 using System.Collections;
 using UnityEngine;
 
 public class NPCController : Interactable {
 
     [Header("References")]
+    private NameDatabase nameDatabase;
+    private TaskManager taskManager;
     private UIManager uiManager;
     private AIPath aiPath;
     private Animator animator;
@@ -12,8 +15,7 @@ public class NPCController : Interactable {
     private Coroutine lookCoroutine;
 
     [Header("Settings")]
-    [SerializeField] private NPCType npcType;
-    [SerializeField] private Gender gender;
+    [SerializeField] private NPCData npcData;
     [SerializeField, Tooltip("How quickly the NPC should look at the player when interacting")] private float lookSpeed;
     [SerializeField, Tooltip("How high above the ground the foot should be positioned")] private float footHeightOffset;
     [SerializeField] private LayerMask environmentMask;
@@ -25,10 +27,14 @@ public class NPCController : Interactable {
     private new void Start() {
 
         base.Start();
+        nameDatabase = FindFirstObjectByType<NameDatabase>();
+        taskManager = FindFirstObjectByType<TaskManager>();
         uiManager = FindFirstObjectByType<UIManager>();
         aiPath = GetComponent<AIPath>();
         animator = GetComponent<Animator>();
         player = FindFirstObjectByType<PlayerController>().transform;
+
+        npcData.SetName(nameDatabase.GetRandomName(npcData.GetSex())); // set the name of the NPC using the name database and sex from the NPC data
 
     }
 
@@ -43,7 +49,14 @@ public class NPCController : Interactable {
 
     public override bool Interact() {
 
-        if (!base.Interact()) return false; // if the base interaction fails, do not proceed
+        if (taskManager.GetActiveTask() is DoomsdayDropoffTask doomsdayDropoffTask) {
+
+            // could use the base method to check here, but instead we use the task manager to directly check if the task is completed
+            // check if the task is completed when interacting with the NPC and return true if it is completed, so the NPC menu isn't opened
+            if (taskManager.CheckTaskCompletion())
+                return true;
+
+        }
 
         isInteracting = true;
         aiPath.canMove = false; // stop the NPC from moving while the menu is open
@@ -107,9 +120,42 @@ public class NPCController : Interactable {
 
     }
 
+    public NPCData GetNPCData() => npcData;
+
+}
+
+#if UNITY_EDITOR
+// using UnityEditor prefix to avoid needing to hide the import in the final build
+[UnityEditor.CustomEditor(typeof(NPCController), true)]
+public class NPCControllerEditor : UnityEditor.Editor {
+
+    public override void OnInspectorGUI() {
+
+        serializedObject.Update();
+
+        DrawPropertiesExcluding(serializedObject, "requireHeldItem", "requiredHeldItem", "consumeHeldItem", "requireBackpackItems", "requiredBackpackItems", "consumeBackpackItems");
+
+        serializedObject.ApplyModifiedProperties();
+
+    }
+}
+#endif
+
+[Serializable]
+public class NPCData {
+
+    [Header("Data")]
+    [SerializeField] private NPCType npcType;
+    [SerializeField] private Sex sex;
+    private string npcName;
+
     public NPCType GetNPCType() => npcType;
 
-    public Gender GetGender() => gender;
+    public Sex GetSex() => sex;
+
+    public void SetName(string name) => npcName = name;
+
+    public string GetName() => npcName;
 
 }
 
