@@ -271,9 +271,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   nameData:
   - name: Abel
-    gender: 0
+    sex: 0
   - name: Ariana
-    gender: 1
+    sex: 1
 --- !u!114 &8446843179058813852
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -301,6 +301,12 @@ MonoBehaviour:
         fool."
     - dialogueLines:
       - "Let\u2019s play a little game of fetch. The stakes? My eternal trust."
+    todoTaskTexts:
+    - '{npcName} wants you to deliver a specific item to earn their trust.'
+    - '{npcName} asks you to bring them something important.'
+    - "{npcName} asks you to bring them something specific they\u2019re waiting on."
+    - '{npcName} is expecting you to drop off something important.'
+    - '{npcName} is expecting you to drop off something important.'
   - taskType: 1
     taskDialogueSequences:
     - dialogueLines:
@@ -312,6 +318,9 @@ MonoBehaviour:
     - dialogueLines:
       - "Look, I know it\u2019s the end of the world, but aesthetics matter. Go tidy
         that up."
+    todoTaskTexts:
+    - '{npcName} needs your help repairing a damaged object nearby.'
+    - '{npcName} wants you to ensure something holds together for just a little longer.'
   - taskType: 2
     taskDialogueSequences:
     - dialogueLines:
@@ -326,6 +335,10 @@ MonoBehaviour:
       - Back in the day, we settled this with dance-offs. Tradition matters.
     - dialogueLines:
       - Only those with rhythm survive...
+    todoTaskTexts:
+    - '{npcName} challenges you to prove yourself through dance.'
+    - '{npcName} wants to see your moves before trusting you.'
+    - '{npcName} is testing your spirit through a dance challenge.'
   - taskType: 3
     taskDialogueSequences:
     - dialogueLines:
@@ -342,6 +355,9 @@ MonoBehaviour:
       - "This is how I bond with people. Don\u2019t hold back."
     - dialogueLines:
       - Ever rage-quit a game? Yeah, channel that. On me.
+    todoTaskTexts:
+    - '{npcName} wants you to strike them with a crowbar to complete the task.'
+    - '{npcName} asks you to hit them with a crowbar to build trust.'
   - taskType: 4
     taskDialogueSequences:
     - dialogueLines:
@@ -351,6 +367,8 @@ MonoBehaviour:
       - "Convince them you\u2019re smarter than you are. Should be easy."
     - dialogueLines:
       - "The world\u2019s ending. Might as well go out with a fake PhD."
+    todoTaskTexts:
+    - i dont know if this should be a task
 --- !u!1 &991225504554710728
 GameObject:
   m_ObjectHideFlags: 0

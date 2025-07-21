@@ -1,5 +1,4 @@
 using System.Linq;
-using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -7,6 +6,7 @@ public class UIManager : MonoBehaviour {
 
     [Header("Hotbar")]
     private HotbarUI hotbarUI;
+    private NPCController currNPCController; // reference to the current NPC controller (used to tell the NPC to continue walking after the NPC menu is closed)
 
     [Header("Backpack")]
     [SerializeField] private float backpackFadeDuration;
@@ -124,6 +124,8 @@ public class UIManager : MonoBehaviour {
 
         if (IsMenuOpen()) return; // do nothing if a menu is open
 
+        this.currNPCController = npcController;
+
         Cursor.lockState = CursorLockMode.None; // unlock the cursor when the NPC menu is open
         Cursor.visible = true; // make the cursor visible when the NPC menu is open
 
@@ -143,6 +145,8 @@ public class UIManager : MonoBehaviour {
         hotbarUI.OpenInventory(); // re-open the hotbar UI
         crosshair.gameObject.SetActive(true); // show the crosshair when the NPC menu is closed
         npcMenu.CloseMenu(); // close the NPC menu
+
+        currNPCController.OnEndInteraction(); // tell the NPC to continue walking after the NPC menu is closed
 
     }
 

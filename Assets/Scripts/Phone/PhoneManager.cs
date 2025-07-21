@@ -59,7 +59,7 @@ public class PhoneManager : MonoBehaviour {
 
         });
 
-        phoneState = PhoneState.PutAway; // initialize phone state to PutAway by default
+        phoneState = PhoneState.Pocket; // initialize phone state to PutAway by default
         animator.SetTrigger("putAwayPhone"); // set the initial animation state to put away the phone
 
         UpdateTimeHUD(timeManager.GetDay(), timeManager.GetHour(), timeManager.GetMinute(), timeManager.IsAM());
@@ -68,32 +68,34 @@ public class PhoneManager : MonoBehaviour {
 
     private void Update() {
 
-        if (Input.GetKeyDown(phoneCycleKey)) {
+        if (Input.GetKeyDown(phoneCycleKey) && !(uiManager.IsMenuOpen() && !IsPhoneToFace())) { // check if the phone cycle key is pressed and no menu, other than the phone being to the player's face, is open (because the phone should not be cycled through when a non-phone-to-face menu is open)
 
             // cycle through phone states and loop around
             phoneState++;
 
-            // reset to PutAway if it exceeds ToFace to loop through states
-            if (phoneState > PhoneState.ToFace)
-                phoneState = PhoneState.PutAway;
+            // reset to Pocket if it exceeds the last state
+            if (phoneState > PhoneState.Hand)
+                phoneState = PhoneState.Pocket;
 
             switch (phoneState) {
 
-                case PhoneState.PutAway:
+                case PhoneState.Pocket:
+                    // it is not necessarily required to lock or hide the cursor here, but it is done for consistency
                     Cursor.lockState = CursorLockMode.Locked; // lock cursor when phone is put away
                     Cursor.visible = false; // hide cursor when phone is put away
                     animator.SetTrigger("putAwayPhone");
                     break;
 
-                case PhoneState.TakenOut:
-                    // no need to lock or hide cursor here, since it is guaranteed to be locked and hidden when the phone is put away
-                    animator.SetTrigger("takeOutPhone");
-                    break;
-
-                case PhoneState.ToFace:
+                case PhoneState.Face:
                     animator.SetTrigger("toFacePhone");
                     Cursor.lockState = CursorLockMode.None; // unlock cursor when phone is to face
                     Cursor.visible = true; // make cursor visible when phone is to face
+                    break;
+
+                case PhoneState.Hand:
+                    Cursor.lockState = CursorLockMode.Locked; // lock cursor when phone is in hand
+                    Cursor.visible = false; // hide cursor when phone is in hand
+                    animator.SetTrigger("takeOutPhone");
                     break;
 
             }
@@ -115,7 +117,7 @@ public class PhoneManager : MonoBehaviour {
 
     }
 
-    public bool IsPhoneToFace() => phoneState == PhoneState.ToFace;
+    public bool IsPhoneToFace() => phoneState == PhoneState.Face;
 
     private void RefreshLayout(RectTransform root) {
 
@@ -205,6 +207,6 @@ public class PhoneApp {
 
 public enum PhoneState {
 
-    PutAway, TakenOut, ToFace
+    Pocket, Face, Hand
 
 }

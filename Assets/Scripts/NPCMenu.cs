@@ -24,6 +24,7 @@ public class NPCMenu : MonoBehaviour {
     [SerializeField] private Button talkButton;
     [SerializeField] private Button tradeButton;
     [SerializeField] private Button trackButton;
+    [SerializeField] private Button untrackButton;
 
     [Header("Dialogue Section")]
     [SerializeField] private GameObject dialogueSection;
@@ -70,6 +71,20 @@ public class NPCMenu : MonoBehaviour {
 
         });
 
+        trackButton.onClick.AddListener(() => {
+
+            currNPCData.GetNPCController().StartGeneralTracking();
+            uiManager.CloseNPCMenu(); // close the NPC menu; call the UIManager method to close the NPC menu rather than this class directly to ensure the extra logic is executed (e.g., re-opening the hotbar UI)
+
+        }); // start general tracking the NPC
+
+        untrackButton.onClick.AddListener(() => {
+
+            currNPCData.GetNPCController().StopGeneralTracking();
+            uiManager.CloseNPCMenu(); // close the NPC menu; call the UIManager method to close the NPC menu rather than this class directly to ensure the extra logic is executed (e.g., re-opening the hotbar UI)
+
+        }); // stop general tracking the NPC
+
         okayButton.onClick.AddListener(() => {
 
             NextDialogueText();
@@ -78,6 +93,13 @@ public class NPCMenu : MonoBehaviour {
         });
 
         closeMenuButton.onClick.AddListener(() => uiManager.CloseNPCMenu()); // add listener to close menu button; call the UIManager method to close the NPC menu rather than this class directly to ensure the extra logic is executed (e.g., re-opening the hotbar UI)
+
+        // activate the default interact section buttons
+        teamButton.gameObject.SetActive(true); // team button is active by default
+        talkButton.gameObject.SetActive(true); // talk button is active by default
+        tradeButton.gameObject.SetActive(true); // trade button is active by default
+        trackButton.gameObject.SetActive(true); // track button is active by default
+        untrackButton.gameObject.SetActive(false); // untrack button is not active by default
 
         dialogueSection.SetActive(false); // ensure the dialogue section is hidden by default
         interactSection.SetActive(true); // ensure the interact section is active by default
@@ -92,6 +114,38 @@ public class NPCMenu : MonoBehaviour {
 
         isMenuOpen = true; // set the menu state to open
         menuPanel.gameObject.SetActive(true); // make sure the menu is active
+
+        teamButton.gameObject.SetActive(!npcData.IsTeamMember());
+
+        BaseTask activeTask = taskManager.GetActiveTask(); // get the current active task from the task manager
+        bool trackingForTask = activeTask != null && activeTask.GetNPCData().Equals(npcData); // check if the active task is for this NPC, which would mean the player is already tracking this NPC for a task
+        bool generalTracking = npcData.GetNPCController().IsGeneralTracking(); // check if the NPC is being tracked generally (not for a task)
+
+        //                        tracking for task && general tracking         just tracking for task         just general tracking               none
+        // trackButton                         not active                               active                      not active                    active
+        // untrackButton                         active                               not active                      active                    not active
+
+        if (trackingForTask && generalTracking) { // tracking for task && general tracking
+
+            trackButton.gameObject.SetActive(false);
+            untrackButton.gameObject.SetActive(true);
+
+        } else if (trackingForTask && !generalTracking) { // just tracking for task
+
+            trackButton.gameObject.SetActive(true);
+            untrackButton.gameObject.SetActive(false);
+
+        } else if (!trackingForTask && generalTracking) { // just general tracking
+
+            trackButton.gameObject.SetActive(false);
+            untrackButton.gameObject.SetActive(true);
+
+        } else { // none
+
+            trackButton.gameObject.SetActive(true);
+            untrackButton.gameObject.SetActive(false);
+
+        }
 
         dialogueSection.SetActive(false); // ensure the dialogue section is hidden by default
         interactSection.SetActive(true); // ensure the interact section is active by default
