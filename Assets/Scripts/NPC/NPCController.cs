@@ -11,7 +11,6 @@ public class NPCController : Interactable {
     private TaskManager taskManager;
     private UIManager uiManager;
     private Animator animator;
-    private Transform player;
     private AIPath aiPath;
     private Coroutine interactCoroutine;
     private Coroutine moveCoroutine;
@@ -44,7 +43,6 @@ public class NPCController : Interactable {
         uiManager = FindFirstObjectByType<UIManager>();
         aiPath = GetComponent<AIPath>();
         animator = GetComponent<Animator>();
-        player = FindFirstObjectByType<PlayerController>().transform;
 
         npcData.Initialize(this, nameDatabase.GetRandomName(npcData.GetSex())); // initialize the NPC
         aiPath.canMove = false; // disable movement initially
@@ -138,7 +136,7 @@ public class NPCController : Interactable {
 
         while (isInteracting) {
 
-            Vector3 direction = player.position - transform.position;
+            Vector3 direction = player.transform.position - transform.position;
             direction.y = 0; // keep rotation on horizontal plane
 
             if (direction.sqrMagnitude > 0.01f) {

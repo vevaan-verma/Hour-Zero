@@ -52,6 +52,7 @@ public class PlayerController : MonoBehaviour {
     [Header("Grabbing")]
     [SerializeField] private float grabRange;
     [SerializeField] private float grabStrength;
+    [SerializeField] private LineRenderer grabLine;
     private Rigidbody currGrabbedObject;
     private float currGrabbedObjectDistance;
     private LayerMask currGrabbedObjectLayer;
@@ -159,6 +160,8 @@ public class PlayerController : MonoBehaviour {
                 DropGrabbedItem();
             else if (Vector3.Distance(cameraPos.position, currGrabbedObject.position) > grabRange) // check if the grabbed object is still within grab range and if not, drop it (use else if here because if the other condition is true, the currGrabbedObject will be dropped anyway)
                 DropGrabbedItem();
+
+        UpdateGrabLine();
         #endregion
 
         #region INTERACTING
@@ -170,14 +173,11 @@ public class PlayerController : MonoBehaviour {
 
                 if (Input.GetKeyDown(KeyCode.E))
                     interactable.Interact();
+
                 interactable.ShowInteractIndicator();
 
             }
-
-
         }
-
-
         #endregion
 
         #region HEADBOB
@@ -256,8 +256,7 @@ public class PlayerController : MonoBehaviour {
             foreach (Transform child in currHeldItem.GetComponentsInChildren<Transform>())
                 child.gameObject.layer = LayerMask.NameToLayer("HeldItem");
 
-        }
-        else {
+        } else {
 
             currHeldItem = null; // clear the held item
 
@@ -267,14 +266,34 @@ public class PlayerController : MonoBehaviour {
     public void SetGrabbedItem(Rigidbody grabbedObject, float hitDistance) {
 
         currGrabbedObject = grabbedObject; // store the grabbed rigidbody
+
         Vector3 grabPoint = cameraPos.position + cameraPos.forward * hitDistance; // calculate the grab point based on the camera position and the distance to the hit point
         grabOffset = currGrabbedObject.position - grabPoint; // calculate the offset from the grab point to the grabbed object's center (which is what rigidbody.position returns)
+
         currGrabbedObject.useGravity = false; // disable gravity on the grabbed object
         currGrabbedObject.freezeRotation = true;
         currGrabbedObjectDistance = hitDistance; // store the distance at which the object was grabbed
         currGrabbedObjectLayer = currGrabbedObject.gameObject.layer; // store the layer of the grabbed object
         currGrabbedObject.gameObject.layer = LayerMask.NameToLayer("Grabbed"); // change the layer of the grabbed object to prevent the player from jumping on the grabbed object to fly; this layer doesn't collide with the player
 
+    }
+
+    private void UpdateGrabLine() {
+
+        if (currGrabbedObject) { // check if the player is grabbing an object
+
+            Vector3 crosshairPoint = cameraPos.position + cameraPos.forward * grabRange; // calculate the crosshair point based on the camera position and the grab range
+            grabLine.SetPosition(0, crosshairPoint); // start the line at the crosshair point
+
+            grabLine.SetPosition(1, currGrabbedObject.worldCenterOfMass); // end the line at the center of the grabbed object
+
+            grabLine.enabled = true; // enable the grab line to show the grab range
+
+        } else {
+
+            grabLine.enabled = false; // disable the grab line if there is no grabbed object
+
+        }
     }
 
     public void DropGrabbedItem() {
@@ -299,8 +318,7 @@ public class PlayerController : MonoBehaviour {
             timer += Time.deltaTime * (moveSpeed == walkSpeed ? walkBobSpeed : sprintBobSpeed);
             cameraPos.localPosition = new Vector3(cameraPos.localPosition.x, defaultYPos + Mathf.Sin(timer) * (moveSpeed == walkSpeed ? walkBobAmount : sprintBobAmount), cameraPos.localPosition.z);
 
-        }
-        else {
+        } else {
 
             timer = 0f;
             cameraPos.localPosition = new Vector3(cameraPos.localPosition.x, Mathf.Lerp(cameraPos.localPosition.y, defaultYPos, Time.deltaTime * (moveSpeed == walkSpeed ? walkBobSpeed : sprintBobSpeed)), cameraPos.localPosition.z);
@@ -332,6 +350,5 @@ public class PlayerController : MonoBehaviour {
     public Transform GetCameraTransform() => cameraPos;
 
     public bool IsLookingAt(GameObject target) => Physics.Raycast(cameraPos.position, cameraPos.forward, out RaycastHit hit, interactRange) && hit.transform.gameObject == target;
-
 
 }

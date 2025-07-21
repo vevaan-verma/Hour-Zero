@@ -3,9 +3,6 @@ using UnityEngine;
 
 public abstract class Interactable : MonoBehaviour {
 
-    [Header("Constants")]
-    private const float indicatorLerpDuration = 0.1f;
-
     [Header("References")]
     protected Hotbar hotbar;
     protected Backpack backpack;
@@ -18,6 +15,7 @@ public abstract class Interactable : MonoBehaviour {
     [SerializeField, Tooltip("Whether to require specific item stacks in the backpack to interact with this object")] protected bool requireBackpackItems;
     [SerializeField, Tooltip("The item stacks that must be in the backpack to interact with this object")] protected ItemStack[] requiredBackpackItems;
     [SerializeField, Tooltip("Whether to consume the backpack item stacks after interaction")] protected bool consumeBackpackItems;
+    private const float interactIndicatorLerpDuration = 0.1f;
 
     [Header("Interaction Indicator")]
     [SerializeField] private GameObject indicator;
@@ -95,7 +93,7 @@ public abstract class Interactable : MonoBehaviour {
 
         indicator.transform.LookAt(player.GetCameraTransform(), Vector3.up);
 
-        // the indicator is set active (shown) by the player, then set inactive (hidden) by the interactable itself    
+        // the indicator is set active (shown) by the player, then set inactive (hidden) by the interactable itself
 
         if (indicatorShown && !player.IsLookingAt(gameObject)) {
 
@@ -106,12 +104,11 @@ public abstract class Interactable : MonoBehaviour {
             indicatorShown = false;
 
         }
-
     }
 
     public void ShowInteractIndicator() {
 
-        // if it is set inactive, it is not currently being displayed 
+        // if it is set inactive, it is not currently being displayed
         if (!indicatorShown) {
 
             // go from hidden to normal size
@@ -121,7 +118,6 @@ public abstract class Interactable : MonoBehaviour {
             indicatorShown = true;
 
         }
-
     }
 
     private IEnumerator LerpIndicatorSize(Vector3 start, Vector3 end) {
@@ -129,9 +125,9 @@ public abstract class Interactable : MonoBehaviour {
         float currentTime = 0f;
         indicator.transform.localScale = start;
 
-        while (currentTime < indicatorLerpDuration) {
+        while (currentTime < interactIndicatorLerpDuration) {
 
-            indicator.transform.localScale = Vector3.Lerp(start, end, currentTime / indicatorLerpDuration);
+            indicator.transform.localScale = Vector3.Lerp(start, end, currentTime / interactIndicatorLerpDuration);
             currentTime += Time.deltaTime;
             yield return null;
 
@@ -140,7 +136,6 @@ public abstract class Interactable : MonoBehaviour {
         indicator.transform.localScale = end;
 
     }
-
 }
 
 #if UNITY_EDITOR
