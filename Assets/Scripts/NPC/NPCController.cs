@@ -73,7 +73,12 @@ public class NPCController : Interactable {
 
     }
 
-    private void Update() => animator.SetFloat("speed", aiPath.canMove ? aiPath.velocity.magnitude : 0f); // update the animator speed based on the NPC's velocity
+    private new void Update() {
+
+        base.Update();
+        animator.SetFloat("speed", aiPath.canMove ? aiPath.velocity.magnitude : 0f); // update the animator speed based on the NPC's velocity
+
+    }
 
     private void OnAnimatorIK(int layerIndex) {
 

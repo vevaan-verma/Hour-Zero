@@ -52,6 +52,23 @@ public abstract class Interactable : MonoBehaviour {
 
     }
 
+    protected void Update() {
+
+        indicator.transform.LookAt(player.GetCameraTransform());
+
+        // the indicator is set active (shown) by the player, then set inactive (hidden) by the interactable itself
+
+        if (indicatorShown && !player.IsLookingAt(gameObject)) {
+
+            // go from current size to hidden
+            if (indicatorLerpCoroutine != null) StopCoroutine(indicatorLerpCoroutine);
+            indicatorLerpCoroutine = StartCoroutine(LerpIndicatorSize(indicator.transform.localScale, Vector3.zero));
+
+            indicatorShown = false;
+
+        }
+    }
+
     public virtual bool Interact() {
 
         // if the interactable requires a held item, check if the player is holding the required item and enough of it
@@ -87,23 +104,6 @@ public abstract class Interactable : MonoBehaviour {
 
         return true;
 
-    }
-
-    private void Update() {
-
-        indicator.transform.LookAt(player.GetCameraTransform(), Vector3.up);
-
-        // the indicator is set active (shown) by the player, then set inactive (hidden) by the interactable itself
-
-        if (indicatorShown && !player.IsLookingAt(gameObject)) {
-
-            // go from current size to hidden
-            if (indicatorLerpCoroutine != null) StopCoroutine(indicatorLerpCoroutine);
-            indicatorLerpCoroutine = StartCoroutine(LerpIndicatorSize(indicator.transform.localScale, Vector3.zero));
-
-            indicatorShown = false;
-
-        }
     }
 
     public void ShowInteractIndicator() {
