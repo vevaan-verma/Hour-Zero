@@ -166,11 +166,18 @@ public class PlayerController : MonoBehaviour {
 
             Interactable interactable = hit.transform.GetComponentInParent<Interactable>(); // make sure to check parent for interactable component since that is how some interactables are set up
 
-            if (interactable)
+            if (interactable) {
+
                 if (Input.GetKeyDown(KeyCode.E))
                     interactable.Interact();
+                interactable.ShowInteractIndicator();
+
+            }
+
 
         }
+
+
         #endregion
 
         #region HEADBOB
@@ -249,7 +256,8 @@ public class PlayerController : MonoBehaviour {
             foreach (Transform child in currHeldItem.GetComponentsInChildren<Transform>())
                 child.gameObject.layer = LayerMask.NameToLayer("HeldItem");
 
-        } else {
+        }
+        else {
 
             currHeldItem = null; // clear the held item
 
@@ -291,7 +299,8 @@ public class PlayerController : MonoBehaviour {
             timer += Time.deltaTime * (moveSpeed == walkSpeed ? walkBobSpeed : sprintBobSpeed);
             cameraPos.localPosition = new Vector3(cameraPos.localPosition.x, defaultYPos + Mathf.Sin(timer) * (moveSpeed == walkSpeed ? walkBobAmount : sprintBobAmount), cameraPos.localPosition.z);
 
-        } else {
+        }
+        else {
 
             timer = 0f;
             cameraPos.localPosition = new Vector3(cameraPos.localPosition.x, Mathf.Lerp(cameraPos.localPosition.y, defaultYPos, Time.deltaTime * (moveSpeed == walkSpeed ? walkBobSpeed : sprintBobSpeed)), cameraPos.localPosition.z);
@@ -319,4 +328,10 @@ public class PlayerController : MonoBehaviour {
             uiManager.SetCrosshairType(CrosshairType.Default);
 
     }
+
+    public Transform GetCameraTransform() => cameraPos;
+
+    public bool IsLookingAt(GameObject target) => Physics.Raycast(cameraPos.position, cameraPos.forward, out RaycastHit hit, interactRange) && hit.transform.gameObject == target;
+
+
 }

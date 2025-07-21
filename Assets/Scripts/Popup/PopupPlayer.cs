@@ -35,7 +35,7 @@ public class PopupPlayer : MonoBehaviour {
 
     #region Pooling 
 
-    private void Start() {
+    private void Awake() {
 
         pool = new(); // sus little shortcut
 

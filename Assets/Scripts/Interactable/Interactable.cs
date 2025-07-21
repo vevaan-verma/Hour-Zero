@@ -1,10 +1,15 @@
+using System.Collections;
 using UnityEngine;
 
 public abstract class Interactable : MonoBehaviour {
 
+    [Header("Constants")]
+    private const float indicatorLerpDuration = 0.1f;
+
     [Header("References")]
     protected Hotbar hotbar;
     protected Backpack backpack;
+    protected PlayerController player;
 
     [Header("Settings")]
     [SerializeField, Tooltip("Whether to require an item stack to be held to interact with this object")] protected bool requireHeldItem;
@@ -13,6 +18,12 @@ public abstract class Interactable : MonoBehaviour {
     [SerializeField, Tooltip("Whether to require specific item stacks in the backpack to interact with this object")] protected bool requireBackpackItems;
     [SerializeField, Tooltip("The item stacks that must be in the backpack to interact with this object")] protected ItemStack[] requiredBackpackItems;
     [SerializeField, Tooltip("Whether to consume the backpack item stacks after interaction")] protected bool consumeBackpackItems;
+
+    [Header("Interaction Indicator")]
+    [SerializeField] private GameObject indicator;
+    private Vector3 indicatorDefaultSize;
+    private Coroutine indicatorLerpCoroutine;
+    private bool indicatorShown;
 
     protected void Start() {
 
@@ -31,6 +42,11 @@ public abstract class Interactable : MonoBehaviour {
 
         hotbar = FindFirstObjectByType<Hotbar>();
         backpack = FindFirstObjectByType<Backpack>();
+        player = FindFirstObjectByType<PlayerController>();
+
+        indicatorDefaultSize = indicator.transform.localScale;
+        indicator.transform.localScale = Vector3.zero;
+        indicatorShown = false;
 
         // ensure the object and all its children are tagged as Interactable
         foreach (Transform child in GetComponentsInChildren<Transform>())
@@ -74,6 +90,57 @@ public abstract class Interactable : MonoBehaviour {
         return true;
 
     }
+
+    private void Update() {
+
+        indicator.transform.LookAt(player.GetCameraTransform(), Vector3.up);
+
+        // the indicator is set active (shown) by the player, then set inactive (hidden) by the interactable itself    
+
+        if (indicatorShown && !player.IsLookingAt(gameObject)) {
+
+            // go from current size to hidden
+            if (indicatorLerpCoroutine != null) StopCoroutine(indicatorLerpCoroutine);
+            indicatorLerpCoroutine = StartCoroutine(LerpIndicatorSize(indicator.transform.localScale, Vector3.zero));
+
+            indicatorShown = false;
+
+        }
+
+    }
+
+    public void ShowInteractIndicator() {
+
+        // if it is set inactive, it is not currently being displayed 
+        if (!indicatorShown) {
+
+            // go from hidden to normal size
+            if (indicatorLerpCoroutine != null) StopCoroutine(indicatorLerpCoroutine);
+            indicatorLerpCoroutine = StartCoroutine(LerpIndicatorSize(Vector3.zero, indicatorDefaultSize));
+
+            indicatorShown = true;
+
+        }
+
+    }
+
+    private IEnumerator LerpIndicatorSize(Vector3 start, Vector3 end) {
+
+        float currentTime = 0f;
+        indicator.transform.localScale = start;
+
+        while (currentTime < indicatorLerpDuration) {
+
+            indicator.transform.localScale = Vector3.Lerp(start, end, currentTime / indicatorLerpDuration);
+            currentTime += Time.deltaTime;
+            yield return null;
+
+        }
+
+        indicator.transform.localScale = end;
+
+    }
+
 }
 
 #if UNITY_EDITOR

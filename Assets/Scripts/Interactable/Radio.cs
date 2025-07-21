@@ -1,3 +1,4 @@
+using TMPro;
 using UnityEngine;
 
 public class Radio : Interactable {
@@ -6,13 +7,22 @@ public class Radio : Interactable {
     [Header("Config")]
     [SerializeField][Tooltip("Ordered")] private SFXLib.Sounds[] playlist;
     [SerializeField] private bool startPlaying;
+
     [Header("Hop")]
     [SerializeField] private float hopForceMin;
     [SerializeField] private float hopForceMax;
     [SerializeField] private float hopTorqueMin;
     [SerializeField] private float hopTorqueMax;
+
+    [Header("Indicator Text")]
+    [SerializeField] private TextMeshPro indicatorText;
+    [SerializeField] private string playText;
+    [SerializeField] private string stopText;
+
     private int nowPlayingIdx;
     private bool isPlaying;
+
+
 
     ParticleSystem particles;
     AudioPlayer audioPlayer;
@@ -32,8 +42,11 @@ public class Radio : Interactable {
 
             audioPlayer.Play(playlist[nowPlayingIdx], true);
             particles.Play();
+            indicatorText.text = stopText;
 
         }
+        else
+            indicatorText.text = playText;
 
     }
 
@@ -47,6 +60,7 @@ public class Radio : Interactable {
             audioPlayer.Play(playlist[nowPlayingIdx], true);
 
             isPlaying = true;
+            indicatorText.text = stopText;
 
             particles.Play();
             rb.AddTorque(new Vector3(Random.Range(hopTorqueMin, hopTorqueMax), Random.Range(hopTorqueMin, hopTorqueMax), Random.Range(hopTorqueMin, hopTorqueMax)));
@@ -63,6 +77,7 @@ public class Radio : Interactable {
                 nowPlayingIdx = 0;
 
             isPlaying = false;
+            indicatorText.text = playText;
 
             particles.Stop();
 
