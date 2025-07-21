@@ -380,7 +380,7 @@ GameObject:
   - component: {fileID: 5959824898682212934}
   - component: {fileID: 4064934602093711752}
   m_Layer: 0
-  m_Name: PostProcessing
+  m_Name: GamePP
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -455,6 +455,7 @@ Transform:
   - {fileID: 6799696741595039755}
   - {fileID: 2634774998028582955}
   - {fileID: 5959824898682212934}
+  - {fileID: 5267802597842072520}
   - {fileID: 6582612922047075680}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -1020,6 +1021,55 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ce4ed0b2629b42143b0bdf3d94edc5fa, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!1 &7210185944356297902
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 5267802597842072520}
+  - component: {fileID: 7392822769493462834}
+  m_Layer: 11
+  m_Name: GPSPP
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &5267802597842072520
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7210185944356297902}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 4657243365197081763}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &7392822769493462834
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7210185944356297902}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 172515602e62fb746b5d573b38a5fe58, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_IsGlobal: 1
+  priority: 0
+  blendDistance: 0
+  weight: 1
+  sharedProfile: {fileID: 11400000, guid: a74c1eef9126b634ea17b9d7bac86709, type: 2}
 --- !u!1 &7283275396557779688
 GameObject:
   m_ObjectHideFlags: 0

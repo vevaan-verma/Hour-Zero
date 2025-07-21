@@ -163,7 +163,10 @@ public class NPCController : Interactable {
         if (interactCoroutine != null) StopCoroutine(interactCoroutine); // stop any existing interaction coroutine
         interactCoroutine = null; // reset coroutine reference
 
-        StartMovement(DestinationType.Random); // start moving again after interaction ends
+        if (npcData.IsTeamMember())
+            StartMovement(DestinationType.Bunker); // if the NPC is a team member, start moving to the bunker when interaction ends
+        else
+            StartMovement(DestinationType.Random); // if the NPC is not a team member, start moving to random points on the surface of the graph
 
     }
 

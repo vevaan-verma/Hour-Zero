@@ -7,6 +7,6 @@ public class Marker : MonoBehaviour {
 
     private void Start() => player = FindFirstObjectByType<PlayerController>().transform;
 
-    private void Update() => transform.LookAt(player.position); // rotate the marker to always face the player
+    private void LateUpdate() => transform.LookAt(player.position); // rotate the marker to always face the player
 
 }
