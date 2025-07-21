@@ -6,8 +6,6 @@ using UnityEngine;
 public class NPCController : Interactable {
 
     [Header("References")]
-    [SerializeField] private GameObject generalMarker;
-    [SerializeField] private GameObject taskMarker;
     [SerializeField] private Transform bunkerNPCPoint;
     private NameDatabase nameDatabase;
     private TaskManager taskManager;
@@ -24,11 +22,17 @@ public class NPCController : Interactable {
     [SerializeField, Tooltip("How high above the ground the foot should be positioned")] private float footHeightOffset;
     [SerializeField] private LayerMask environmentMask;
     private bool isInteracting; // whether the NPC is currently interacting with the player
-    private bool generalTrackedBeforeTask; // whether the general marker was active before a task was assigned
 
     [Header("Pathfinding")]
     [SerializeField, Tooltip("Minimum wait time at each destination")] private float minWaitTime;
     [SerializeField, Tooltip("Maximum wait time at each destination")] private float maxWaitTime;
+
+    [Header("Tracking")]
+    [SerializeField] private Marker generalMarkerPrefab;
+    [SerializeField] private Marker taskMarkerPrefab;
+    private Marker generalMarker;
+    private Marker taskMarker;
+    private bool generalTrackedBeforeTask; // whether the general marker was active before a task was assigned; is also modified if the player general tracks/untracks the NPC while a task is assigned
 
     [Header("Ground Check")]
     [SerializeField] private float raycastDistance; // distance to raycast down from the foot position
@@ -45,8 +49,11 @@ public class NPCController : Interactable {
         npcData.Initialize(this, nameDatabase.GetRandomName(npcData.GetSex())); // initialize the NPC
         aiPath.canMove = false; // disable movement initially
 
-        taskMarker.SetActive(false); // hide the task marker by default
-        generalMarker.SetActive(false); // hide the general marker by default
+        generalMarker = Instantiate(generalMarkerPrefab, transform); // instantiate the general marker and set it as a child of the NPC
+        taskMarker = Instantiate(taskMarkerPrefab, transform); // instantiate the task marker and set it as a child of the NPC
+
+        generalMarker.gameObject.SetActive(false); // hide the general marker by default
+        taskMarker.gameObject.SetActive(false); // hide the task marker by default
 
         StartMovement(DestinationType.Random); // start moving the NPC to random points on the surface of the graph
 
@@ -156,22 +163,25 @@ public class NPCController : Interactable {
         if (interactCoroutine != null) StopCoroutine(interactCoroutine); // stop any existing interaction coroutine
         interactCoroutine = null; // reset coroutine reference
 
-        StartMovement(DestinationType.Random); // start moving again after interaction ends
+        if (npcData.IsTeamMember())
+            StartMovement(DestinationType.Bunker); // if the NPC is a team member, start moving to the bunker when interaction ends
+        else
+            StartMovement(DestinationType.Random); // if the NPC is not a team member, start moving to random points on the surface of the graph
 
     }
 
     private void OnTaskAssigned() {
 
-        generalTrackedBeforeTask = generalMarker.activeSelf; // store the state of the general marker before a task is assigned
+        generalTrackedBeforeTask = generalMarker.gameObject.activeSelf; // store the state of the general marker before a task is assigned
 
-        taskMarker.SetActive(true); // show the task marker when a task is assigned
+        taskMarker.gameObject.SetActive(true); // show the task marker when a task is assigned
         StopGeneralTracking(); // stop tracking when a task is assigned
 
     }
 
     private void OnTaskCompleted() {
 
-        taskMarker.SetActive(false); // hide the task marker when the task is completed
+        taskMarker.gameObject.SetActive(false); // hide the task marker when the task is completed
 
         // if the general marker was active before the task was assigned, restore its state
         if (generalTrackedBeforeTask)
@@ -189,7 +199,7 @@ public class NPCController : Interactable {
         if (IsTaskTracking())
             generalTrackedBeforeTask = true; // if the task marker is active, set the general tracked state to true so it shows up after the task marker is hidden
         else
-            generalMarker.SetActive(true); // start general tracking the NPC by showing the general marker as normal
+            generalMarker.gameObject.SetActive(true); // start general tracking the NPC by showing the general marker as normal
 
     }
 
@@ -198,7 +208,7 @@ public class NPCController : Interactable {
         if (IsTaskTracking())
             generalTrackedBeforeTask = false; // if the task marker is active, set the general tracked state to false so it doesn't show up after the task marker is hidden
         else
-            generalMarker.SetActive(false); // stop general tracking the NPC by hiding the general marker
+            generalMarker.gameObject.SetActive(false); // stop general tracking the NPC by hiding the general marker
 
     }
 
@@ -254,9 +264,9 @@ public class NPCController : Interactable {
 
     public NPCData GetNPCData() => npcData;
 
-    public bool IsGeneralTracking() => generalMarker.activeSelf || generalTrackedBeforeTask;
+    public bool IsGeneralTracking() => generalMarker.gameObject.activeSelf || generalTrackedBeforeTask; // check if the general marker is active or if it was active before a task was assigned
 
-    public bool IsTaskTracking() => taskMarker.activeSelf;
+    public bool IsTaskTracking() => taskMarker.gameObject.activeSelf;
 
 }
 
