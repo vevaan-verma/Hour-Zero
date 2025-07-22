@@ -34,8 +34,8 @@ public class Slot : MonoBehaviour, IDropHandler, IPointerEnterHandler, IPointerE
         if (slotColor != null)
             image.color = (Color) slotColor;
 
-        slotItemHolder.Initialize(); // initialize the item holder
-        SetItemStack(itemStack); // initialize the slot with the provided item stack
+        slotItemHolder.Initialize(inventoryUI); // initialize the item holder
+        ForceSetItemStack(itemStack); // initialize the slot with the provided item stack
 
         transform.GetChild(0).name = $"ItemHolder{index + 1}"; // rename the item holder child to reflect its index
 
@@ -45,6 +45,8 @@ public class Slot : MonoBehaviour, IDropHandler, IPointerEnterHandler, IPointerE
 
     public void OnPointerClick(PointerEventData eventData) {
 
+        if (inventoryUI.AreSlotsLocked()) return; // if the slots are locked, do not process the pointer click event
+
         // check if shift + left click is pressed to activate quick transfer and make sure the item is not null to make sure there is something to transfer
         if (Input.GetKey(KeyCode.LeftShift) && itemStack.GetItem() != null)
             inventory.QuickTransferItem(inventoryUI.GetQuickTransferInventory(), itemStack, index);
@@ -52,6 +54,8 @@ public class Slot : MonoBehaviour, IDropHandler, IPointerEnterHandler, IPointerE
     }
 
     public void OnPointerEnter(PointerEventData eventData) {
+
+        // this event gets processed even when the slot is locked because the item widget is still shown when hovering over a locked slot
 
         if (eventData.dragging || itemStack.GetItem() == null || !showItemInfoWidgetOnHover) return; // if the slot is empty or the item info widget is disabled, do nothing
 
@@ -67,8 +71,12 @@ public class Slot : MonoBehaviour, IDropHandler, IPointerEnterHandler, IPointerE
 
     public void OnDrop(PointerEventData eventData) { // this is called on the target slot when an item is dropped on it
 
+        if (inventoryUI.AreSlotsLocked()) return; // if the slots are locked, do not process the drop event
+
         DraggableSlotItemHolder droppedItemHolder = eventData.pointerDrag.GetComponent<DraggableSlotItemHolder>();
         Slot sourceSlot = droppedItemHolder.GetInitialSlot();
+
+        if (sourceSlot == null) return; // if the source slot is null, do nothing (prevents errors when an item is dragged from a locked slot)
 
         int sourceIndex = sourceSlot.GetIndex();
         int targetIndex = GetIndex();
@@ -138,6 +146,21 @@ public class Slot : MonoBehaviour, IDropHandler, IPointerEnterHandler, IPointerE
 
     public void SetItemStack(ItemStack itemStack) {
 
+        if (inventoryUI.AreSlotsLocked()) return; // if the slots are locked, do not allow setting the item stack
+
+        this.itemStack = itemStack; // set the item stack in this slot to the one being dropped
+
+        slotItemHolder.SetItemStack(itemStack); // set the item stack in the new slot item holder
+        slotItemHolder.transform.SetParent(transform); // set the parent of the new item to this slot
+        slotItemHolder.transform.SetAsFirstSibling(); // set to the first sibling so the count text appears on top
+        slotItemHolder.transform.position = transform.position; // move the new item to the position of this slot
+
+    }
+
+    public void ForceSetItemStack(ItemStack itemStack) {
+
+        // this method is used to set the item stack without checking if the slots are locked, for example when initializing the slot
+
         this.itemStack = itemStack; // set the item stack in this slot to the one being dropped
 
         slotItemHolder.SetItemStack(itemStack); // set the item stack in the new slot item holder
@@ -149,7 +172,8 @@ public class Slot : MonoBehaviour, IDropHandler, IPointerEnterHandler, IPointerE
 
     public void DestroyCurrentItemInfoWidget() {
 
-        if (currItemInfoWidget != null) Destroy(currItemInfoWidget.gameObject); // destroy the item info widget if it exists
+        if (currItemInfoWidget != null)
+            Destroy(currItemInfoWidget.gameObject); // destroy the item info widget if it exists
 
     }
 

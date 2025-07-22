@@ -21,7 +21,7 @@ public abstract class Interactable : MonoBehaviour {
     [SerializeField] private GameObject indicator;
     private Vector3 indicatorDefaultSize;
     private Coroutine indicatorLerpCoroutine;
-    private bool indicatorShown;
+    private bool isIndicatorVisible;
 
     protected void Start() {
 
@@ -44,7 +44,7 @@ public abstract class Interactable : MonoBehaviour {
 
         indicatorDefaultSize = indicator.transform.localScale;
         indicator.transform.localScale = Vector3.zero;
-        indicatorShown = false;
+        indicator.SetActive(true); // ensure the indicator is active so it can be shown when needed
 
         // ensure the object and all its children are tagged as Interactable
         foreach (Transform child in GetComponentsInChildren<Transform>())
@@ -58,13 +58,13 @@ public abstract class Interactable : MonoBehaviour {
 
         // the indicator is set active (shown) by the player, then set inactive (hidden) by the interactable itself
 
-        if (indicatorShown && !player.IsLookingAt(gameObject)) {
+        if (isIndicatorVisible && !player.IsLookingAt(gameObject)) {
 
             // go from current size to hidden
             if (indicatorLerpCoroutine != null) StopCoroutine(indicatorLerpCoroutine);
             indicatorLerpCoroutine = StartCoroutine(LerpIndicatorSize(indicator.transform.localScale, Vector3.zero));
 
-            indicatorShown = false;
+            isIndicatorVisible = false;
 
         }
     }
@@ -108,14 +108,14 @@ public abstract class Interactable : MonoBehaviour {
 
     public void ShowInteractIndicator() {
 
-        // if it is set inactive, it is not currently being displayed
-        if (!indicatorShown) {
+        // if the indicator is inactive, it is not currently being displayed
+        if (!isIndicatorVisible) {
 
             // go from hidden to normal size
             if (indicatorLerpCoroutine != null) StopCoroutine(indicatorLerpCoroutine);
             indicatorLerpCoroutine = StartCoroutine(LerpIndicatorSize(Vector3.zero, indicatorDefaultSize));
 
-            indicatorShown = true;
+            isIndicatorVisible = true;
 
         }
     }

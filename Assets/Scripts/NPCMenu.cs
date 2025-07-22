@@ -48,6 +48,8 @@ public class NPCMenu : MonoBehaviour {
         animator = GetComponent<Animator>();
         dialogueDatabase = FindFirstObjectByType<DialogueDatabase>();
 
+        // we can use currNpcData in the button events because they will only be clicked when the menu is open, which means currNpcData will always be set
+
         teamButton.onClick.AddListener(() => {
 
             interactSection.SetActive(false); // hide the interact section
@@ -70,6 +72,8 @@ public class NPCMenu : MonoBehaviour {
             NextDialogueText(); // display the next dialogue text (this starts the dialogue sequence)
 
         });
+
+        tradeButton.onClick.AddListener(() => uiManager.OpenTradeMenu(currNPCData.GetTradeData())); // open the trade menu for this NPC
 
         trackButton.onClick.AddListener(() => {
 
@@ -115,7 +119,10 @@ public class NPCMenu : MonoBehaviour {
         isMenuOpen = true; // set the menu state to open
         menuPanel.gameObject.SetActive(true); // make sure the menu is active
 
+        TradeData tradeData = npcData.GetTradeData(); // get the trade data for this NPC
+
         teamButton.gameObject.SetActive(!npcData.IsTeamMember());
+        tradeButton.gameObject.SetActive(tradeData.GetInputItems().Length > 0 && tradeData.GetOutputItems().Length > 0); // only show the trade button if there is at least one input and output item in the trade data
 
         BaseTask activeTask = taskManager.GetActiveTask(); // get the current active task from the task manager
         bool trackingForTask = activeTask != null && activeTask.GetNPCData().Equals(npcData); // check if the active task is for this NPC, which would mean the player is already tracking this NPC for a task

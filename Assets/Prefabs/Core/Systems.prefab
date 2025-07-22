@@ -201,6 +201,7 @@ GameObject:
   - component: {fileID: 7604711163905020208}
   - component: {fileID: 333784477074832816}
   - component: {fileID: 8446843179058813852}
+  - component: {fileID: 3680907966849622088}
   m_Layer: 0
   m_Name: Databases
   m_TagString: Untagged
@@ -369,6 +370,27 @@ MonoBehaviour:
       - "The world\u2019s ending. Might as well go out with a fake PhD."
     todoTaskTexts:
     - i dont know if this should be a task
+--- !u!114 &3680907966849622088
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 981124074798637499}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e744916759e18db418d872a8b789df27, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  tradeData:
+  - inputItems:
+    - item: {fileID: 11400000, guid: 8f20b7461664bdc41b8934ae38c5a482, type: 2}
+      count: 2
+    - item: {fileID: 11400000, guid: c4dcd18e3fb72314d9b46864f773a636, type: 2}
+      count: 1
+    outputItems:
+    - item: {fileID: 11400000, guid: ee73f72d758317948936cf4886ab01b2, type: 2}
+      count: 1
 --- !u!1 &991225504554710728
 GameObject:
   m_ObjectHideFlags: 0
@@ -490,6 +512,7 @@ Transform:
   m_Children:
   - {fileID: 6687450380683717070}
   - {fileID: 8622865103528328746}
+  - {fileID: 2696517238985241227}
   - {fileID: 3781323653774936728}
   m_Father: {fileID: 4657243365197081763}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -1123,6 +1146,58 @@ MonoBehaviour:
   filteredItems: []
   visibleByDefault: 0
   hotbarSlotColor: {r: 0.77254903, g: 0.4769521, b: 0, a: 1}
+--- !u!1 &7349119336799005058
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 2696517238985241227}
+  - component: {fileID: 8004112626842153375}
+  m_Layer: 0
+  m_Name: TradeInventory
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &2696517238985241227
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7349119336799005058}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 4705136932370552162}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &8004112626842153375
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7349119336799005058}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 471ad186b5948b340a5646e19adec91d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  slotsPerRow: 0
+  initialSlotCount: 0
+  slotStackLimit: 0
+  itemTypeFilterType: 0
+  filteredItemTypes: 
+  itemFilterType: 0
+  filteredItems: []
+  visibleByDefault: 0
 --- !u!1 &8881561702421961136
 GameObject:
   m_ObjectHideFlags: 0

@@ -17,6 +17,7 @@ public abstract class InventoryUI : MonoBehaviour {
     [SerializeField, Tooltip("The inventory that can be used for quick transfering items between inventories.")] private Inventory quickTransferInventory;
     [SerializeField, Tooltip("Whether to show the item info widget when hovering over an item in the inventory")] protected bool showItemInfoWidgetOnHover;
     protected bool isInventoryOpen;
+    private bool areSlotsLocked;
 
     // runs before Initialize
     private void OnEnable() {
@@ -80,6 +81,10 @@ public abstract class InventoryUI : MonoBehaviour {
     public abstract void OpenInventory();
 
     public abstract void CloseInventory();
+
+    public void SetSlotsLocked(bool areSlotsLocked) => this.areSlotsLocked = areSlotsLocked;
+
+    public bool AreSlotsLocked() => areSlotsLocked;
 
     public bool IsInventoryOpen() => isInventoryOpen;
 

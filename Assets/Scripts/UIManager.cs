@@ -19,6 +19,9 @@ public class UIManager : MonoBehaviour {
     [Header("NPC")]
     private NPCMenu npcMenu; // reference to the NPC menu (used for opening the menu when interacting with an NPC)
 
+    [Header("Trade")]
+    private TradeMenu tradeMenu; // reference to the trade menu (used for opening the menu when trading)
+
     [Header("Phone")]
     private PhoneManager phoneManager;
 
@@ -57,6 +60,7 @@ public class UIManager : MonoBehaviour {
         primaryBackpackUI = FindObjectsByType<BackpackUI>(FindObjectsSortMode.None).FirstOrDefault(ui => ui.GetBackpackType() == BackpackType.Primary); // find the primary backpack UI
         systemRepairMenu = FindFirstObjectByType<SystemRepairMenu>();
         npcMenu = FindFirstObjectByType<NPCMenu>();
+        tradeMenu = FindFirstObjectByType<TradeMenu>();
         phoneManager = FindFirstObjectByType<PhoneManager>();
 
         crosshair.sprite = defaultCrosshair; // set the crosshair to the default crosshair at the start
@@ -150,6 +154,28 @@ public class UIManager : MonoBehaviour {
 
     }
 
+    public void OpenTradeMenu(TradeData tradeData) {
+
+        CloseNPCMenu();
+
+        if (IsMenuOpen()) return; // do nothing if a menu is open
+
+        hotbarUI.CloseInventory(); // close the hotbar UI if it is open (this is done to ensure the hotbar is not visible when the trade menu is open)
+        crosshair.gameObject.SetActive(false); // hide the crosshair when the trade menu is open
+        tradeMenu.OpenMenu(tradeData); // open the trade menu
+
+    }
+
+    public void CloseTradeMenu(bool tradeRequirementsMet = false) {
+
+        if (!tradeMenu.IsMenuOpen()) return; // do nothing if the trade menu is not open
+
+        hotbarUI.OpenInventory(); // re-open the hotbar UI
+        crosshair.gameObject.SetActive(true); // show the crosshair when the trade menu is closed
+        tradeMenu.CloseMenu(tradeRequirementsMet); // close the trade menu
+
+    }
+
     public void OnPhoneStateCycle() {
 
         if (phoneManager.IsPhoneToFace()) {
@@ -193,7 +219,7 @@ public class UIManager : MonoBehaviour {
         }
     }
 
-    public bool IsMenuOpen() => primaryBackpackUI.IsInventoryOpen() || systemRepairMenu.IsMenuOpen() || npcMenu.IsMenuOpen() || phoneManager.IsPhoneToFace();
+    public bool IsMenuOpen() => primaryBackpackUI.IsInventoryOpen() || systemRepairMenu.IsMenuOpen() || npcMenu.IsMenuOpen() || tradeMenu.IsMenuOpen() || phoneManager.IsPhoneToFace();
 
 }
 

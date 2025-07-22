@@ -35,54 +35,46 @@ public class TaskManager : MonoBehaviour {
 
     }
 
-    public bool AssignTask(TaskType taskType, NPCData npcData) {
+    public bool AssignRandomTask(NPCData npcData) {
 
         if (activeTask != null)
             return false;
 
-        switch (taskType) {
+        TaskData randomTaskData = taskDatabase.GetRandomTaskData(); // get a random task data from the task database
+
+        switch (randomTaskData.GetTaskType()) {
 
             case TaskType.DoomsdayDropoff:
 
                 Item item = dropoffItems[UnityEngine.Random.Range(0, dropoffItems.Count)]; // randomly select a dropoff item from the list
                 dropoffItemStack = new ItemStack(item, item.GetDropoffCount()); // create a new item stack with the selected item and its dropoff count
-                activeTask = new DoomsdayDropoffTask(npcData, taskDatabase.GetTaskData(TaskType.DoomsdayDropoff), dropoffItemStack, hotbar);
+                activeTask = new DoomsdayDropoffTask(npcData, randomTaskData, dropoffItemStack, hotbar);
                 break;
 
             case TaskType.LastMinuteRepairs:
-                activeTask = new LastMinuteRepairsTask(npcData, taskDatabase.GetTaskData(TaskType.LastMinuteRepairs));
+                activeTask = new LastMinuteRepairsTask(npcData, randomTaskData);
                 break;
 
             case TaskType.DanceOff:
-                activeTask = new DanceOffTask(npcData, taskDatabase.GetTaskData(TaskType.DanceOff));
+                activeTask = new DanceOffTask(npcData, randomTaskData);
                 break;
 
             case TaskType.CrowbarTherapy:
-                activeTask = new CrowbarTherapyTask(npcData, taskDatabase.GetTaskData(TaskType.CrowbarTherapy));
+                activeTask = new CrowbarTherapyTask(npcData, randomTaskData);
                 break;
 
             case TaskType.AcademicFraud:
-                activeTask = new AcademicFraudTask(npcData, taskDatabase.GetTaskData(TaskType.AcademicFraud));
+                activeTask = new AcademicFraudTask(npcData, randomTaskData);
                 break;
 
             default:
-                Debug.LogError("Unknown task type: " + taskType);
+                Debug.LogError("Unknown task type: " + randomTaskData.GetTaskType());
                 break;
 
         }
 
         onTaskAssigned?.Invoke(); // invoke the task assigned event to notify any listeners that a task has been assigned
         return true;
-
-    }
-
-    public bool AssignRandomTask(NPCData npcData) {
-
-        TaskType[] taskTypes = (TaskType[]) Enum.GetValues(typeof(TaskType));
-        TaskType randomTaskType = taskTypes[UnityEngine.Random.Range(0, taskTypes.Length)];
-        return AssignTask(TaskType.DoomsdayDropoff, npcData); // return whether the task was successfully assigned or not
-
-        // TODO: change task type back to random
 
     }
 

@@ -10,7 +10,7 @@ public class RepairInventory : Inventory {
 
     public void Initialize(ItemStack[] repairStacks, int repairPercent, BunkerSystemType systemType) {
 
-        this.repairStacks = repairStacks; // set the repair stack to the stack that is required for repairing
+        this.repairStacks = repairStacks; // set the repair stacks to the stacks required for repairing
         this.initialSlotCount = repairStacks.Length; // set the initial slot count to the number of items that are required for repairing
         this.repairPercent = repairPercent; // set the repair percent to the percent durability of the system that is to be repaired
         this.systemType = systemType; // set the system type to the type of system that is to be repaired
@@ -46,14 +46,15 @@ public class RepairInventory : Inventory {
             if (!ContainsItemStack(stack))
                 return;
 
-        // if we reach here, all required stacks are present for repairing
+        // at this point, all required stacks are present for repairing
+
         systemRepairMenu.OnRepairRequirementsMet(repairPercent, systemType); // notify the system repair menu that the repair inventory is full, which means the necessary items for repairing were put in
 
     }
 
     public override int GetEffectiveStackLimit(Item item) {
 
-        // return the amount of items required to repair the system if the item is in the repair stack
+        // return the amount of items required to repair the system if the item is in the repair stacks
         for (int i = 0; i < repairStacks.Length; i++)
             if (repairStacks[i].GetItem().Equals(item))
                 return repairStacks[i].GetCount();

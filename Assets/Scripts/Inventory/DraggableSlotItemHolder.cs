@@ -10,14 +10,16 @@ public class DraggableSlotItemHolder : SlotItemHolder, IBeginDragHandler, IDragH
     [Header("Settings")]
     [SerializeField] private float dragAlpha;
 
-    public override void Initialize() {
+    public override void Initialize(InventoryUI inventoryUI) {
 
-        base.Initialize();
+        base.Initialize(inventoryUI);
         initialColor = itemIcon.color;
 
     }
 
     public void OnBeginDrag(PointerEventData eventData) {
+
+        if (inventoryUI.AreSlotsLocked()) return; // if the slots are locked, do not allow dragging
 
         // if the item being dragged is null, destroy the dragged item to cancel the drag
         if (itemStack.GetItem() == null) {
@@ -36,9 +38,17 @@ public class DraggableSlotItemHolder : SlotItemHolder, IBeginDragHandler, IDragH
 
     }
 
-    public void OnDrag(PointerEventData eventData) => transform.position = eventData.position; // update the position of the dragged item to follow the mouse pointer
+    public void OnDrag(PointerEventData eventData) {
+
+        if (inventoryUI.AreSlotsLocked()) return; // if the slots are locked, do not allow dragging
+
+        transform.position = eventData.position; // update the position of the dragged item to follow the mouse pointer
+
+    }
 
     public void OnEndDrag(PointerEventData eventData) {
+
+        if (inventoryUI.AreSlotsLocked()) return; // if the slots are locked, do not allow dragging
 
         // eventData.pointerCurrentRaycast returns the raycast result of what the pointer is currently over, whereas eventData.pointerDrag is the item being dragged
         // if the pointer is not over a valid slot, destroy the dragged item

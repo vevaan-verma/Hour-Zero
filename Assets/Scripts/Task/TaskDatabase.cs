@@ -6,16 +6,8 @@ public class TaskDatabase : MonoBehaviour {
     [Header("Data")]
     [SerializeField] private TaskData[] taskData;
 
-    public TaskData GetTaskData(TaskType taskType) {
+    public TaskData GetRandomTaskData() => taskData[UnityEngine.Random.Range(0, taskData.Length)];
 
-        foreach (var data in taskData)
-            if (data.GetTaskType() == taskType)
-                return data;
-
-        Debug.LogWarning($"TaskData for {taskType} not found.");
-        return null;
-
-    }
 }
 
 [Serializable]

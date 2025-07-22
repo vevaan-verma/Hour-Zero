@@ -93,6 +93,26 @@ public class PlayerController : MonoBehaviour {
 
     private void Update() {
 
+        // these are placed before the menu check because they need to occur regardless of whether a menu is open or not
+        #region GROUND CHECK
+        isGrounded = Physics.CheckSphere(feet.position, groundCheckDistance, environmentMask);
+        #endregion
+
+        #region SPEED & DRAG CONTROL
+        Vector3 flatVel = new Vector3(rb.linearVelocity.x, 0f, rb.linearVelocity.z); // get flat velocity (no y value)
+
+        // limit flat velocity
+        if (flatVel.magnitude > moveSpeed) {
+
+            Vector3 controlledVel = flatVel.normalized * moveSpeed; // get controlled velocity
+            rb.linearVelocity = new Vector3(controlledVel.x, rb.linearVelocity.y, controlledVel.z); // set controlled velocity
+
+        }
+
+        if (isGrounded) rb.linearDamping = groundDrag;
+        else rb.linearDamping = airDrag;
+        #endregion
+
         // prevent player from doing other actions while a menu is open
         if (uiManager.IsMenuOpen()) {
 
@@ -102,10 +122,6 @@ public class PlayerController : MonoBehaviour {
             return;
 
         }
-
-        #region GROUND CHECK
-        isGrounded = Physics.CheckSphere(feet.position, groundCheckDistance, environmentMask);
-        #endregion
 
         #region MOVEMENT INPUT
         horizontalInput = Input.GetAxisRaw("Horizontal");
@@ -131,7 +147,7 @@ public class PlayerController : MonoBehaviour {
         if (Input.GetKeyDown(KeyCode.Space) && isGrounded) Jump();
 
         if (rb.linearVelocity.y < 0f)
-            rb.linearVelocity += Vector3.up * Physics.gravity.y * (fallMultiplier - 1) * Time.deltaTime;
+            rb.linearVelocity += (fallMultiplier - 1) * Physics.gravity.y * Time.deltaTime * Vector3.up;
         #endregion
 
         #region HOTBAR
@@ -182,21 +198,6 @@ public class PlayerController : MonoBehaviour {
 
         #region HEADBOB
         HandleHeadbob();
-        #endregion
-
-        #region SPEED & DRAG CONTROL
-        Vector3 flatVel = new Vector3(rb.linearVelocity.x, 0f, rb.linearVelocity.z); // get flat velocity (no y value)
-
-        // limit flat velocity
-        if (flatVel.magnitude > moveSpeed) {
-
-            Vector3 controlledVel = flatVel.normalized * moveSpeed; // get controlled velocity
-            rb.linearVelocity = new Vector3(controlledVel.x, rb.linearVelocity.y, controlledVel.z); // set controlled velocity
-
-        }
-
-        if (isGrounded) rb.linearDamping = groundDrag;
-        else rb.linearDamping = airDrag;
         #endregion
 
         #region CROSSHAIR

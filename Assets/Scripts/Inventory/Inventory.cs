@@ -135,6 +135,7 @@ public abstract class Inventory : MonoBehaviour {
 
         // no need to invoke the item added event here, as it was already invoked in the SetItemStack method if items were successfully added
 
+        // TODO: deal with the remainder here, maybe drop them on the ground or something
         return count; // return the count of items that could not be added
 
     }
@@ -193,6 +194,100 @@ public abstract class Inventory : MonoBehaviour {
 
         // if we reach here, not all items could be removed
         return count; // return the count of items that could not be removed
+
+    }
+
+    // simulates adding the item stacks and returns true if all items can be added (no remainder), false otherwise; does not modify the inventory
+    public bool CanAddFullItemStacks(ItemStack[] itemStacks) {
+
+        if (itemStacks == null || itemStacks.Length == 0) return false; // cannot add null or empty array
+
+        // create a copy of the current contents to simulate adding
+        List<ItemStack> simulatedContents = new List<ItemStack>(contents.Count);
+
+        for (int i = 0; i < contents.Count; i++) {
+
+            ItemStack stack = contents[i];
+            simulatedContents.Add(new ItemStack(stack.GetItem(), stack.GetCount()));
+
+        }
+
+        // for each itemStack in the array, simulate adding it
+        foreach (ItemStack itemStack in itemStacks) {
+
+            Item item = itemStack.GetItem();
+            int count = itemStack.GetCount();
+
+            if (item == null || count <= 0) return false; // cannot add null or zero items
+
+            if (filteredItemTypes.Length > 0) { // if there are filtered item types, check if the item type is allowed by the filter
+
+                bool found = Array.FindIndex(filteredItemTypes, x => x.Equals(item.GetItemType())) >= 0;
+
+                if ((itemTypeFilterType == FilterType.Whitelist && !found) || (itemTypeFilterType == FilterType.Blacklist && found))
+                    return false; // item type not allowed by filter
+
+            }
+
+            if (filteredItems.Length > 0) { // if there are filtered items, check if the item is allowed by the filter
+
+                bool found = Array.FindIndex(filteredItems, x => x != null && x.Equals(item)) >= 0;
+
+                if ((itemFilterType == FilterType.Whitelist && !found) || (itemFilterType == FilterType.Blacklist && found))
+                    return false; // item not allowed by filter
+
+            }
+
+            int remaining = count;
+
+            // first, try to stack into existing stacks
+            for (int i = 0; i < simulatedContents.Count; i++) {
+
+                ItemStack stack = simulatedContents[i];
+
+                if (stack.GetItem() != null && stack.GetItem().Equals(item)) { // check if the stack already contains the item
+
+                    int stackLimit = GetEffectiveStackLimit(item);
+                    int currentCount = stack.GetCount();
+                    int space = stackLimit - currentCount;
+
+                    if (space > 0) {
+
+                        int toAdd = Mathf.Min(space, remaining);
+                        simulatedContents[i] = new ItemStack(item, currentCount + toAdd);
+                        remaining -= toAdd;
+
+                        if (remaining <= 0) break; // all items can be added for this stack
+
+                    }
+                }
+            }
+
+            // then, try to add to empty slots
+            for (int i = 0; i < simulatedContents.Count && remaining > 0; i++) {
+
+                ItemStack stack = simulatedContents[i];
+
+                if (stack.GetItem() == null || stack.GetCount() == 0) { // check if the slot is empty
+
+                    int stackLimit = GetEffectiveStackLimit(item);
+                    int toAdd = Mathf.Min(stackLimit, remaining);
+                    simulatedContents[i] = new ItemStack(item, toAdd);
+                    remaining -= toAdd;
+
+                    if (remaining <= 0) break; // all items can be added for this stack
+
+                }
+            }
+
+            // if we reach here, not all items can be added for this stack
+            if (remaining > 0)
+                return false;
+
+        }
+
+        // if we reach here, all item stacks can be added
+        return true;
 
     }
 
@@ -272,6 +367,7 @@ public abstract class Inventory : MonoBehaviour {
     public int GetCurrentSlotCount() => currSlotCount;
 
     public bool IsVisibleByDefault() => visibleByDefault;
+    // simulates adding the item stack and returns true if all items can be added (no remainder), false otherwise; does not modify the inventory
 
 }
 

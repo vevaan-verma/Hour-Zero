@@ -8,6 +8,7 @@ public class NPCController : Interactable {
     [Header("References")]
     [SerializeField] private Transform bunkerNPCPoint;
     private NameDatabase nameDatabase;
+    private TradeDatabase tradeDatabase;
     private TaskManager taskManager;
     private UIManager uiManager;
     private Animator animator;
@@ -39,12 +40,13 @@ public class NPCController : Interactable {
     private void Awake() {
 
         nameDatabase = FindFirstObjectByType<NameDatabase>();
+        tradeDatabase = FindFirstObjectByType<TradeDatabase>();
         taskManager = FindFirstObjectByType<TaskManager>();
         uiManager = FindFirstObjectByType<UIManager>();
         aiPath = GetComponent<AIPath>();
         animator = GetComponent<Animator>();
 
-        npcData.Initialize(this, nameDatabase.GetRandomName(npcData.GetSex())); // initialize the NPC
+        npcData.Initialize(this, nameDatabase.GetRandomName(npcData.GetSex()), tradeDatabase.GetRandomTradeData()); // initialize the NPC
         aiPath.canMove = false; // disable movement initially
 
         generalMarker = Instantiate(generalMarkerPrefab, transform); // instantiate the general marker and set it as a child of the NPC
@@ -300,12 +302,14 @@ public class NPCData {
     [SerializeField] private NPCType npcType;
     [SerializeField] private Sex sex;
     private string npcName;
+    private TradeData tradeData;
     private bool isTeamMember; // whether the NPC is a team member (used for team button logic)
 
-    public void Initialize(NPCController npcController, string npcName) {
+    public void Initialize(NPCController npcController, string npcName, TradeData tradeData) {
 
         this.npcController = npcController;
         this.npcName = npcName;
+        this.tradeData = tradeData;
 
     }
 
@@ -316,6 +320,8 @@ public class NPCData {
     public Sex GetSex() => sex;
 
     public string GetName() => npcName;
+
+    public TradeData GetTradeData() => tradeData;
 
     public bool IsTeamMember() => isTeamMember;
 

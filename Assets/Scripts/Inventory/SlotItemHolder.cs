@@ -5,6 +5,7 @@ using UnityEngine.UI;
 public class SlotItemHolder : MonoBehaviour {
 
     [Header("References")]
+    protected InventoryUI inventoryUI;
     protected ItemStack itemStack;
 
     [Header("UI References")]
@@ -12,7 +13,12 @@ public class SlotItemHolder : MonoBehaviour {
     [SerializeField] private Sprite emptyIcon; // icon to show when there is no item
     protected Image itemIcon;
 
-    public virtual void Initialize() => itemIcon = GetComponent<Image>();
+    public virtual void Initialize(InventoryUI inventoryUI) {
+
+        this.inventoryUI = inventoryUI;
+        itemIcon = GetComponent<Image>();
+
+    }
 
     public void SetItemStack(ItemStack itemStack) {
 
