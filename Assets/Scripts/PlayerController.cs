@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 
 public class PlayerController : MonoBehaviour {
@@ -5,7 +6,6 @@ public class PlayerController : MonoBehaviour {
     [Header("References")]
     [SerializeField] private Transform cameraPos;
     [SerializeField] private LayerMask nonPlayerMask; // mask for raycasts that should not hit the player
-    private TaskManager taskManager;
     private UIManager uiManager;
     private Rigidbody rb;
     private Collider col;
@@ -56,7 +56,7 @@ public class PlayerController : MonoBehaviour {
     [SerializeField] private LineRenderer grabLine;
     private Rigidbody currGrabbedObject;
     private float currGrabbedObjectDistance;
-    private LayerMask currGrabbedObjectLayer;
+    private Dictionary<GameObject, LayerMask> currGrabbedObjectLayers;
     private Vector3 grabOffset; // offset from the grab point to the grabbed object's position
 
     [Header("Headbob")]
@@ -79,13 +79,16 @@ public class PlayerController : MonoBehaviour {
     [SerializeField] private float airDrag;
 
     [Header("Developer Only")]
+    [SerializeField] private KeyCode flightToggleKey;
+    [SerializeField] private KeyCode flightAscendKey;
+    [SerializeField] private KeyCode flightDescendKey;
     [SerializeField] private float flightSpeed;
-    [SerializeField] private float flightHeightAdjustSpeed;
-    [SerializeField, Tooltip("Enable noclipping while flying")] private bool noclipFlight;
+    [SerializeField] private float verticalFlightForce;
+    [SerializeField] private bool noClipFlight;
+    private bool flightModeActive;
 
     private void Start() {
 
-        taskManager = FindFirstObjectByType<TaskManager>();
         uiManager = FindFirstObjectByType<UIManager>();
         rb = GetComponent<Rigidbody>();
         hotbar = FindFirstObjectByType<Hotbar>();
@@ -123,36 +126,19 @@ public class PlayerController : MonoBehaviour {
         // prevent player from doing other actions while a menu is open
         if (uiManager.IsMenuOpen()) {
 
+            // if a menu is open, drop any grabbed object to prevent it from being stuck in the player's hand
             if (currGrabbedObject)
-                DropGrabbedItem(); // if a menu is open, drop any grabbed object to prevent it from being stuck in the player's hand
+                DropGrabbedItem();
 
             return;
 
         }
 
-        #region MOVEMENT INPUT
+        #region INPUT
         horizontalInput = Input.GetAxisRaw("Horizontal");
         verticalInput = Input.GetAxisRaw("Vertical");
 
         moveSpeed = Input.GetKey(KeyCode.LeftShift) && verticalInput > 0f ? sprintSpeed : walkSpeed; // set move speed to sprint speed if shift is held and player has a forward movement component, otherwise set to walk speed
-
-        // enable flight
-        if (Input.GetKey(KeyCode.LeftControl)) {
-
-            moveSpeed = flightSpeed;
-            rb.useGravity = false;
-            col.enabled = !noclipFlight;
-
-        }
-        else {
-
-            moveSpeed = Input.GetKey(KeyCode.LeftShift) && verticalInput > 0f ? sprintSpeed : walkSpeed; // set move speed to sprint speed if shift is held and player has a forward movement component, otherwise set to walk speed
-            rb.useGravity = true;
-            col.enabled = true;
-
-        }
-
-
         #endregion
 
         #region LOOKING
@@ -168,28 +154,12 @@ public class PlayerController : MonoBehaviour {
         cameraPos.rotation = Quaternion.Euler(xRotation, yRotation, 0f);
         #endregion
 
-        #region JUMPING (and flying)
+        #region JUMPING
+        if (Input.GetKeyDown(KeyCode.Space) && isGrounded) Jump();
 
-        // if flying
-
-        if (Input.GetKey(KeyCode.LeftControl)) {
-
-            if (Input.GetKey(KeyCode.Space))
-                rb.linearVelocity = new Vector3(rb.linearVelocity.x, flightHeightAdjustSpeed, rb.linearVelocity.z);
-            else if (Input.GetKey(KeyCode.LeftShift))
-                rb.linearVelocity = new Vector3(rb.linearVelocity.x, -flightHeightAdjustSpeed, rb.linearVelocity.z);
-        }
-        else { // if not flying
-
-            if (Input.GetKeyDown(KeyCode.Space) && (isGrounded || rb.useGravity == false)) Jump(); // this is super cheap, but useGravity = false means you are in dev movement mode
-
-            if (rb.linearVelocity.y < 0f)
-                rb.linearVelocity += (fallMultiplier - 1) * Physics.gravity.y * Time.deltaTime * Vector3.up;
-
-        }
-
-
-
+        // if the player is falling, apply a fall multiplier to increase the fall speed
+        if (rb.linearVelocity.y < 0f)
+            rb.linearVelocity += (fallMultiplier - 1) * Physics.gravity.y * Time.deltaTime * Vector3.up;
         #endregion
 
         #region HOTBAR
@@ -208,8 +178,8 @@ public class PlayerController : MonoBehaviour {
         #endregion
 
         #region GRABBING
-        // check if player is looking at a rigidbody within grab range and right mouse button is pressed; also make sure the rigidbody is not kinematic (so it can be grabbed)
-        if (Physics.Raycast(cameraPos.position, cameraPos.forward, out RaycastHit hit, grabRange) && hit.rigidbody && !hit.rigidbody.isKinematic)
+        // check if player is looking at a rigidbody within grab range and right mouse button is pressed; also make sure the rigidbody is not kinematic (so it can be grabbed); use the nonPlayerMask to prevent the player from grabbing themselves
+        if (Physics.Raycast(cameraPos.position, cameraPos.forward, out RaycastHit hit, grabRange, nonPlayerMask) && hit.rigidbody && !hit.rigidbody.isKinematic)
             if (Input.GetMouseButtonDown(1))
                 SetGrabbedItem(hit.rigidbody, hit.distance);
 
@@ -223,7 +193,7 @@ public class PlayerController : MonoBehaviour {
         #endregion
 
         #region INTERACTING
-        if (Physics.Raycast(cameraPos.position, cameraPos.forward, out hit, interactRange) && hit.collider.CompareTag("Interactable")) { // check if player is looking at interactable object within interact distance and is tagged as interactable
+        if (Physics.Raycast(cameraPos.position, cameraPos.forward, out hit, interactRange, nonPlayerMask) && hit.collider.CompareTag("Interactable")) { // check if player is looking at interactable object within interact distance and is tagged as interactable; use the nonPlayerMask to prevent the player from interacting with themselves
 
             Interactable interactable = hit.transform.GetComponentInParent<Interactable>(); // make sure to check parent for interactable component since that is how some interactables are set up
 
@@ -246,6 +216,41 @@ public class PlayerController : MonoBehaviour {
         SetCrosshair();
         #endregion
 
+        #region DEVELOPER ONLY
+#if UNITY_EDITOR
+        if (Input.GetKeyDown(flightToggleKey)) {
+
+            flightModeActive = !flightModeActive; // toggle flight mode when flight key is pressed
+
+            if (flightModeActive) {
+
+                rb.useGravity = false; // disable gravity when flight mode is activated
+                col.enabled = !noClipFlight; // disable collider when noclip flight is enabled to allow passing through objects
+
+            } else {
+
+                // no need to set the move speed here since it is already set to walk or sprint speed based on the input
+                rb.useGravity = true; // enable gravity when flight mode is deactivated
+                col.enabled = true; // enable collider when flight mode is deactivated or noclip flight is disabled
+
+            }
+        }
+
+        if (flightModeActive) {
+
+            moveSpeed = flightSpeed; // set move speed to flight speed when flight mode is activated
+
+            if (Input.GetKey(flightAscendKey))
+                rb.AddForce(Vector3.up * verticalFlightForce, ForceMode.Acceleration); // apply upward force when the ascend key is held
+            else if (Input.GetKey(flightDescendKey))
+                rb.AddForce(Vector3.down * verticalFlightForce, ForceMode.Acceleration); // apply downward force when the descend key is held
+            else
+                rb.linearVelocity = new Vector3(rb.linearVelocity.x, 0f, rb.linearVelocity.z); // reset vertical velocity to keep the player at the same height when flight mode is activated and they aren't moving up or down
+
+        }
+#endif
+        #endregion
+
     }
 
     private void FixedUpdate() {
@@ -253,7 +258,7 @@ public class PlayerController : MonoBehaviour {
         // prevent player from moving or grabbing while a menu is open
         if (uiManager.IsMenuOpen()) return;
 
-        if (isGrounded || rb.useGravity == false) // this is super cheap, but useGravity = false means you are in dev movement mode
+        if (isGrounded) // check if the player is grounded or flying and apply movement accordingly
             rb.AddForce((transform.forward * verticalInput + transform.right * horizontalInput).normalized * moveSpeed, ForceMode.Force);
         else
             rb.AddForce(airMultiplier * moveSpeed * (transform.forward * verticalInput + transform.right * horizontalInput).normalized, ForceMode.Force);
@@ -299,8 +304,7 @@ public class PlayerController : MonoBehaviour {
             foreach (Transform child in currHeldItem.GetComponentsInChildren<Transform>())
                 child.gameObject.layer = LayerMask.NameToLayer("HeldItem");
 
-        }
-        else {
+        } else {
 
             currHeldItem = null; // clear the held item
 
@@ -317,9 +321,16 @@ public class PlayerController : MonoBehaviour {
         currGrabbedObject.useGravity = false; // disable gravity on the grabbed object
         currGrabbedObject.freezeRotation = true;
         currGrabbedObjectDistance = hitDistance; // store the distance at which the object was grabbed
-        currGrabbedObjectLayer = currGrabbedObject.gameObject.layer; // store the layer of the grabbed object
-        currGrabbedObject.gameObject.layer = LayerMask.NameToLayer("Grabbed"); // change the layer of the grabbed object to prevent the player from jumping on the grabbed object to fly; this layer doesn't collide with the player
 
+        currGrabbedObjectLayers = new Dictionary<GameObject, LayerMask>();
+
+        // loop through the grabbed object and its children
+        foreach (Transform child in currGrabbedObject.GetComponentsInChildren<Transform>()) {
+
+            currGrabbedObjectLayers[child.gameObject] = child.gameObject.layer; // store the original layer of the grabbed object and its children
+            child.gameObject.layer = LayerMask.NameToLayer("Grabbed"); // change the layer of the grabbed object and its children to prevent the player from jumping on the grabbed object to fly; this layer doesn't collide with the player
+
+        }
     }
 
     private void UpdateGrabLine() {
@@ -333,8 +344,7 @@ public class PlayerController : MonoBehaviour {
 
             grabLine.enabled = true; // enable the grab line to show the grab range
 
-        }
-        else {
+        } else {
 
             grabLine.enabled = false; // disable the grab line if there is no grabbed object
 
@@ -345,7 +355,10 @@ public class PlayerController : MonoBehaviour {
 
         if (!currGrabbedObject) return; // if there is no grabbed object, do nothing
 
-        currGrabbedObject.gameObject.layer = currGrabbedObjectLayer; // restore the original layer of the grabbed object
+        // restore the original layers of the grabbed object and its children
+        foreach (KeyValuePair<GameObject, LayerMask> kvp in currGrabbedObjectLayers)
+            kvp.Key.layer = kvp.Value;
+
         currGrabbedObject.freezeRotation = false; // allow rotation again
         currGrabbedObject.useGravity = true; // enable gravity on the grabbed object
         currGrabbedObject = null; // clear the grabbed object
@@ -363,8 +376,7 @@ public class PlayerController : MonoBehaviour {
             timer += Time.deltaTime * (moveSpeed == walkSpeed ? walkBobSpeed : sprintBobSpeed);
             cameraPos.localPosition = new Vector3(cameraPos.localPosition.x, defaultYPos + Mathf.Sin(timer) * (moveSpeed == walkSpeed ? walkBobAmount : sprintBobAmount), cameraPos.localPosition.z);
 
-        }
-        else {
+        } else {
 
             timer = 0f;
             cameraPos.localPosition = new Vector3(cameraPos.localPosition.x, Mathf.Lerp(cameraPos.localPosition.y, defaultYPos, Time.deltaTime * (moveSpeed == walkSpeed ? walkBobSpeed : sprintBobSpeed)), cameraPos.localPosition.z);

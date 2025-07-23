@@ -1,3 +1,5 @@
+using System;
+using System.Collections;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -7,6 +9,7 @@ public abstract class InventoryUI : MonoBehaviour {
     [SerializeField] protected Slot slotPrefab;
     protected Inventory inventory;
     protected Slot[] inventorySlots;
+    protected Coroutine placeholderCycleCoroutine;
 
     [Header("UI References")]
     [SerializeField] protected CanvasGroup uiPanel; // the panel that contains the inventory UI (used to allow the script to remain active while the UI is hidden)
@@ -72,7 +75,7 @@ public abstract class InventoryUI : MonoBehaviour {
             Slot slot = Instantiate(slotPrefab, inventoryContents.transform);
             slot.transform.name = $"Slot{i + 1}";
             ItemStack itemStack = inventory.GetItemStack(i); // get the item stack from the inventory at the corresponding index
-            slot.Initialize(inventory, this, i, new ItemStack(itemStack.GetItem(), itemStack.GetCount()), showItemInfoWidgetOnHover); // initialize the slot
+            slot.Initialize(inventory, this, i, new ItemStack(itemStack.GetItem(), itemStack.GetCount()), showItemInfoWidgetOnHover, null); // initialize the slot
             inventorySlots[i] = slot; // store the slot in the array for later reference
 
         }
@@ -85,6 +88,28 @@ public abstract class InventoryUI : MonoBehaviour {
     public void SetSlotsLocked(bool areSlotsLocked) => this.areSlotsLocked = areSlotsLocked;
 
     public bool AreSlotsLocked() => areSlotsLocked;
+
+    protected IEnumerator HandlePlaceholderCycle() {
+
+        Item[] placeholderItems = inventory.GetFilteredItems(); // get the placeholder items from the inventory
+
+        while (true) {
+
+            for (int offset = 0; offset < placeholderItems.Length; offset++) {
+
+                for (int i = 0; i < inventorySlots.Length; i++) {
+
+                    int itemIndex = (i + offset) % placeholderItems.Length;
+                    Item placeholderItem = placeholderItems[itemIndex];
+                    inventorySlots[i].SetPlaceholderItem(placeholderItem);
+
+                }
+
+                yield return new WaitForSeconds(2f);
+
+            }
+        }
+    }
 
     public bool IsInventoryOpen() => isInventoryOpen;
 

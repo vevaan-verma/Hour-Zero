@@ -366,6 +366,8 @@ public abstract class Inventory : MonoBehaviour {
 
     public int GetCurrentSlotCount() => currSlotCount;
 
+    public Item[] GetFilteredItems() => filteredItems;
+
     public bool IsVisibleByDefault() => visibleByDefault;
     // simulates adding the item stack and returns true if all items can be added (no remainder), false otherwise; does not modify the inventory
 

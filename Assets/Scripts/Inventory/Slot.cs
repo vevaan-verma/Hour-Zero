@@ -1,3 +1,4 @@
+using System.Collections;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
@@ -6,6 +7,7 @@ public class Slot : MonoBehaviour, IDropHandler, IPointerEnterHandler, IPointerE
 
     [Header("References")]
     [SerializeField] private ItemInfoWidget itemInfoWidgetPrefab;
+    [SerializeField] private Image placeholder;
     private ItemInfoWidget currItemInfoWidget;
     private SlotItemHolder slotItemHolder;
     private Inventory inventory;
@@ -176,6 +178,8 @@ public class Slot : MonoBehaviour, IDropHandler, IPointerEnterHandler, IPointerE
             Destroy(currItemInfoWidget.gameObject); // destroy the item info widget if it exists
 
     }
+
+    public void SetPlaceholderItem(Item placeholderItem) => placeholder.sprite = placeholderItem.GetItemIcon(); // set the placeholder sprite to the sprite of the placeholder item
 
     public Inventory GetInventory() => inventory;
 

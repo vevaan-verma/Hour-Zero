@@ -388,7 +388,7 @@ MonoBehaviour:
   cameraPos: {fileID: 4336792574799851453}
   nonPlayerMask:
     serializedVersion: 2
-    m_Bits: 447
+    m_Bits: 8127
   walkSpeed: 4500
   sprintSpeed: 7000
   airMultiplier: 0.4
@@ -424,6 +424,9 @@ MonoBehaviour:
     m_Bits: 8
   groundDrag: 8
   airDrag: 3
-  flightSpeed: 50000
-  flightHeightAdjustSpeed: 40
-  noclipFlight: 1
+  flightToggleKey: 102
+  flightAscendKey: 32
+  flightDescendKey: 306
+  flightSpeed: 30000
+  verticalFlightForce: 50
+  noClipFlight: 0
