@@ -8,6 +8,7 @@ public class PlayerController : MonoBehaviour {
     private TaskManager taskManager;
     private UIManager uiManager;
     private Rigidbody rb;
+    private Collider col;
 
     [Header("Movement")]
     [SerializeField] private float walkSpeed;
@@ -77,6 +78,11 @@ public class PlayerController : MonoBehaviour {
     [SerializeField] private float groundDrag;
     [SerializeField] private float airDrag;
 
+    [Header("Developer Only")]
+    [SerializeField] private float flightSpeed;
+    [SerializeField] private float flightHeightAdjustSpeed;
+    [SerializeField, Tooltip("Enable noclipping while flying")] private bool noclipFlight;
+
     private void Start() {
 
         taskManager = FindFirstObjectByType<TaskManager>();
@@ -84,6 +90,7 @@ public class PlayerController : MonoBehaviour {
         rb = GetComponent<Rigidbody>();
         hotbar = FindFirstObjectByType<Hotbar>();
         itemHolder = FindFirstObjectByType<ItemHolder>();
+        col = GetComponent<Collider>();
 
         itemHolder.Initialize(swayAmount, swaySmoothness, rotationSwayAmount, rotationSwaySmoothness, breathingAmplitude, breathingFrequency, mouseSwayDeadzone); // initialize the held item sway with the settings
 
@@ -128,6 +135,24 @@ public class PlayerController : MonoBehaviour {
         verticalInput = Input.GetAxisRaw("Vertical");
 
         moveSpeed = Input.GetKey(KeyCode.LeftShift) && verticalInput > 0f ? sprintSpeed : walkSpeed; // set move speed to sprint speed if shift is held and player has a forward movement component, otherwise set to walk speed
+
+        // enable flight
+        if (Input.GetKey(KeyCode.LeftControl)) {
+
+            moveSpeed = flightSpeed;
+            rb.useGravity = false;
+            col.enabled = !noclipFlight;
+
+        }
+        else {
+
+            moveSpeed = Input.GetKey(KeyCode.LeftShift) && verticalInput > 0f ? sprintSpeed : walkSpeed; // set move speed to sprint speed if shift is held and player has a forward movement component, otherwise set to walk speed
+            rb.useGravity = true;
+            col.enabled = true;
+
+        }
+
+
         #endregion
 
         #region LOOKING
@@ -143,11 +168,28 @@ public class PlayerController : MonoBehaviour {
         cameraPos.rotation = Quaternion.Euler(xRotation, yRotation, 0f);
         #endregion
 
-        #region JUMPING
-        if (Input.GetKeyDown(KeyCode.Space) && isGrounded) Jump();
+        #region JUMPING (and flying)
 
-        if (rb.linearVelocity.y < 0f)
-            rb.linearVelocity += (fallMultiplier - 1) * Physics.gravity.y * Time.deltaTime * Vector3.up;
+        // if flying
+
+        if (Input.GetKey(KeyCode.LeftControl)) {
+
+            if (Input.GetKey(KeyCode.Space))
+                rb.linearVelocity = new Vector3(rb.linearVelocity.x, flightHeightAdjustSpeed, rb.linearVelocity.z);
+            else if (Input.GetKey(KeyCode.LeftShift))
+                rb.linearVelocity = new Vector3(rb.linearVelocity.x, -flightHeightAdjustSpeed, rb.linearVelocity.z);
+        }
+        else { // if not flying
+
+            if (Input.GetKeyDown(KeyCode.Space) && (isGrounded || rb.useGravity == false)) Jump(); // this is super cheap, but useGravity = false means you are in dev movement mode
+
+            if (rb.linearVelocity.y < 0f)
+                rb.linearVelocity += (fallMultiplier - 1) * Physics.gravity.y * Time.deltaTime * Vector3.up;
+
+        }
+
+
+
         #endregion
 
         #region HOTBAR
@@ -211,7 +253,7 @@ public class PlayerController : MonoBehaviour {
         // prevent player from moving or grabbing while a menu is open
         if (uiManager.IsMenuOpen()) return;
 
-        if (isGrounded)
+        if (isGrounded || rb.useGravity == false) // this is super cheap, but useGravity = false means you are in dev movement mode
             rb.AddForce((transform.forward * verticalInput + transform.right * horizontalInput).normalized * moveSpeed, ForceMode.Force);
         else
             rb.AddForce(airMultiplier * moveSpeed * (transform.forward * verticalInput + transform.right * horizontalInput).normalized, ForceMode.Force);
@@ -257,7 +299,8 @@ public class PlayerController : MonoBehaviour {
             foreach (Transform child in currHeldItem.GetComponentsInChildren<Transform>())
                 child.gameObject.layer = LayerMask.NameToLayer("HeldItem");
 
-        } else {
+        }
+        else {
 
             currHeldItem = null; // clear the held item
 
@@ -290,7 +333,8 @@ public class PlayerController : MonoBehaviour {
 
             grabLine.enabled = true; // enable the grab line to show the grab range
 
-        } else {
+        }
+        else {
 
             grabLine.enabled = false; // disable the grab line if there is no grabbed object
 
@@ -319,7 +363,8 @@ public class PlayerController : MonoBehaviour {
             timer += Time.deltaTime * (moveSpeed == walkSpeed ? walkBobSpeed : sprintBobSpeed);
             cameraPos.localPosition = new Vector3(cameraPos.localPosition.x, defaultYPos + Mathf.Sin(timer) * (moveSpeed == walkSpeed ? walkBobAmount : sprintBobAmount), cameraPos.localPosition.z);
 
-        } else {
+        }
+        else {
 
             timer = 0f;
             cameraPos.localPosition = new Vector3(cameraPos.localPosition.x, Mathf.Lerp(cameraPos.localPosition.y, defaultYPos, Time.deltaTime * (moveSpeed == walkSpeed ? walkBobSpeed : sprintBobSpeed)), cameraPos.localPosition.z);

@@ -11,6 +11,7 @@ GameObject:
   - component: {fileID: 6365714966996968923}
   - component: {fileID: 6292645484299493116}
   - component: {fileID: 76593669992948557}
+  - component: {fileID: 235357784662374153}
   m_Layer: 0
   m_Name: GasStationShelter
   m_TagString: Untagged
@@ -97,6 +98,28 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
+--- !u!64 &235357784662374153
+MeshCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2111041410517616909}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 5
+  m_Convex: 0
+  m_CookingOptions: 30
+  m_Mesh: {fileID: -5495902117074765545, guid: f66df4a77787ca742b3d59b9db630d04, type: 3}
 --- !u!1 &5463193801672089889
 GameObject:
   m_ObjectHideFlags: 0
@@ -108,6 +131,7 @@ GameObject:
   - component: {fileID: 4162947319076554450}
   - component: {fileID: 1073019056403650353}
   - component: {fileID: 1831889215360055264}
+  - component: {fileID: 916146529715803964}
   m_Layer: 0
   m_Name: GasStationSignSmall
   m_TagString: Untagged
@@ -183,6 +207,27 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
+--- !u!65 &916146529715803964
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5463193801672089889}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 1, y: 1, z: 1}
+  m_Center: {x: 0, y: 0, z: 0}
 --- !u!1001 &153687880384130131
 PrefabInstance:
   m_ObjectHideFlags: 0
