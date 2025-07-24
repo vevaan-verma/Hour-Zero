@@ -18,7 +18,7 @@ public abstract class Interactable : MonoBehaviour {
     private const float interactIndicatorLerpDuration = 0.1f;
 
     [Header("Interaction Indicator")]
-    [SerializeField] private GameObject indicator;
+    [SerializeField] protected InteractIndicator indicator;
     private Vector3 indicatorDefaultSize;
     private Coroutine indicatorLerpCoroutine;
     private bool isIndicatorVisible;
@@ -44,7 +44,7 @@ public abstract class Interactable : MonoBehaviour {
 
         indicatorDefaultSize = indicator.transform.localScale;
         indicator.transform.localScale = Vector3.zero;
-        indicator.SetActive(true); // ensure the indicator is active so it can be shown when needed
+        indicator.gameObject.SetActive(true); // ensure the indicator is active so it can be shown when needed
 
         // ensure the object and all its children are tagged as Interactable
         foreach (Transform child in GetComponentsInChildren<Transform>())

@@ -1,4 +1,3 @@
-using TMPro;
 using UnityEngine;
 
 public class Radio : Interactable {
@@ -15,7 +14,6 @@ public class Radio : Interactable {
     [SerializeField] private float hopTorqueMax;
 
     [Header("Indicator Text")]
-    [SerializeField] private TextMeshPro indicatorText;
     [SerializeField] private string playText;
     [SerializeField] private string stopText;
 
@@ -42,11 +40,11 @@ public class Radio : Interactable {
 
             audioPlayer.Play(playlist[nowPlayingIdx], true);
             particles.Play();
-            indicatorText.text = stopText;
+            indicator.SetText(stopText);
 
         }
         else
-            indicatorText.text = playText;
+            indicator.SetText(playText);
 
     }
 
@@ -60,7 +58,8 @@ public class Radio : Interactable {
             audioPlayer.Play(playlist[nowPlayingIdx], true);
 
             isPlaying = true;
-            indicatorText.text = stopText;
+
+            indicator.SetText(stopText);
 
             particles.Play();
             rb.AddTorque(new Vector3(Random.Range(hopTorqueMin, hopTorqueMax), Random.Range(hopTorqueMin, hopTorqueMax), Random.Range(hopTorqueMin, hopTorqueMax)));
@@ -77,7 +76,8 @@ public class Radio : Interactable {
                 nowPlayingIdx = 0;
 
             isPlaying = false;
-            indicatorText.text = playText;
+
+            indicator.SetText(playText);
 
             particles.Stop();
 

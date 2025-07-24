@@ -11,6 +11,10 @@ public class OpenableInteractable : Interactable {
     [SerializeField, Tooltip("Whether the item lock should be broken when the interactable is interacted with")] private bool breakItemLockOnInteract;
     private bool isOpen;
 
+    [Header("Interact Indicator")]
+    [SerializeField, Tooltip("Text shown on the indicator when the door state is set to open")] private string openedText;
+    [SerializeField, Tooltip("Text shown on the indicator when the door state is set to closed")] private string closedText;
+
     private new void Start() {
 
         base.Start();
@@ -21,8 +25,17 @@ public class OpenableInteractable : Interactable {
 
         isOpen = isInitiallyOpen; // set the initial state of the interactable
 
-        if (isOpen)
+        print(gameObject.name + " " + isInitiallyOpen);
+
+        if (isOpen) {
+
             animator.SetTrigger("open"); // trigger the open animation if the interactable is initially open
+
+            indicator.SetText(openedText);
+
+        }
+        else
+            indicator.SetText(closedText);
 
     }
 
@@ -41,10 +54,15 @@ public class OpenableInteractable : Interactable {
             animator.SetTrigger("close"); // trigger the close animation
             isOpen = false; // set the interactable as closed
 
-        } else {
+            indicator.SetText(closedText);
+
+        }
+        else {
 
             animator.SetTrigger("open"); // trigger the open animation
             isOpen = true; // set the interactable as open
+
+            indicator.SetText(openedText);
 
         }
 
