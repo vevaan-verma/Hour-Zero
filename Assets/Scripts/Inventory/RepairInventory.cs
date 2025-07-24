@@ -1,6 +1,8 @@
+using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
-public class RepairInventory : Inventory {
+public class RepairInventory : ExchangeInventory {
 
     [Header("References")]
     private SystemRepairMenu systemRepairMenu;
@@ -17,10 +19,12 @@ public class RepairInventory : Inventory {
 
         this.itemTypeFilterType = FilterType.Whitelist; // set the item type filter type to whitelist since we only want to allow the item types that are in the repair stacks
 
-        this.filteredItemTypes = new ItemType[repairStacks.Length]; // set the filtered item types to the item types of the repair stacks
+        HashSet<ItemType> uniqueItemTypes = new HashSet<ItemType>(); // use a hash set to ensure unique item types
 
         for (int i = 0; i < repairStacks.Length; i++)
-            this.filteredItemTypes[i] = repairStacks[i].GetItem().GetItemType(); // set the filtered item types to the item types of the repair stacks
+            uniqueItemTypes.Add(repairStacks[i].GetItem().GetItemType()); // add the item types of the repair stacks to the hash set
+
+        this.filteredItemTypes = uniqueItemTypes.ToArray(); // convert the hash set to an array and assign it to the filtered item types
 
         this.itemFilterType = FilterType.Whitelist; // set the filter type to whitelist since we only want to allow the items that are in the repair stacks
 

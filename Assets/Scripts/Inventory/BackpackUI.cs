@@ -19,7 +19,7 @@ public class BackpackUI : InventoryUI {
     public override void Initialize() {
 
         uiManager = FindFirstObjectByType<UIManager>();
-        inventory = FindFirstObjectByType<Backpack>(FindObjectsInactive.Include); // find the backpack in the scene
+        inventory = FindFirstObjectByType<Backpack>(FindObjectsInactive.Include); // find the backpack in the scene (must be done before base.Initialize() to ensure backpack is set)
         animator = GetComponent<Animator>();
 
         closeBackpackButton.onClick.AddListener(uiManager.ClosePrimaryBackpack); // add listener to close backpack button; call the UIManager method to close the primary backpack rather than this class directly to ensure the extra logic is executed too (e.g. closing the hotbar UI)

@@ -1,5 +1,3 @@
-using System;
-using System.Collections;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -9,7 +7,6 @@ public abstract class InventoryUI : MonoBehaviour {
     [SerializeField] protected Slot slotPrefab;
     protected Inventory inventory;
     protected Slot[] inventorySlots;
-    protected Coroutine placeholderCycleCoroutine;
 
     [Header("UI References")]
     [SerializeField] protected CanvasGroup uiPanel; // the panel that contains the inventory UI (used to allow the script to remain active while the UI is hidden)
@@ -23,16 +20,13 @@ public abstract class InventoryUI : MonoBehaviour {
     private bool areSlotsLocked;
 
     // runs before Initialize
-    private void OnEnable() {
+    protected void OnEnable() {
 
         // if the inventory is set, subscribe to the inventory's contents update event to refresh the UI when the contents change (done here too to ensure the event is always subscribed to; initialize only subscribes the first time)
         // inventory isn't set the first time (when Initialize is called) so we check if it is set here
-        if (inventory) {
-
-            RefreshInventory(); // refresh the inventory slots to ensure they are up to date
+        if (inventory)
             inventory.onContentsUpdated += RefreshInventory; // subscribe to the inventory's contents update event to refresh the UI when the contents change
 
-        }
     }
 
     public virtual void Initialize() {
@@ -44,7 +38,10 @@ public abstract class InventoryUI : MonoBehaviour {
 
         uiPanel.gameObject.SetActive(inventory.IsVisibleByDefault());
 
-        RefreshInventory();
+        // if the inventory is visible by default, refresh the inventory slots to ensure they are up to date
+        if (inventory.IsVisibleByDefault())
+            RefreshInventory();
+
         inventory.onContentsUpdated += RefreshInventory; // subscribe to the inventory's contents update event to refresh the UI when the contents change
 
     }
@@ -89,29 +86,9 @@ public abstract class InventoryUI : MonoBehaviour {
 
     public bool AreSlotsLocked() => areSlotsLocked;
 
-    protected IEnumerator HandlePlaceholderCycle() {
-
-        Item[] placeholderItems = inventory.GetFilteredItems(); // get the placeholder items from the inventory
-
-        while (true) {
-
-            for (int offset = 0; offset < placeholderItems.Length; offset++) {
-
-                for (int i = 0; i < inventorySlots.Length; i++) {
-
-                    int itemIndex = (i + offset) % placeholderItems.Length;
-                    Item placeholderItem = placeholderItems[itemIndex];
-                    inventorySlots[i].SetPlaceholderItem(placeholderItem);
-
-                }
-
-                yield return new WaitForSeconds(2f);
-
-            }
-        }
-    }
-
     public bool IsInventoryOpen() => isInventoryOpen;
+
+    public Inventory GetInventory() => inventory;
 
     public Inventory GetQuickTransferInventory() => quickTransferInventory;
 

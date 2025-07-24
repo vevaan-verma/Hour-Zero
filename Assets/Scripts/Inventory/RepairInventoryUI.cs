@@ -1,35 +1,15 @@
 using UnityEngine;
 
-public class RepairInventoryUI : InventoryUI {
+public class RepairInventoryUI : ExchangeInventoryUI {
 
     public override void Initialize() {
 
-        inventory = FindFirstObjectByType<RepairInventory>(FindObjectsInactive.Include); // find the inventory in the scene
+        inventory = FindFirstObjectByType<RepairInventory>(FindObjectsInactive.Include); // find the inventory in the scene (must be done before base.Initialize() to ensure inventory is set)
         base.Initialize();
 
     }
 
-    public override void RefreshInventory() {
-
-        // initialSlotCount is the amount of repair items that are needed to repair the system (each item gets a slot)
-        inventorySlots = new Slot[inventory.GetInitialSlotCount()];
-
-        // delete all existing slots in the inventory contents
-        foreach (Transform child in inventoryContents.transform)
-            Destroy(child.gameObject);
-
-        // instantiate the slots based on the current capacity of the inventory
-        for (int i = 0; i < inventorySlots.Length; i++) {
-
-            Slot slot = Instantiate(slotPrefab, inventoryContents.transform);
-            slot.transform.name = $"Slot{i + 1}";
-            ItemStack itemStack = inventory.GetItemStack(i); // get the item stack from the inventory at the corresponding index
-            slot.Initialize(inventory, this, i, new ItemStack(itemStack.GetItem(), itemStack.GetCount()), showItemInfoWidgetOnHover); // initialize the slot
-            inventorySlots[i] = slot; // store the slot in the array for later reference
-
-        }
-    }
-
+    // OpenInventory and CloseInventory could be placed in the ExchangeInventoryUI class, but they are kept here in case the inventory UIs ever have different behaviors for opening and closing (e.g. animations, sounds, etc.)
     public override void OpenInventory() {
 
         if (isInventoryOpen) return; // do nothing if the inventory is already open

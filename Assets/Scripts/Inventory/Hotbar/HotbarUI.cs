@@ -42,7 +42,7 @@ public class HotbarUI : InventoryUI {
 
     public override void RefreshInventory() {
 
-        if (!uiPanel.gameObject.activeSelf) return; // don't refresh the inventory if the UI is not active (special check since the hotbar UI is based on the backpack UI, so the hotbar UI could be forced to refresh when it is inactive due to the backpack being active/updated)
+        if (!uiPanel.gameObject.activeSelf) return; // don't refresh the inventory UI if the UI panel is not active; hotbar UI is based on the backpack UI, so the hotbar UI could be forced to refresh when it is inactive due to the backpack being active/updated
 
         RectTransform rectTransform = slotPrefab.GetComponent<RectTransform>();
         inventoryContents.cellSize = new Vector2(rectTransform.rect.width, rectTransform.rect.height); // set the cell size of the grid layout group to match the size of the slot prefab

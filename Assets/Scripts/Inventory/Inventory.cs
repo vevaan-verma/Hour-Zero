@@ -23,6 +23,30 @@ public abstract class Inventory : MonoBehaviour {
 
     public virtual void Initialize() {
 
+        #region VALIDATION
+        // make sure filtered items contain no duplicate items
+        if (filteredItems != null && filteredItems.Length > 0) { // if there are filtered items, check for duplicates
+
+            HashSet<Item> uniqueItems = new HashSet<Item>(filteredItems);
+
+            // if the number of unique items is less than the number of filtered items, there are duplicates, so output an error message
+            if (uniqueItems.Count != filteredItems.Length)
+                Debug.LogError($"Filtered items on {gameObject.name} contain duplicates, removing duplicates from the list.");
+
+        }
+
+        // make sure filtered item types contain no duplicate item types
+        if (filteredItemTypes != null && filteredItemTypes.Length > 0) { // if there are filtered item types, check for duplicates
+
+            HashSet<ItemType> uniqueItemTypes = new HashSet<ItemType>(filteredItemTypes);
+
+            // if the number of unique item types is less than the number of filtered item types, there are duplicates, so output an error message
+            if (uniqueItemTypes.Count != filteredItemTypes.Length)
+                Debug.LogError($"Filtered item types on {gameObject.name} contain duplicates, removing duplicates from the list.");
+
+        }
+        #endregion
+
         contents = new List<ItemStack>(currSlotCount);
         currSlotCount = initialSlotCount;
 

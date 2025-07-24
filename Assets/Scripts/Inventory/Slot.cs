@@ -1,4 +1,4 @@
-using System.Collections;
+using System;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
@@ -8,11 +8,11 @@ public class Slot : MonoBehaviour, IDropHandler, IPointerEnterHandler, IPointerE
     [Header("References")]
     [SerializeField] private ItemInfoWidget itemInfoWidgetPrefab;
     [SerializeField] private Image placeholder;
+    protected Image image;
     private ItemInfoWidget currItemInfoWidget;
     private SlotItemHolder slotItemHolder;
     private Inventory inventory;
     private InventoryUI inventoryUI;
-    protected Image image;
 
     [Header("Settings")]
     private bool showItemInfoWidgetOnHover;
@@ -20,6 +20,9 @@ public class Slot : MonoBehaviour, IDropHandler, IPointerEnterHandler, IPointerE
     [Header("Data")]
     private ItemStack itemStack;
     private int index;
+
+    [Header("Actions")]
+    public Action<int, Item> onItemStackSet; // action to be invoked when the item stack is set in this slot
 
     public virtual void Initialize(Inventory inventory, InventoryUI inventoryUI, int index, ItemStack itemStack, bool showItemInfoWidgetOnHover, Color? slotColor = null) {
 
@@ -157,6 +160,8 @@ public class Slot : MonoBehaviour, IDropHandler, IPointerEnterHandler, IPointerE
         slotItemHolder.transform.SetAsFirstSibling(); // set to the first sibling so the count text appears on top
         slotItemHolder.transform.position = transform.position; // move the new item to the position of this slot
 
+        onItemStackSet?.Invoke(index, itemStack.GetItem()); // invoke the action to notify that the item stack has been set
+
     }
 
     public void ForceSetItemStack(ItemStack itemStack) {
@@ -169,6 +174,8 @@ public class Slot : MonoBehaviour, IDropHandler, IPointerEnterHandler, IPointerE
         slotItemHolder.transform.SetParent(transform); // set the parent of the new item to this slot
         slotItemHolder.transform.SetAsFirstSibling(); // set to the first sibling so the count text appears on top
         slotItemHolder.transform.position = transform.position; // move the new item to the position of this slot
+
+        onItemStackSet?.Invoke(index, itemStack.GetItem()); // invoke the action to notify that the item stack has been set
 
     }
 
@@ -188,5 +195,7 @@ public class Slot : MonoBehaviour, IDropHandler, IPointerEnterHandler, IPointerE
     public int GetCount() => slotItemHolder.GetCount();
 
     public int GetIndex() => index;
+
+    public bool IsItemStackSet() => itemStack != null && itemStack.GetItem() != null; // check if the item stack is set and the item is not null
 
 }
