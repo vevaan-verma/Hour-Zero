@@ -53,7 +53,7 @@ public class BunkerPanelManager : MonoBehaviour {
             }
 
             if (!found)
-                Debug.LogError($"No UI defined for BunkerSystemType: {type}");
+                Debug.LogError($"No UI defined for BunkerSystemType: {type}.");
 
         }
 
@@ -75,7 +75,7 @@ public class BunkerPanelManager : MonoBehaviour {
             }
 
             if (!found)
-                Debug.LogError($"No properties defined for BunkerSystemStatus: {status}");
+                Debug.LogError($"No properties defined for BunkerSystemStatus: {status}.");
 
         }
 
@@ -99,9 +99,9 @@ public class BunkerPanelManager : MonoBehaviour {
         for (int i = 0; i <= 100; i++) {
 
             if (coveredBy[i] == 0)
-                Debug.LogError($"No BunkerSystemStatusProperties covers durability percent value: {i}");
+                Debug.LogError($"No BunkerSystemStatusProperties covers durability percent value: {i}.");
             else if (coveredBy[i] > 1)
-                Debug.LogError($"Multiple BunkerSystemStatusProperties cover durability percent value: {i}");
+                Debug.LogError($"Multiple BunkerSystemStatusProperties cover durability percent value: {i}.");
 
         }
         #endregion

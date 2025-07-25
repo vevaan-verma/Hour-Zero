@@ -122,7 +122,7 @@ public class NPCMenu : MonoBehaviour {
         TradeData tradeData = npcData.GetTradeData(); // get the trade data for this NPC
 
         teamButton.gameObject.SetActive(!npcData.IsTeamMember());
-        tradeButton.gameObject.SetActive(tradeData.GetInputItems().Length > 0 && tradeData.GetOutputItems().Length > 0); // only show the trade button if there is at least one input and output item in the trade data
+        tradeButton.gameObject.SetActive(tradeData.GetInputItemStacks().Length > 0 && tradeData.GetOutputItemStacks().Length > 0); // only show the trade button if there is at least one input and output item in the trade data
 
         BaseTask activeTask = taskManager.GetActiveTask(); // get the current active task from the task manager
         bool trackingForTask = activeTask != null && activeTask.GetNPCData().Equals(npcData); // check if the active task is for this NPC, which would mean the player is already tracking this NPC for a task

@@ -45,7 +45,7 @@ public class UIManager : MonoBehaviour {
 
             if (foundBackpacks.Length != 1) {
 
-                Debug.LogError($"There should be exactly one BackpackUI of type {type} in the scene, found {foundBackpacks.Length}");
+                Debug.LogError($"There should be exactly one BackpackUI of type {type} in the scene, found {foundBackpacks.Length}.");
                 return;
 
             }

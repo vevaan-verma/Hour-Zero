@@ -43,7 +43,7 @@ public class AudioPlayer : MonoBehaviour {
         if (toPlay != null) {
 
             // play the popup and get the reference to the GameObject
-            PopupSound playing = (PopupSound)popups.Play(toPlay, target ?? gameObject, looping);
+            PopupSound playing = (PopupSound) popups.Play(toPlay, target ?? gameObject, looping);
 
             // start tracking this sound
             currentlyPlaying.Add(playing);
@@ -54,9 +54,8 @@ public class AudioPlayer : MonoBehaviour {
             // consider removing the key field in PopupSound and rely entirely on SFXLib.GetKey();
             playing.SetKey(sound);
 
-        }
-        else
-            Debug.LogError("SFXLib: No PopupSound defined for SFXLib.Sounds." + sound);
+        } else
+            Debug.LogError($"SFXLib: No PopupSound defined for SFXLib.Sounds.{sound}.");
 
     }
 
@@ -79,7 +78,7 @@ public class AudioPlayer : MonoBehaviour {
         if (toRemove != null)
             toRemove.StopPlaying();
         if (toRemove == null)
-            Debug.LogError("No such sound " + key + " is currently acknowledged by " + gameObject.name + "'s AudioPlayer");
+            Debug.LogError("No such sound " + key + " is currently acknowledged by " + gameObject.name + "'s AudioPlayer.");
 
     }
 

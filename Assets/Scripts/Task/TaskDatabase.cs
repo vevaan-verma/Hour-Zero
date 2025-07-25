@@ -6,6 +6,28 @@ public class TaskDatabase : MonoBehaviour {
     [Header("Data")]
     [SerializeField] private TaskData[] taskData;
 
+    private void Start() {
+
+        #region VALIDATION
+        TaskType[] taskTypes = (TaskType[]) Enum.GetValues(typeof(TaskType)); // get all task types
+
+        // make sure exactly one task data exists for each task type
+        foreach (TaskType taskType in taskTypes) {
+
+            int count = 0;
+
+            foreach (TaskData data in taskData)
+                if (data.GetTaskType() == taskType)
+                    count++;
+
+            if (count != 1)
+                Debug.LogError($"Expected exactly one TaskData for task type {taskType}, but found {count}.");
+
+        }
+        #endregion
+
+    }
+
     public TaskData GetRandomTaskData() => taskData[UnityEngine.Random.Range(0, taskData.Length)];
 
 }

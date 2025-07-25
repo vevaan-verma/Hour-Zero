@@ -68,7 +68,7 @@ public class TaskManager : MonoBehaviour {
                 break;
 
             default:
-                Debug.LogError("Unknown task type: " + randomTaskData.GetTaskType());
+                Debug.LogError($"Unknown task type: {randomTaskData.GetTaskType()}.");
                 break;
 
         }

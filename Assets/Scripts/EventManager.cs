@@ -10,7 +10,7 @@ public class EventManager : MonoBehaviour {
                 break;
 
             default:
-                Debug.LogError("Unknown event type: " + eventType);
+                Debug.LogError($"Unknown event type: {eventType}.");
                 break;
 
         }

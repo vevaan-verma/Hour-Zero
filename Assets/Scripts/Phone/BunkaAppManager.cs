@@ -46,7 +46,7 @@ public class BunkaAppManager : AppManager {
             }
 
             if (!found)
-                Debug.LogError($"No UI defined for BunkerSystemType: {type}");
+                Debug.LogError($"No UI defined for BunkerSystemType: {type}.");
 
         }
         #endregion

@@ -90,11 +90,15 @@ public class SystemRepairMenu : MonoBehaviour {
 
     private IEnumerator ProcessRepair(int repairPercent, BunkerSystemType systemType) {
 
-        repairInventoryUI.SetSlotsLocked(true); // lock the slots in the repair inventory to prevent further modifications while the repair is being processed
+        // lock the slots in the repair inventory to prevent further modifications while the repair is being processed
+        foreach (Slot slot in repairInventoryUI.GetInventorySlots())
+            slot.SetLocked(true);
 
         yield return new WaitForSeconds(repairProcessingDuration); // simulate the repair processing time
 
-        repairInventoryUI.SetSlotsLocked(false); // unlock the slots in the repair inventory after the repair is processed
+        // unlock the slots in the repair inventory after the repair is processed
+        foreach (Slot slot in repairInventoryUI.GetInventorySlots())
+            slot.SetLocked(false);
 
         uiManager.CloseSystemRepairMenu(true); // close the menu when the repair inventory is full (with a flag that the repair requirements were met); don't call CloseMenu() directly to ensure the UIManager logic is executed (e.g., re-opening the hotbar UI)
         bunkerManager.RepairSystem(systemType, repairPercent); // repair the system using the bunker manager

@@ -30,7 +30,7 @@ public class BunkerManager : MonoBehaviour {
             }
 
             if (!found)
-                Debug.LogError($"BunkerController: No BunkerSystem component found for {systemType} in the scene. Please add it to the scene");
+                Debug.LogError($"No BunkerSystem component found for {systemType} in the scene. Please add it to the scene.");
 
         }
         #endregion

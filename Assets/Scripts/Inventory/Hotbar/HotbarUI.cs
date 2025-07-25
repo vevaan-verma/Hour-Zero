@@ -45,9 +45,14 @@ public class HotbarUI : InventoryUI {
         if (!uiPanel.gameObject.activeSelf) return; // don't refresh the inventory UI if the UI panel is not active; hotbar UI is based on the backpack UI, so the hotbar UI could be forced to refresh when it is inactive due to the backpack being active/updated
 
         RectTransform rectTransform = slotPrefab.GetComponent<RectTransform>();
-        inventoryContents.cellSize = new Vector2(rectTransform.rect.width, rectTransform.rect.height); // set the cell size of the grid layout group to match the size of the slot prefab
-        inventoryContents.constraint = GridLayoutGroup.Constraint.FixedRowCount; // set the constraint to fixed row count to ensure the hotbar is displayed in a single row
-        inventoryContents.constraintCount = 1; // set the number of columns in the inventory contents grid layout group to 1 (since the hotbar is a single row)
+
+        if (inventoryContents is GridLayoutGroup gridLayoutGroup) { // check if the inventory contents is a grid layout group
+
+            gridLayoutGroup.cellSize = new Vector2(rectTransform.rect.width, rectTransform.rect.height); // set the cell size of the grid layout group to match the size of the slot prefab
+            gridLayoutGroup.constraint = GridLayoutGroup.Constraint.FixedRowCount; // set the constraint to fixed row count to ensure the hotbar is displayed in a single row
+            gridLayoutGroup.constraintCount = 1; // set the number of columns in the inventory contents grid layout group to 1 (since the hotbar is a single row)
+
+        }
 
         inventorySlots = new Slot[inventory.GetCurrentSlotCount()];
 
@@ -75,9 +80,9 @@ public class HotbarUI : InventoryUI {
 
                 slot.SelectSlot(); // select the slot if it is the currently selected one
 
-                if (slot.GetItem() != null) {
+                if (slot.GetItemStack().GetItem() != null) {
 
-                    selectedToolText.text = slot.GetItem().GetName(); // update the selected tool text to show the name of the item in the selected slot
+                    selectedToolText.text = slot.GetItemStack().GetItem().GetName(); // update the selected tool text to show the name of the item in the selected slot
 
                     if (selectedToolTextFadeCoroutine != null) StopCoroutine(selectedToolTextFadeCoroutine); // stop any existing selected tool text fade coroutine
                     selectedToolTextFadeCoroutine = StartCoroutine(Fade(selectedToolText.GetComponent<CanvasGroup>(), 1f, selectedTextFadeDuration)); // start the fade in coroutine for the selected tool text
@@ -96,6 +101,11 @@ public class HotbarUI : InventoryUI {
 
             }
         }
+
+        // refresh the layout if the rect transform is active in hierarchy
+        if (rectTransform.gameObject.activeInHierarchy)
+            RefreshLayout(rectTransform);
+
     }
 
     public override void OpenInventory() {

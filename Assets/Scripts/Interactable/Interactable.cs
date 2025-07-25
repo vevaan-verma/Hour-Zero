@@ -18,7 +18,7 @@ public abstract class Interactable : MonoBehaviour {
     private const float interactIndicatorLerpDuration = 0.1f;
 
     [Header("Interaction Indicator")]
-    [SerializeField] protected InteractIndicator indicator;
+    protected InteractIndicator indicator;
     private Vector3 indicatorDefaultSize;
     private Coroutine indicatorLerpCoroutine;
     private bool isIndicatorVisible;
@@ -41,6 +41,7 @@ public abstract class Interactable : MonoBehaviour {
         hotbar = FindFirstObjectByType<Hotbar>();
         backpack = FindFirstObjectByType<Backpack>();
         player = FindFirstObjectByType<PlayerController>();
+        indicator = GetComponentInChildren<InteractIndicator>(true); // find the interact indicator in the children of this object, even if inactive
 
         indicatorDefaultSize = indicator.transform.localScale;
         indicator.transform.localScale = Vector3.zero;

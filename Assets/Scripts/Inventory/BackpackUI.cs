@@ -35,9 +35,14 @@ public class BackpackUI : InventoryUI {
         int slotsPerRow = inventory.GetSlotsPerRow();
 
         RectTransform rectTransform = slotPrefab.GetComponent<RectTransform>();
-        inventoryContents.cellSize = new Vector2(rectTransform.rect.width, rectTransform.rect.height); // set the cell size of the grid layout group to match the size of the slot prefab
-        inventoryContents.constraint = GridLayoutGroup.Constraint.FixedColumnCount; // set the constraint to fixed column count
-        inventoryContents.constraintCount = slotsPerRow; // set the number of columns in the inventory contents grid layout group
+
+        if (inventoryContents is GridLayoutGroup gridLayoutGroup) { // check if the inventory contents is a grid layout group
+
+            gridLayoutGroup.cellSize = new Vector2(rectTransform.rect.width, rectTransform.rect.height); // set the cell size of the grid layout group to match the size of the slot prefab
+            gridLayoutGroup.constraint = GridLayoutGroup.Constraint.FixedColumnCount; // set the constraint to fixed column count
+            gridLayoutGroup.constraintCount = slotsPerRow; // set the number of columns in the inventory contents grid layout group
+
+        }
 
         inventorySlots = new Slot[inventory.GetCurrentSlotCount()];
 
@@ -55,6 +60,11 @@ public class BackpackUI : InventoryUI {
             inventorySlots[i] = slot; // store the slot in the array for later reference
 
         }
+
+        // refresh the layout if the rect transform is active in hierarchy
+        if (rectTransform.gameObject.activeInHierarchy)
+            RefreshLayout(rectTransform);
+
     }
 
     public override void OpenInventory() {

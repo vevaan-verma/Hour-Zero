@@ -1,3 +1,4 @@
+using System.Collections;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -7,10 +8,12 @@ public abstract class InventoryUI : MonoBehaviour {
     [SerializeField] protected Slot slotPrefab;
     protected Inventory inventory;
     protected Slot[] inventorySlots;
+    protected RectTransform rectTransform;
+    private Coroutine refreshLayoutCoroutine;
 
     [Header("UI References")]
     [SerializeField] protected CanvasGroup uiPanel; // the panel that contains the inventory UI (used to allow the script to remain active while the UI is hidden)
-    [SerializeField] protected GridLayoutGroup inventoryContents;
+    [SerializeField] protected LayoutGroup inventoryContents;
 
     [Header("Settings")]
     [SerializeField] private bool quickTransferEnabled;
@@ -33,8 +36,10 @@ public abstract class InventoryUI : MonoBehaviour {
 
         #region VALIDATION
         if (quickTransferEnabled && quickTransferInventory == null)
-            Debug.LogError("Quick transfer is enabled but no quick transfer inventory is set on " + gameObject.name);
+            Debug.LogError($"Quick transfer is enabled but no quick transfer inventory is set on {gameObject.name}.");
         #endregion
+
+        rectTransform = GetComponent<RectTransform>();
 
         uiPanel.gameObject.SetActive(inventory.IsVisibleByDefault());
 
@@ -56,9 +61,14 @@ public abstract class InventoryUI : MonoBehaviour {
     public virtual void RefreshInventory() {
 
         RectTransform rectTransform = slotPrefab.GetComponent<RectTransform>();
-        inventoryContents.cellSize = new Vector2(rectTransform.rect.width, rectTransform.rect.height); // set the cell size of the grid layout group to match the size of the slot prefab
-        inventoryContents.constraint = GridLayoutGroup.Constraint.FixedColumnCount; // set the constraint to fixed column count
-        inventoryContents.constraintCount = inventory.GetSlotsPerRow(); // set the number of columns in the inventory contents grid layout group
+
+        if (inventoryContents is GridLayoutGroup gridLayoutGroup) { // check if the inventory contents is a grid layout group
+
+            gridLayoutGroup.cellSize = new Vector2(rectTransform.rect.width, rectTransform.rect.height); // set the cell size of the grid layout group to match the size of the slot prefab
+            gridLayoutGroup.constraint = GridLayoutGroup.Constraint.FixedColumnCount; // set the constraint to fixed column count
+            gridLayoutGroup.constraintCount = inventory.GetSlotsPerRow(); // set the number of columns in the inventory contents grid layout group
+
+        }
 
         inventorySlots = new Slot[inventory.GetCurrentSlotCount()];
 
@@ -76,15 +86,36 @@ public abstract class InventoryUI : MonoBehaviour {
             inventorySlots[i] = slot; // store the slot in the array for later reference
 
         }
+
+        // refresh the layout if the rect transform is active in hierarchy
+        if (rectTransform.gameObject.activeInHierarchy)
+            RefreshLayout(rectTransform);
+
+    }
+
+    protected void RefreshLayout(RectTransform root) {
+
+        if (refreshLayoutCoroutine != null) StopCoroutine(refreshLayoutCoroutine); // stop any existing layout refresh coroutine
+        refreshLayoutCoroutine = StartCoroutine(HandleRefreshLayout(root));
+
+    }
+
+    private IEnumerator HandleRefreshLayout(RectTransform root) {
+
+        yield return null; // wait for the end of the frame to ensure all UI elements are properly initialized
+
+        foreach (LayoutGroup layoutGroup in root.GetComponentsInChildren<LayoutGroup>())
+            LayoutRebuilder.ForceRebuildLayoutImmediate(layoutGroup.GetComponent<RectTransform>());
+
+        refreshLayoutCoroutine = null; // reset the coroutine reference after completion
+
     }
 
     public abstract void OpenInventory();
 
     public abstract void CloseInventory();
 
-    public void SetSlotsLocked(bool areSlotsLocked) => this.areSlotsLocked = areSlotsLocked;
-
-    public bool AreSlotsLocked() => areSlotsLocked;
+    public Slot[] GetInventorySlots() => inventorySlots;
 
     public bool IsInventoryOpen() => isInventoryOpen;
 

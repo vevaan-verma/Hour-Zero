@@ -40,7 +40,7 @@ public class AlertManager : MonoBehaviour {
             }
 
             if (!hasColor)
-                Debug.LogError($"No color defined for alert type: {type}");
+                Debug.LogError($"No color defined for alert type: {type}.");
 
         }
         #endregion

@@ -48,8 +48,6 @@ public class SlotItemHolder : MonoBehaviour {
 
     }
 
-    public Item GetItem() => this.itemStack.GetItem();
-
-    public int GetCount() => this.itemStack.GetCount();
+    public ItemStack GetItemStack() => itemStack;
 
 }

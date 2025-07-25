@@ -5,61 +5,59 @@ using UnityEngine;
 public class TradeInventory : ExchangeInventory {
 
     [Header("References")]
-    private TradeMenu npcTradeMenu;
     private TradeData tradeData;
 
     public void Initialize(TradeData tradeData) {
 
         this.tradeData = tradeData; // set the trade data for this trade inventory
 
-        ItemStack[] inputStacks = tradeData.GetInputItems(); // get the input stacks for the trade
+        this.initialSlotCount = tradeData.GetInputItemStacks().Length + tradeData.GetOutputItemStacks().Length; // set the initial slot count to the number of input item stacks plus the number of output item stacks
 
-        this.initialSlotCount = inputStacks.Length; // set the initial slot count to the number of input item types required for the trade
+        this.itemTypeFilterType = FilterType.Whitelist;
+        this.filteredItemTypes = new ItemType[0]; // initialize the filtered item types to an empty array
 
-        this.itemTypeFilterType = FilterType.Whitelist; // set the item type filter type to whitelist since we only want to allow the item types that are in the trade stacks
+        this.itemFilterType = FilterType.Whitelist;
+        this.filteredItems = new Item[0]; // initialize the filtered items to an empty array
 
-        HashSet<ItemType> uniqueItemTypes = new HashSet<ItemType>(); // use a hash set to ensure unique item types
-
-        for (int i = 0; i < inputStacks.Length; i++)
-            uniqueItemTypes.Add(inputStacks[i].GetItem().GetItemType()); // add the item types of the repair stacks to the hash set
-
-        this.filteredItemTypes = uniqueItemTypes.ToArray(); // convert the hash set to an array and assign it to the filtered item types
-
-        this.itemFilterType = FilterType.Whitelist; // set the filter type to whitelist since we only want to allow the items that are in the trade stacks
-
-        // set the item whitelist to the trade stack items
-        this.filteredItems = new Item[inputStacks.Length];
-
-        for (int i = 0; i < inputStacks.Length; i++)
-            this.filteredItems[i] = inputStacks[i].GetItem();
+        // don't actually set the filters here because they need to be set after the output slots are filled; the actual filters exclude the items in the output stack, so if they are set right now, the items wouldn't be able to be put in the trade inventory in the correct slots
 
         base.Initialize(); // initialize at the end to ensure the properties are set before calling the base method (especially the slot count)
 
     }
 
-    private void OnEnable() => onContentsUpdated += OnItemStackAdded;
+    public void SetFilters() {
 
-    private void Start() => npcTradeMenu = FindFirstObjectByType<TradeMenu>();
+        ItemStack[] inputStacks = tradeData.GetInputItemStacks(); // get the input stacks for the trade
 
-    private void OnDisable() => onContentsUpdated -= OnItemStackAdded;
+        this.itemTypeFilterType = FilterType.Whitelist; // set the item type filter type to whitelist since we only want to allow the item types that are in the trade stacks
 
-    private void OnItemStackAdded() {
+        HashSet<ItemType> uniqueItemTypes = new HashSet<ItemType>(); // use a hash set to ensure unique item types
 
-        ItemStack[] inputStacks = tradeData.GetInputItems(); // get the input stacks for the trade
+        // add all item types from the input stacks to the hash set
+        for (int i = 0; i < inputStacks.Length; i++)
+            uniqueItemTypes.Add(inputStacks[i].GetItem().GetItemType());
 
-        foreach (ItemStack stack in inputStacks)
-            if (!ContainsItemStack(stack))
-                return;
+        // don't include the output stacks in the item type filter, since they are not allowed to be put in the trade inventory, they are only allowed to be taken out after trading
 
-        // at this point, all required stacks are present for trading
+        this.filteredItemTypes = uniqueItemTypes.ToArray(); // convert the hash set to an array and assign it to the filtered item types
 
-        npcTradeMenu.OnTradeRequirementsMet(tradeData); // notify the trade menu that the trade inventory is full, which means the necessary items for trading were put in
+        this.itemFilterType = FilterType.Whitelist; // set the filter type to whitelist since we only want to allow the items that are in the trade stacks
+
+        HashSet<Item> uniqueItems = new HashSet<Item>(); // use a hash set to ensure unique items
+
+        // add all items from the input stacks to the hash set
+        for (int i = 0; i < inputStacks.Length; i++)
+            uniqueItems.Add(inputStacks[i].GetItem());
+
+        // don't include the output stacks in the item filter, since they are not allowed to be put in the trade inventory, they are only allowed to be taken out after trading
+
+        this.filteredItems = uniqueItems.ToArray(); // convert the hash set to an array and assign it to the filtered items
 
     }
 
     public override int GetEffectiveStackLimit(Item item) {
 
-        ItemStack[] inputStacks = tradeData.GetInputItems(); // get the input stacks for the trade
+        ItemStack[] inputStacks = tradeData.GetInputItemStacks(); // get the input stacks for the trade
 
         // return the amount of items required to trade if the item is in the trade stacks
         for (int i = 0; i < inputStacks.Length; i++)
@@ -69,6 +67,9 @@ public class TradeInventory : ExchangeInventory {
         return 0;
 
     }
+
+    public TradeData GetTradeData() => tradeData;
+
 }
 
 #if UNITY_EDITOR

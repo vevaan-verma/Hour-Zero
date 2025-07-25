@@ -1,4 +1,3 @@
-using System;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
@@ -16,13 +15,11 @@ public class Slot : MonoBehaviour, IDropHandler, IPointerEnterHandler, IPointerE
 
     [Header("Settings")]
     private bool showItemInfoWidgetOnHover;
+    private bool isLocked;
 
     [Header("Data")]
     private ItemStack itemStack;
     private int index;
-
-    [Header("Actions")]
-    public Action<int, Item> onItemStackSet; // action to be invoked when the item stack is set in this slot
 
     public virtual void Initialize(Inventory inventory, InventoryUI inventoryUI, int index, ItemStack itemStack, bool showItemInfoWidgetOnHover, Color? slotColor = null) {
 
@@ -40,7 +37,7 @@ public class Slot : MonoBehaviour, IDropHandler, IPointerEnterHandler, IPointerE
             image.color = (Color) slotColor;
 
         slotItemHolder.Initialize(inventoryUI); // initialize the item holder
-        ForceSetItemStack(itemStack); // initialize the slot with the provided item stack
+        SetItemStack(itemStack, true); // force setting the item stack to ensure it is set even if the slots are locked; this is useful for initializing the slot with an item stack
 
         transform.GetChild(0).name = $"ItemHolder{index + 1}"; // rename the item holder child to reflect its index
 
@@ -50,7 +47,7 @@ public class Slot : MonoBehaviour, IDropHandler, IPointerEnterHandler, IPointerE
 
     public void OnPointerClick(PointerEventData eventData) {
 
-        if (inventoryUI.AreSlotsLocked()) return; // if the slots are locked, do not process the pointer click event
+        if (isLocked) return; // if the slot is locked, do not process the pointer click event
 
         // check if shift + left click is pressed to activate quick transfer and make sure the item is not null to make sure there is something to transfer
         if (Input.GetKey(KeyCode.LeftShift) && itemStack.GetItem() != null)
@@ -76,12 +73,10 @@ public class Slot : MonoBehaviour, IDropHandler, IPointerEnterHandler, IPointerE
 
     public void OnDrop(PointerEventData eventData) { // this is called on the target slot when an item is dropped on it
 
-        if (inventoryUI.AreSlotsLocked()) return; // if the slots are locked, do not process the drop event
-
         DraggableSlotItemHolder droppedItemHolder = eventData.pointerDrag.GetComponent<DraggableSlotItemHolder>();
         Slot sourceSlot = droppedItemHolder.GetInitialSlot();
 
-        if (sourceSlot == null) return; // if the source slot is null, do nothing (prevents errors when an item is dragged from a locked slot)
+        if (isLocked || sourceSlot.IsLocked()) return; // if the slot or the source slot is locked, do not process the drop event
 
         int sourceIndex = sourceSlot.GetIndex();
         int targetIndex = GetIndex();
@@ -96,9 +91,9 @@ public class Slot : MonoBehaviour, IDropHandler, IPointerEnterHandler, IPointerE
 
             if (sourceIndex == targetIndex) return; // if the source and target slots are the same, we can just return
 
-            if (GetItem() != null && GetItem() == sourceStack.GetItem()) { // check if the item in this slot is the same as the one being dropped, which would allow stacking (same regardless of if the interaction is between different inventories or not)
+            if (GetItemStack().GetItem() != null && GetItemStack().GetItem() == sourceStack.GetItem()) { // check if the item in this slot is the same as the one being dropped, which would allow stacking (same regardless of if the interaction is between different inventories or not)
 
-                int remainder = sourceInventory.SetItemStack(new ItemStack(sourceStack.GetItem(), GetCount() + sourceStack.GetCount()), targetIndex); // set the item stack in the target inventory to the one being dropped and get the remainder of items that couldn't be added
+                int remainder = sourceInventory.SetItemStack(new ItemStack(sourceStack.GetItem(), GetItemStack().GetCount() + sourceStack.GetCount()), targetIndex); // set the item stack in the target inventory to the one being dropped and get the remainder of items that couldn't be added
 
                 sourceInventory.SetItemStack(new ItemStack(sourceStack.GetItem(), remainder), sourceIndex); // set the source slot to empty or the remainder of the source stack that wasn't stacked
 
@@ -119,9 +114,9 @@ public class Slot : MonoBehaviour, IDropHandler, IPointerEnterHandler, IPointerE
             }
         } else { // the source and target inventories are different, so we need to handle the swapping differently
 
-            if (GetItem() != null && GetItem() == sourceStack.GetItem()) { // check if the item in this slot is the same as the one being dropped, which would allow stacking (same regardless of if the interaction is between different inventories or not)
+            if (GetItemStack().GetItem() != null && GetItemStack().GetItem() == sourceStack.GetItem()) { // check if the item in this slot is the same as the one being dropped, which would allow stacking (same regardless of if the interaction is between different inventories or not)
 
-                int remainder = targetInventory.SetItemStack(new ItemStack(sourceStack.GetItem(), GetCount() + sourceStack.GetCount()), targetIndex); // set the item stack in the target inventory to the one being dropped and get the remainder of items that couldn't be added
+                int remainder = targetInventory.SetItemStack(new ItemStack(sourceStack.GetItem(), GetItemStack().GetCount() + sourceStack.GetCount()), targetIndex); // set the item stack in the target inventory to the one being dropped and get the remainder of items that couldn't be added
                 sourceInventory.SetItemStack(new ItemStack(sourceStack.GetItem(), remainder), sourceIndex); // set the source slot to empty or the remainder of the source stack that wasn't stacked
 
             } else {
@@ -149,24 +144,9 @@ public class Slot : MonoBehaviour, IDropHandler, IPointerEnterHandler, IPointerE
         }
     }
 
-    public void SetItemStack(ItemStack itemStack) {
+    public void SetItemStack(ItemStack itemStack, bool force = false) {
 
-        if (inventoryUI.AreSlotsLocked()) return; // if the slots are locked, do not allow setting the item stack
-
-        this.itemStack = itemStack; // set the item stack in this slot to the one being dropped
-
-        slotItemHolder.SetItemStack(itemStack); // set the item stack in the new slot item holder
-        slotItemHolder.transform.SetParent(transform); // set the parent of the new item to this slot
-        slotItemHolder.transform.SetAsFirstSibling(); // set to the first sibling so the count text appears on top
-        slotItemHolder.transform.position = transform.position; // move the new item to the position of this slot
-
-        onItemStackSet?.Invoke(index, itemStack.GetItem()); // invoke the action to notify that the item stack has been set
-
-    }
-
-    public void ForceSetItemStack(ItemStack itemStack) {
-
-        // this method is used to set the item stack without checking if the slots are locked, for example when initializing the slot
+        if (!force && isLocked) return; // if the slot is locked, do not allow setting the item stack; if force is true, we ignore the locked state
 
         this.itemStack = itemStack; // set the item stack in this slot to the one being dropped
 
@@ -174,8 +154,6 @@ public class Slot : MonoBehaviour, IDropHandler, IPointerEnterHandler, IPointerE
         slotItemHolder.transform.SetParent(transform); // set the parent of the new item to this slot
         slotItemHolder.transform.SetAsFirstSibling(); // set to the first sibling so the count text appears on top
         slotItemHolder.transform.position = transform.position; // move the new item to the position of this slot
-
-        onItemStackSet?.Invoke(index, itemStack.GetItem()); // invoke the action to notify that the item stack has been set
 
     }
 
@@ -188,11 +166,13 @@ public class Slot : MonoBehaviour, IDropHandler, IPointerEnterHandler, IPointerE
 
     public void SetPlaceholderItem(Item placeholderItem) => placeholder.sprite = placeholderItem.GetItemIcon(); // set the placeholder sprite to the sprite of the placeholder item
 
+    public void SetLocked(bool isLocked) => this.isLocked = isLocked;
+
+    public bool IsLocked() => isLocked;
+
     public Inventory GetInventory() => inventory;
 
-    public Item GetItem() => slotItemHolder.GetItem();
-
-    public int GetCount() => slotItemHolder.GetCount();
+    public ItemStack GetItemStack() => slotItemHolder.GetItemStack();
 
     public int GetIndex() => index;
 
