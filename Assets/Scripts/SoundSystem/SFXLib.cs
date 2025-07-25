@@ -23,6 +23,11 @@ public class SFXLib : MonoBehaviour {
         #region Object Sounds
 
         Object_WoodenBreak,
+        Object_DoorOpen,
+        Object_SoftBells,
+        Object_MetalDoorOpen,
+        Object_MetalDoorClose,
+        Object_WoodDoorOpen,
 
         #endregion
 
@@ -39,6 +44,9 @@ public class SFXLib : MonoBehaviour {
 
         //General
         General_Thump,
+        General_Creak,
+        General_LongCreak,
+        General_Slam,
 
         #endregion
 
@@ -51,17 +59,9 @@ public class SFXLib : MonoBehaviour {
 
         #endregion
     }
-    private void Start() {
+    private void Start() => ValidateDict(modifyDict: false);
 
-        ValidateDict(modifyDict: false);
-
-    }
-
-    private void OnValidate() {
-
-        hasErrors = false;
-
-    }
+    private void OnValidate() => hasErrors = false;
 
     // make sure the library looks how it should (?)
     public void ValidateDict(bool modifyDict) {
@@ -88,7 +88,7 @@ public class SFXLib : MonoBehaviour {
             }
 
             // automatically alphabetize
-            soundDict = soundDict.OrderBy(entry => entry.Key.ToString()).ToList();
+            //soundDict = soundDict.OrderBy(entry => entry.Key.ToString()).ToList();
 
         }
 
@@ -119,7 +119,6 @@ public class SFXLib : MonoBehaviour {
 
                     duplicateKeyLog.Add(entry.Key, "The SFXLib's soundDict has multiple definitions for the sound key " +
                         entry.Key + ". Please remove duplicates. \n\t\tConflicts found at these indices: " + firstAppearance + ", " + i + ", ");
-
 
                 }
 

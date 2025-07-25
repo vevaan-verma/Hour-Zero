@@ -9,7 +9,13 @@ public class OpenableInteractable : Interactable {
     [SerializeField, Tooltip("Whether the interactable is open when the game starts")] private bool isInitiallyOpen;
     [SerializeField, Tooltip("Whether the item lock is intact by default, which requires the specified items to open or close the interactable when intact")] private bool itemLockIntact;
     [SerializeField, Tooltip("Whether the item lock should be broken when the interactable is interacted with")] private bool breakItemLockOnInteract;
+    [SerializeField, Tooltip("The linkedOpenable will be triggered when ")] private OpenableInteractable linkedOpenable;
     private bool isOpen;
+
+    [Header("Sounds")]
+    [SerializeField] private SFXLib.Sounds openSound;
+    [SerializeField] private SFXLib.Sounds closeSound;
+    private AudioPlayer audioPlayer;
 
     [Header("Interact Indicator")]
     [SerializeField, Tooltip("Text shown on the indicator when the door state is set to open")] private string openedText;
@@ -19,6 +25,7 @@ public class OpenableInteractable : Interactable {
 
         base.Start();
         animator = GetComponent<Animator>();
+        audioPlayer = GetComponent<AudioPlayer>();
 
         if (!itemLockIntact && breakItemLockOnInteract)
             Debug.LogWarning($"Interactable {name} has item lock intact set to false but break item lock on interact is true. This will have no effect since the item lock is already broken.");
@@ -54,6 +61,8 @@ public class OpenableInteractable : Interactable {
             animator.SetTrigger("close"); // trigger the close animation
             isOpen = false; // set the interactable as closed
 
+            audioPlayer.Play(closeSound);
+
             indicator.SetText(closedText);
 
         }
@@ -61,6 +70,8 @@ public class OpenableInteractable : Interactable {
 
             animator.SetTrigger("open"); // trigger the open animation
             isOpen = true; // set the interactable as open
+
+            audioPlayer.Play(openSound);
 
             indicator.SetText(openedText);
 

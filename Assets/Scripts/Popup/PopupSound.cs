@@ -1,10 +1,10 @@
+using UnityEditor;
 using UnityEngine;
 
 [ExecuteAlways]
 public class PopupSound : Popup {
 
     private AudioSource audioSource;
-
     // Everything that plays sound uses an AudioPlayer to do so, and the AudioPlayer keeps track of all the 
     //      PopupSounds it spawned in that are active. The PopupSound tells the AudioPlayer when it is done existing. 
     private AudioPlayer owner;
@@ -12,6 +12,8 @@ public class PopupSound : Popup {
     // Simiular to above, each of these SoundPopups needs to know what key it corresponds to in the SFXLib.
     // note that the SFXLib can only have each popup appear once, meaning no two keys have any popups in common
     private SFXLib.Sounds? key;
+
+    [SerializeField, ReadOnly] private string audioClipDirectory = "Assets/Art/Sounds/";
 
     /// <summary>
     /// 
@@ -102,6 +104,23 @@ public class PopupSound : Popup {
             duration = ((AudioClip)audioSource.resource).length;
         else
             duration = 0;
+
+    }
+
+    // attempt to find a clip in the assets directory with the same name as this prefab
+    public void TryAutoAssignClip() {
+
+        audioSource = GetComponent<AudioSource>();
+        AudioClip found = AssetDatabase.LoadAssetAtPath<AudioClip>(audioClipDirectory + gameObject.name + ".mp3");
+
+        if (found == null)
+            print("Could not find file " + audioClipDirectory + gameObject.name + ".mp3");
+        else {
+
+            audioSource.clip = found;
+            print("Clip assigned succesfully (" + gameObject.name + ".mp3)");
+
+        }
 
     }
 

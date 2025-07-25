@@ -471,7 +471,6 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
-  - {fileID: 2808746135432225051}
   - {fileID: 2451145160311219708}
   - {fileID: 4705136932370552162}
   - {fileID: 489921776395838992}
@@ -481,6 +480,7 @@ Transform:
   - {fileID: 5959824898682212934}
   - {fileID: 5267802597842072520}
   - {fileID: 6582612922047075680}
+  - {fileID: 3517173905474923730}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &2044946820952681042
@@ -605,94 +605,6 @@ Transform:
   m_Children: []
   m_Father: {fileID: 6582612922047075680}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!1 &3292680284011718251
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 2808746135432225051}
-  - component: {fileID: 3474953531704605569}
-  m_Layer: 0
-  m_Name: SFXLibrary
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &2808746135432225051
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3292680284011718251}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 72.52, y: 1.75, z: -0.8299999}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 4657243365197081763}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &3474953531704605569
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3292680284011718251}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 229559572e3fc274c9c8843ab503836d, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  soundDict:
-  - key: 7
-    sounds:
-    - {fileID: 8929416327475045476, guid: b7a930d34a1835b469b420ee79c9b6a5, type: 3}
-    - {fileID: 8929416327475045476, guid: 11e01d1ba1b894048b09167d262960d8, type: 3}
-    - {fileID: 8929416327475045476, guid: ba1a144f722abc64e98ae6b3803cd2f3, type: 3}
-  - key: 0
-    sounds:
-    - {fileID: 8929416327475045476, guid: a546f94b5fefd614eb82f9b602cfc45e, type: 3}
-    - {fileID: 8929416327475045476, guid: 45ec51e4c30bcba46bec2b79163c0971, type: 3}
-    - {fileID: 8929416327475045476, guid: ad67d370bbf7d51408775216cb62a7b6, type: 3}
-  - key: 1
-    sounds:
-    - {fileID: 8929416327475045476, guid: 2aa60371204e69445b10bb97f33dbf45, type: 3}
-    - {fileID: 8929416327475045476, guid: 099889ae78529d343b18a4f885a95222, type: 3}
-    - {fileID: 8929416327475045476, guid: b42d77225086da747a74015c90d91e77, type: 3}
-  - key: 9
-    sounds:
-    - {fileID: 8929416327475045476, guid: 694ede64c36d6ad43be8969dd8dacd55, type: 3}
-  - key: 10
-    sounds:
-    - {fileID: 8929416327475045476, guid: 3d9c3c9e420483b4ca5dcf0b9aa11eec, type: 3}
-  - key: 8
-    sounds:
-    - {fileID: 8929416327475045476, guid: a664a9a777ca7d044b9e363e11924601, type: 3}
-  - key: 3
-    sounds:
-    - {fileID: 8929416327475045476, guid: 9f6f2174235d87d43a3cd5096cda828c, type: 3}
-  - key: 4
-    sounds:
-    - {fileID: 8929416327475045476, guid: 2ee476ddddd405d41b47dba8065bb502, type: 3}
-  - key: 5
-    sounds:
-    - {fileID: 8929416327475045476, guid: e85b5d64fdb41f74f95faf31717e86a8, type: 3}
-  - key: 6
-    sounds:
-    - {fileID: 8929416327475045476, guid: 84625dbe9c452c945b43f9dda69ea603, type: 3}
-  - key: 2
-    sounds:
-    - {fileID: 8929416327475045476, guid: 368e70c8724f1a8468d927978e21d971, type: 3}
-    - {fileID: 8929416327475045476, guid: ade6949fdcc576d478483b7c090499f3, type: 3}
-    - {fileID: 8929416327475045476, guid: e4d75daef9994f043bc71c928844710b, type: 3}
-    - {fileID: 8929416327475045476, guid: 59d1085a4a7d8424cab40d6ce485fbd0, type: 3}
-  hasErrors: 0
 --- !u!1 &3421092482866710807
 GameObject:
   m_ObjectHideFlags: 0
@@ -1059,6 +971,124 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1e59b4b10634f3a47b2bace9dd5c101c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!1 &6879172415585169606
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 3517173905474923730}
+  - component: {fileID: 2547022525542849363}
+  m_Layer: 0
+  m_Name: SFXLibrary
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &3517173905474923730
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6879172415585169606}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 72.52, y: 1.75, z: -0.8299999}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 4657243365197081763}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &2547022525542849363
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6879172415585169606}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 229559572e3fc274c9c8843ab503836d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  soundDict:
+  - key: 13
+    sounds:
+    - {fileID: 8929416327475045476, guid: 3e26000950da8e24395399d25507554b, type: 3}
+    - {fileID: 8929416327475045476, guid: 481b8b18f456e5048908a553e5d682f4, type: 3}
+  - key: 14
+    sounds:
+    - {fileID: 8929416327475045476, guid: bf8a534df84d02f49a046fb429ac2c2d, type: 3}
+  - key: 15
+    sounds:
+    - {fileID: 8929416327475045476, guid: 82d644f29cfbd8749852b9a67115678a, type: 3}
+  - key: 12
+    sounds:
+    - {fileID: 8929416327475045476, guid: b7a930d34a1835b469b420ee79c9b6a5, type: 3}
+    - {fileID: 8929416327475045476, guid: 11e01d1ba1b894048b09167d262960d8, type: 3}
+    - {fileID: 8929416327475045476, guid: ba1a144f722abc64e98ae6b3803cd2f3, type: 3}
+  - key: 0
+    sounds:
+    - {fileID: 8929416327475045476, guid: a546f94b5fefd614eb82f9b602cfc45e, type: 3}
+    - {fileID: 8929416327475045476, guid: 45ec51e4c30bcba46bec2b79163c0971, type: 3}
+    - {fileID: 8929416327475045476, guid: ad67d370bbf7d51408775216cb62a7b6, type: 3}
+  - key: 1
+    sounds:
+    - {fileID: 8929416327475045476, guid: 2aa60371204e69445b10bb97f33dbf45, type: 3}
+    - {fileID: 8929416327475045476, guid: 099889ae78529d343b18a4f885a95222, type: 3}
+    - {fileID: 8929416327475045476, guid: b42d77225086da747a74015c90d91e77, type: 3}
+  - key: 17
+    sounds:
+    - {fileID: 8929416327475045476, guid: 694ede64c36d6ad43be8969dd8dacd55, type: 3}
+  - key: 18
+    sounds:
+    - {fileID: 8929416327475045476, guid: 3d9c3c9e420483b4ca5dcf0b9aa11eec, type: 3}
+  - key: 16
+    sounds:
+    - {fileID: 8929416327475045476, guid: a664a9a777ca7d044b9e363e11924601, type: 3}
+  - key: 8
+    sounds:
+    - {fileID: 8929416327475045476, guid: 9f6f2174235d87d43a3cd5096cda828c, type: 3}
+  - key: 9
+    sounds:
+    - {fileID: 8929416327475045476, guid: 2ee476ddddd405d41b47dba8065bb502, type: 3}
+  - key: 10
+    sounds:
+    - {fileID: 8929416327475045476, guid: e85b5d64fdb41f74f95faf31717e86a8, type: 3}
+  - key: 11
+    sounds:
+    - {fileID: 8929416327475045476, guid: 84625dbe9c452c945b43f9dda69ea603, type: 3}
+  - key: 3
+    sounds:
+    - {fileID: 8929416327475045476, guid: c5fe023958fb3c14594cafe6ea5b0082, type: 3}
+    - {fileID: 8929416327475045476, guid: d7d70b8a739327e45addc9f28662550a, type: 3}
+  - key: 6
+    sounds:
+    - {fileID: 8929416327475045476, guid: bba0bf41d96081447b23cd038825e268, type: 3}
+  - key: 5
+    sounds:
+    - {fileID: 8929416327475045476, guid: c810ca4b3f707ad47a348254017a3461, type: 3}
+  - key: 4
+    sounds:
+    - {fileID: 8929416327475045476, guid: 94f578214cb3ea5469c886da48db2496, type: 3}
+    - {fileID: 8929416327475045476, guid: 03e8432ef647a124a8386ab8f7ebde3a, type: 3}
+    - {fileID: 8929416327475045476, guid: 1d9d7ef672f2e834ba40b4f517633250, type: 3}
+    - {fileID: 8929416327475045476, guid: 3d7ca4dedfde8f34f848d29e3655a934, type: 3}
+  - key: 7
+    sounds:
+    - {fileID: 8929416327475045476, guid: 12b9e1c7ced667e47bb1a93d5ee41615, type: 3}
+    - {fileID: 8929416327475045476, guid: 2835d936049ce5844b369b90b6624e1c, type: 3}
+  - key: 2
+    sounds:
+    - {fileID: 8929416327475045476, guid: 368e70c8724f1a8468d927978e21d971, type: 3}
+    - {fileID: 8929416327475045476, guid: ade6949fdcc576d478483b7c090499f3, type: 3}
+    - {fileID: 8929416327475045476, guid: e4d75daef9994f043bc71c928844710b, type: 3}
+    - {fileID: 8929416327475045476, guid: 59d1085a4a7d8424cab40d6ce485fbd0, type: 3}
+  hasErrors: 0
 --- !u!1 &7210185944356297902
 GameObject:
   m_ObjectHideFlags: 0

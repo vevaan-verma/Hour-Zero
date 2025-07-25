@@ -134,6 +134,8 @@ GameObject:
   - component: {fileID: 341857661412233441}
   - component: {fileID: 8120016014915802564}
   - component: {fileID: 4221138403890818621}
+  - component: {fileID: 33921552071894760}
+  - component: {fileID: 2780616245344554993}
   m_Layer: 0
   m_Name: 'Outdoor Floor Lamp '
   m_TagString: Untagged
@@ -258,6 +260,34 @@ Rigidbody:
   m_Interpolate: 1
   m_Constraints: 0
   m_CollisionDetection: 2
+--- !u!114 &33921552071894760
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5300073066334219483}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 56427b6021941a348bbd3f964a3b1ea8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  colSound: 0
+  linkedToBreakableProp: 0
+  breakableProp: {fileID: 0}
+  ignorePlayerCollisions: 0
+--- !u!114 &2780616245344554993
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5300073066334219483}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f7be6f1ab43efd74f90a10be906d53e5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &9191431139581698327
 GameObject:
   m_ObjectHideFlags: 0

@@ -20,8 +20,6 @@ public class Radio : Interactable {
     private int nowPlayingIdx;
     private bool isPlaying;
 
-
-
     ParticleSystem particles;
     AudioPlayer audioPlayer;
     Rigidbody rb;
