@@ -15,9 +15,10 @@ public abstract class Interactable : MonoBehaviour {
     [SerializeField, Tooltip("Whether to require specific item stacks in the backpack to interact with this object")] protected bool requireBackpackItems;
     [SerializeField, Tooltip("The item stacks that must be in the backpack to interact with this object")] protected ItemStack[] requiredBackpackItems;
     [SerializeField, Tooltip("Whether to consume the backpack item stacks after interaction")] protected bool consumeBackpackItems;
-    private const float interactIndicatorLerpDuration = 0.1f;
+    [SerializeField] protected float interactIndicatorLerpDuration;
+    protected bool canInteract;
 
-    [Header("Interaction Indicator")]
+    [Header("Indicator")]
     protected InteractIndicator indicator;
     private Vector3 indicatorDefaultSize;
     private Coroutine indicatorLerpCoroutine;
@@ -51,6 +52,8 @@ public abstract class Interactable : MonoBehaviour {
         foreach (Transform child in GetComponentsInChildren<Transform>())
             child.gameObject.tag = "Interactable";
 
+        canInteract = true;
+
     }
 
     protected void Update() {
@@ -71,6 +74,8 @@ public abstract class Interactable : MonoBehaviour {
     }
 
     public virtual bool Interact() {
+
+        if (!canInteract) return false; // if the interactable is not allowed to be interacted with, return false
 
         // if the interactable requires a held item, check if the player is holding the required item and enough of it
         if (requireHeldItem) {

@@ -1,15 +1,17 @@
+using System.Collections;
 using UnityEngine;
 
 public class OpenableInteractable : Interactable {
 
     [Header("References")]
     private Animator animator;
+    private Coroutine interactCooldownCoroutine;
 
     [Header("Settings")]
     [SerializeField, Tooltip("Whether the interactable is open when the game starts")] private bool isInitiallyOpen;
     [SerializeField, Tooltip("Whether the item lock is intact by default, which requires the specified items to open or close the interactable when intact")] private bool itemLockIntact;
     [SerializeField, Tooltip("Whether the item lock should be broken when the interactable is interacted with")] private bool breakItemLockOnInteract;
-    [SerializeField, Tooltip("The linkedOpenable will be triggered when ")] private OpenableInteractable linkedOpenable;
+    [SerializeField, Tooltip("Whether to wait for the animation to finish before allowing further interactions")] private bool waitForAnimation;
     private bool isOpen;
 
     [Header("Sounds")]
@@ -30,23 +32,17 @@ public class OpenableInteractable : Interactable {
         if (!itemLockIntact && breakItemLockOnInteract)
             Debug.LogWarning($"Interactable {name} has item lock intact set to false but break item lock on interact is true. This will have no effect since the item lock is already broken.");
 
-        isOpen = isInitiallyOpen; // set the initial state of the interactable
-
-        print(gameObject.name + " " + isInitiallyOpen);
-
-        if (isOpen) {
-
-            animator.SetTrigger("open"); // trigger the open animation if the interactable is initially open
-
-            indicator.SetText(openedText);
-
-        }
+        // set the initial state of the interactable based on the isInitiallyOpen variable
+        if (isInitiallyOpen)
+            Open();
         else
-            indicator.SetText(closedText);
+            Close();
 
     }
 
     public override bool Interact() {
+
+        if (!canInteract) return false;
 
         // if the item lock is still intact, check if the player has the required item to open or close the interactable
         if (itemLockIntact)
@@ -56,28 +52,53 @@ public class OpenableInteractable : Interactable {
         if (breakItemLockOnInteract)
             itemLockIntact = false;
 
-        if (isOpen) {
+        if (isOpen)
+            Close();
+        else
+            Open();
 
-            animator.SetTrigger("close"); // trigger the close animation
-            isOpen = false; // set the interactable as closed
+        if (interactCooldownCoroutine != null) StopCoroutine(interactCooldownCoroutine); // stop any existing interact cooldown coroutine
 
-            audioPlayer.Play(closeSound);
+        // check if the animation should be waited for before allowing further interactions
+        if (waitForAnimation) {
 
-            indicator.SetText(closedText);
-
-        }
-        else {
-
-            animator.SetTrigger("open"); // trigger the open animation
-            isOpen = true; // set the interactable as open
-
-            audioPlayer.Play(openSound);
-
-            indicator.SetText(openedText);
+            canInteract = false; // set canInteract to false to prevent further interactions until the animation is done
+            interactCooldownCoroutine = StartCoroutine(HandleInteractCooldown()); // start the interact cooldown coroutine
 
         }
 
         return true;
+
+    }
+
+    private void Open() {
+
+        animator.SetTrigger("open"); // trigger the open animation
+        isOpen = true; // set the interactable as open
+
+        audioPlayer.Play(openSound);
+
+        indicator.SetText(openedText);
+
+    }
+
+    private void Close() {
+
+        animator.SetTrigger("close"); // trigger the close animation
+        isOpen = false; // set the interactable as closed
+
+        audioPlayer.Play(closeSound);
+
+        indicator.SetText(closedText);
+
+    }
+
+    private IEnumerator HandleInteractCooldown() {
+
+        yield return null; // wait for the animation to start
+        yield return new WaitForSeconds(animator.GetCurrentAnimatorStateInfo(0).length); // wait for the interact animation to finish
+
+        canInteract = true;
 
     }
 }

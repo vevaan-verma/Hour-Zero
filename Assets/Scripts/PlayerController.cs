@@ -191,12 +191,8 @@ public class PlayerController : MonoBehaviour {
 
                 SetGrabbedItem(hit.rigidbody, hit.distance);
 
-
             }
-
-
         }
-
 
         if (currGrabbedObject)
             if (Input.GetMouseButtonUp(1)) // check if there is a currently grabbed object and the right mouse button is released and drop the grabbed object if so
@@ -210,7 +206,7 @@ public class PlayerController : MonoBehaviour {
         #region INTERACTING
         if (Physics.Raycast(cameraPos.position, cameraPos.forward, out hit, interactRange, nonPlayerMask) && hit.collider.CompareTag("Interactable")) { // check if player is looking at interactable object within interact distance and is tagged as interactable; use the nonPlayerMask to prevent the player from interacting with themselves
 
-            Interactable interactable = hit.transform.GetComponentInParent<Interactable>(); // make sure to check parent for interactable component since that is how some interactables are set up
+            Interactable interactable = hit.collider.GetComponentInParent<Interactable>(); // make sure to check parent for interactable component since that is how some interactables are set up; use hit.collider not hit.transform to ensure the object is the one with the collider
 
             if (interactable) {
 
@@ -242,8 +238,7 @@ public class PlayerController : MonoBehaviour {
                 rb.useGravity = false; // disable gravity when flight mode is activated
                 col.enabled = !noClipFlight; // disable collider when noclip flight is enabled to allow passing through objects
 
-            }
-            else {
+            } else {
 
                 // no need to set the move speed here since it is already set to walk or sprint speed based on the input
                 rb.useGravity = true; // enable gravity when flight mode is deactivated
@@ -320,8 +315,7 @@ public class PlayerController : MonoBehaviour {
             foreach (Transform child in currHeldItem.GetComponentsInChildren<Transform>())
                 child.gameObject.layer = LayerMask.NameToLayer("HeldItem");
 
-        }
-        else {
+        } else {
 
             currHeldItem = null; // clear the held item
 
@@ -361,8 +355,7 @@ public class PlayerController : MonoBehaviour {
 
             grabLine.enabled = true; // enable the grab line to show the grab range
 
-        }
-        else {
+        } else {
 
             grabLine.enabled = false; // disable the grab line if there is no grabbed object
 
@@ -394,8 +387,7 @@ public class PlayerController : MonoBehaviour {
             timer += Time.deltaTime * (moveSpeed == walkSpeed ? walkBobSpeed : sprintBobSpeed);
             cameraPos.localPosition = new Vector3(cameraPos.localPosition.x, defaultYPos + Mathf.Sin(timer) * (moveSpeed == walkSpeed ? walkBobAmount : sprintBobAmount), cameraPos.localPosition.z);
 
-        }
-        else {
+        } else {
 
             timer = 0f;
             cameraPos.localPosition = new Vector3(cameraPos.localPosition.x, Mathf.Lerp(cameraPos.localPosition.y, defaultYPos, Time.deltaTime * (moveSpeed == walkSpeed ? walkBobSpeed : sprintBobSpeed)), cameraPos.localPosition.z);

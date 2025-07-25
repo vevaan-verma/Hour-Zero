@@ -81,6 +81,10 @@ public class UIManager : MonoBehaviour {
                 ClosePrimaryBackpack();
             else if (systemRepairMenu.IsMenuOpen()) // close system repair menu if it is open
                 CloseSystemRepairMenu();
+            else if (npcMenu.IsMenuOpen()) // close NPC menu if it is open
+                CloseNPCMenu();
+            else if (tradeMenu.IsMenuOpen()) // close trade menu if it is open
+                CloseTradeMenu();
 
     }
 
