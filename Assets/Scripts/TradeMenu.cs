@@ -34,7 +34,7 @@ public class TradeMenu : MonoBehaviour {
 
     private void Start() {
 
-        backpack = FindFirstObjectByType<Backpack>(FindObjectsInactive.Include);
+        backpack = FindFirstObjectByType<Backpack>();
         tradeBackpackUI = FindObjectsByType<BackpackUI>(FindObjectsInactive.Include, FindObjectsSortMode.None).FirstOrDefault(ui => ui.GetBackpackType() == BackpackType.Trade); // find the trade backpack UI
         alertManager = FindFirstObjectByType<AlertManager>();
         uiManager = FindFirstObjectByType<UIManager>();
@@ -128,7 +128,7 @@ public class TradeMenu : MonoBehaviour {
         }
 
         foreach (ItemStack outputStack in outputStacks)
-            backpack.AddItemStack(outputStack); // no need to store the remainder since we are guaranteed to have enough space in the backpack
+            backpack.AddItemStack(outputStack, true); // add the output stacks to the backpack and drop the remainder if the backpack is full
 
         tradeInventory.Clear();
 
@@ -143,7 +143,7 @@ public class TradeMenu : MonoBehaviour {
 
         foreach (ItemStack itemStack in itemsToReturn)
             if (itemStack.GetItem() != null) // check if the item is not null
-                backpack.AddItemStack(itemStack); // add the item stack back to the trade backpack
+                backpack.AddItemStack(itemStack, true); // add the item stack back to the trade backpack and drop the remainder if the backpack is full
 
     }
 

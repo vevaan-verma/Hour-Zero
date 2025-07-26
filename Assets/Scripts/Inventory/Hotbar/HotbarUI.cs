@@ -20,10 +20,10 @@ public class HotbarUI : InventoryUI {
 
     public override void Initialize() {
 
-        inventory = FindFirstObjectByType<Hotbar>(FindObjectsInactive.Include); // find the hotbar in the scene
-        hotbar = (Hotbar) inventory; // cast the inventory to a hotbar
-        backpack = FindFirstObjectByType<Backpack>(FindObjectsInactive.Include); // find the backpack in the scene (needed because the hotbar is a special case of the backpack as it is the top row of the backpack)
+        inventory = FindFirstObjectByType<Hotbar>(); // find the hotbar in the scene
+        backpack = FindFirstObjectByType<Backpack>(); // find the backpack in the scene (needed because the hotbar is a special case of the backpack as it is the top row of the backpack)
         uiPanel.gameObject.SetActive(inventory.IsVisibleByDefault()); // set the UI panel to be active by default if the inventory is visible by default
+        hotbar = (Hotbar) inventory; // cast the inventory to a hotbar
         hotbar.onSlotSelected += RefreshInventory; // subscribe to the slot selected event to refresh the inventory UI when a slot is selected
         backpack.onContentsUpdated += RefreshInventory; // subscribe to the inventory's contents update event to refresh the UI when the contents change; use the backpack's event since the hotbar is a part of the backpack (the top row)
 

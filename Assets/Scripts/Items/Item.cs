@@ -10,6 +10,7 @@ public class Item : ScriptableObject {
     [SerializeField] private Sprite itemIcon;
     [SerializeField, Tooltip("The maximum number of items that can be stacked in this item. If set to 0, it will either use the slot's stack limit, or if that is set to 0, an infinite limit"), Min(0)] private int stackLimit;
     [SerializeField] private ItemType itemType;
+    [SerializeField] private ItemInteractable droppedItemPrefab;
     [SerializeField] private HeldItem heldItemPrefab;
     [SerializeField] private SFXLib.Sounds hitSound;
     [Space]
@@ -30,6 +31,8 @@ public class Item : ScriptableObject {
     public int GetStackSize() => stackLimit;
 
     public ItemType GetItemType() => itemType;
+
+    public ItemInteractable GetDroppedItemPrefab() => droppedItemPrefab;
 
     public HeldItem GetHeldItemPrefab() => heldItemPrefab;
 

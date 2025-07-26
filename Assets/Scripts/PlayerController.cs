@@ -4,11 +4,15 @@ using UnityEngine;
 public class PlayerController : MonoBehaviour {
 
     [Header("References")]
-    [SerializeField] private Transform cameraPos;
+    [SerializeField] private Transform dropPoint;
     [SerializeField] private LayerMask nonPlayerMask; // mask for raycasts that should not hit the player
     private UIManager uiManager;
     private Rigidbody rb;
     private Collider col;
+
+    [Header("Camera")]
+    [SerializeField] private Transform cameraHolder;
+    [SerializeField] private Transform cameraPos;
 
     [Header("Movement")]
     [SerializeField] private float walkSpeed;
@@ -296,6 +300,8 @@ public class PlayerController : MonoBehaviour {
 
         itemHolder.HandleSway(mouseX, mouseY, true, !menuOpen, !menuOpen); // handle the sway effect for the held item based on mouse movement; use LateUpdate to calculate sway to ensure the sway happens after all other updates, preventing jittering; the breathe effect is always enabled, headbob is enabled when not in a menu, and sway is enabled when not in a menu
 
+        cameraHolder.SetPositionAndRotation(cameraPos.position, cameraPos.rotation);
+
     }
 
     private void Jump() => rb.linearVelocity = new Vector3(rb.linearVelocity.x, jumpHeight, rb.linearVelocity.z);
@@ -396,6 +402,16 @@ public class PlayerController : MonoBehaviour {
     }
 
     public float GetHeadbobOffset() => cameraPos.localPosition.y - defaultYPos; // returns the headbob offset from the default position
+
+    public void DropItemStack(ItemStack itemStack) {
+
+        Item item = itemStack.GetItem();
+
+        // instantiate each item in the item stack at the drop point position
+        for (int i = 0; i < itemStack.GetCount(); i++)
+            Instantiate(item.GetDroppedItemPrefab(), dropPoint.position, Quaternion.identity);
+
+    }
 
     public void SetCrosshair() {
 

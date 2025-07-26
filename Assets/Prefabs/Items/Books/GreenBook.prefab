@@ -160,9 +160,10 @@ MonoBehaviour:
   requireBackpackItems: 0
   requiredBackpackItems: []
   consumeBackpackItems: 0
-  indicator: {fileID: 6821856939994148186}
+  interactIndicatorLerpDuration: 0.1
   item: {fileID: 11400000, guid: 16d43364547c7754983d1f92c4713a32, type: 2}
   itemCount: 1
+  dropRemainder: 1
   destroyDuration: 0.1
 --- !u!114 &-1338183205691637437
 MonoBehaviour:
@@ -254,14 +255,3 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 5361283978612971972, guid: 51d1401b4d66c5c45b6b13ec2c3d26d8, type: 3}
   m_PrefabInstance: {fileID: 5509830101034375520}
   m_PrefabAsset: {fileID: 0}
---- !u!114 &6821856939994148186 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 1358613701485851706, guid: 51d1401b4d66c5c45b6b13ec2c3d26d8, type: 3}
-  m_PrefabInstance: {fileID: 5509830101034375520}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 9b7e11de6366cd04a80a72b2a2bb8872, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 

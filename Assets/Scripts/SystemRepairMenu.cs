@@ -30,7 +30,7 @@ public class SystemRepairMenu : MonoBehaviour {
     private void Start() {
 
         repairInventory = FindFirstObjectByType<RepairInventory>();
-        backpack = FindFirstObjectByType<Backpack>(FindObjectsInactive.Include);
+        backpack = FindFirstObjectByType<Backpack>();
         repairBackpackUI = FindObjectsByType<BackpackUI>(FindObjectsInactive.Include, FindObjectsSortMode.None).FirstOrDefault(ui => ui.GetBackpackType() == BackpackType.Repair); // find the repair backpack UI
         bunkerManager = FindFirstObjectByType<BunkerManager>();
         alertManager = FindFirstObjectByType<AlertManager>();
@@ -115,7 +115,7 @@ public class SystemRepairMenu : MonoBehaviour {
 
         foreach (ItemStack itemStack in itemsToReturn)
             if (itemStack.GetItem() != null) // check if the item is not null
-                backpack.AddItemStack(itemStack); // add the item stack back to the repair backpack
+                backpack.AddItemStack(itemStack, true); // add the item stack back to the repair backpack and drop the remainder if the backpack is full
 
     }
 

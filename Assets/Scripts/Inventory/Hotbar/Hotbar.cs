@@ -4,7 +4,6 @@ using UnityEngine;
 public class Hotbar : Inventory {
 
     [Header("References")]
-    private PlayerController playerController;
     private Backpack backpack;
 
     [Header("Settings")]
@@ -19,7 +18,7 @@ public class Hotbar : Inventory {
 
     public override void Initialize() {
 
-        playerController = FindFirstObjectByType<PlayerController>();
+        playerController = FindFirstObjectByType<PlayerController>(); // set the playerController here even though it is already set in the base class Initialize method, because the base method isn't called in this class
         backpack = FindFirstObjectByType<Backpack>();
 
         initialSlotCount = Mathf.Min(backpack.GetSlotsPerRow(), backpack.GetInitialSlotCount()); // set the initial slot count to the number of slots per row in the backpack (since the top row of the backpack is the hotbar)
@@ -75,9 +74,7 @@ public class Hotbar : Inventory {
 
     }
 
-    public override int AddItemStack(ItemStack itemStack) {
-
-        // no point implementing this method since there isn't really a situation where you would want to add an item stack to the hotbar directly; instead, items should be added through the backpack
+    public override int AddItemStack(ItemStack itemStack, bool dropRemainder) {
 
         Debug.LogError("Cannot add ItemStack directly to the hotbar. Please add items through the backpack."); // output error because ItemStacks cannot be added to the hotbar directly, they must go through the backpack instead
         return -1;
@@ -86,32 +83,8 @@ public class Hotbar : Inventory {
 
     public override int RemoveItemStack(ItemStack itemStack, int? slotIndex = null) {
 
-        int remainder = 0;
-
-        // go through each slot, starting with the selected slot, then go through the slots from first to last (left to right)
-        for (int i = 0; i < currSlotCount; i++) {
-
-            remainder = backpack.RemoveItemStack(itemStack, selectedIndex); // start with the selected slot
-
-            // if the item stack was removed successfully, return 0
-            if (remainder == 0)
-                return 0;
-
-            // if there is still a remainder, remove the item stack from the rest of the hotbar slots starting from the first slot, skipping the selected slot
-            for (int j = 0; j < currSlotCount; j++) {
-
-                if (j == selectedIndex) continue; // skip the selected slot
-
-                remainder = backpack.RemoveItemStack(itemStack, j); // remove the item stack from the current slot
-
-                // if the item stack was removed successfully, return 0
-                if (remainder == 0)
-                    return 0;
-
-            }
-        }
-
-        return remainder;
+        Debug.LogError("Cannot remove ItemStack directly from the hotbar. Please remove items through the backpack."); // output error because ItemStacks cannot be removed from the hotbar directly, they must go through the backpack instead
+        return -1;
 
     }
 

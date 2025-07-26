@@ -4,6 +4,9 @@ using UnityEngine;
 
 public abstract class Inventory : MonoBehaviour {
 
+    [Header("References")]
+    protected PlayerController playerController;
+
     [Header("Settings")]
     [SerializeField, Tooltip("The number of slots to show per row in the inventory UI (used to calculate the size of the inventory contents grid layout group)")] protected int slotsPerRow;
     [SerializeField, Min(1)] protected int initialSlotCount;
@@ -47,6 +50,8 @@ public abstract class Inventory : MonoBehaviour {
         }
         #endregion
 
+        playerController = FindFirstObjectByType<PlayerController>();
+
         contents = new List<ItemStack>(currSlotCount);
         currSlotCount = initialSlotCount;
 
@@ -56,7 +61,7 @@ public abstract class Inventory : MonoBehaviour {
 
     }
 
-    // returns the amount of items that could not be added to the inventory; null item signifies that the slot should be set to empty
+    // returns the amount of items that could not be added to the inventory; null item signifies that the slot should be set to empty; does not support dropping item remainders
     public int SetItemStack(ItemStack itemStack, int index) {
 
         Item item = itemStack.GetItem();
@@ -99,8 +104,8 @@ public abstract class Inventory : MonoBehaviour {
 
     }
 
-    // returns the amount of items that could not be added to the inventory
-    public virtual int AddItemStack(ItemStack itemStack) {
+    // returns the amount of items that could not be added to the inventory unless the dropRemainder parameter is set to true, in which case it will drop the remainder on the ground
+    public virtual int AddItemStack(ItemStack itemStack, bool dropRemainder) {
 
         Item item = itemStack.GetItem();
         int count = itemStack.GetCount();
@@ -134,7 +139,7 @@ public abstract class Inventory : MonoBehaviour {
 
                 int currentCount = stack.GetCount();
                 int remainder = SetItemStack(new ItemStack(item, currentCount + count), i); // set the item stack in the slot with the new count
-                count = remainder; // update count to the remainder
+                count = remainder; // update count to the remainder of items that couldn't be added
 
                 if (count <= 0) return 0; // return 0 since all items were added; no need to invoke the item added event here, as it will be invoked in the SetItemStack method if items were successfully added
 
@@ -159,7 +164,15 @@ public abstract class Inventory : MonoBehaviour {
 
         // no need to invoke the item added event here, as it was already invoked in the SetItemStack method if items were successfully added
 
-        // TODO: deal with the remainder here, maybe drop them on the ground or something
+        if (dropRemainder && count > 0) {
+
+            playerController.DropItemStack(new ItemStack(item, count)); // drop the remainder on the ground
+            return 0; // return 0 since we dropped the remainder
+
+        }
+
+        // if we reach here, not all items could be added and we didn't drop the remainder
+
         return count; // return the count of items that could not be added
 
     }
@@ -375,7 +388,7 @@ public abstract class Inventory : MonoBehaviour {
 
         if (quickTransferInventory == null) return; // if there is no quick transfer inventory, do nothing
 
-        int remainder = quickTransferInventory.AddItemStack(itemStack); // try to add the item stack to the quick transfer inventory
+        int remainder = quickTransferInventory.AddItemStack(itemStack, false); // try to add the item stack to the quick transfer inventory and don't drop the remainder
         RemoveItemStack(new ItemStack(itemStack.GetItem(), itemStack.GetCount() - remainder), slotIndex); // remove the items that were successfully added to the quick transfer inventory from this inventory
 
     }
@@ -391,6 +404,16 @@ public abstract class Inventory : MonoBehaviour {
     public int GetCurrentSlotCount() => currSlotCount;
 
     public Item[] GetFilteredItems() => filteredItems;
+
+    public bool AreAllSlotsOccupied() {
+
+        foreach (ItemStack stack in contents)
+            if (stack.GetItem() == null)
+                return false; // if any slot is empty, return false
+
+        return true; // all slots are occupied
+
+    }
 
     public bool IsVisibleByDefault() => visibleByDefault;
     // simulates adding the item stack and returns true if all items can be added (no remainder), false otherwise; does not modify the inventory

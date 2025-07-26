@@ -183,8 +183,8 @@ GameObject:
   - component: {fileID: 2685300342497163726}
   - component: {fileID: 1472439539075980314}
   - component: {fileID: 8758339536065222626}
-  - component: {fileID: -5238864106241551795}
   - component: {fileID: 37255998045018443}
+  - component: {fileID: -5238864106241551795}
   - component: {fileID: -8763501021503768209}
   - component: {fileID: -4172201699420346717}
   m_Layer: 0
@@ -256,30 +256,6 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 0.21248479, y: 0.29864737, z: 0.11999996}
   m_Center: {x: 0, y: 0.2229831, z: 0}
---- !u!114 &-5238864106241551795
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6122936270431666263}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 30e175cce3dc36a468c610e0d2242175, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  requireHeldItem: 0
-  requiredHeldItem:
-    item: {fileID: 0}
-    count: 0
-  consumeHeldItem: 0
-  requireBackpackItems: 0
-  requiredBackpackItems: []
-  consumeBackpackItems: 0
-  indicator: {fileID: 8036857960032717295}
-  item: {fileID: 11400000, guid: f04045be65f4538428598a7c9e18547e, type: 2}
-  itemCount: 1
-  destroyDuration: 0.1
 --- !u!54 &37255998045018443
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -307,6 +283,31 @@ Rigidbody:
   m_Interpolate: 1
   m_Constraints: 0
   m_CollisionDetection: 2
+--- !u!114 &-5238864106241551795
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6122936270431666263}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 30e175cce3dc36a468c610e0d2242175, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  requireHeldItem: 0
+  requiredHeldItem:
+    item: {fileID: 0}
+    count: 0
+  consumeHeldItem: 0
+  requireBackpackItems: 0
+  requiredBackpackItems: []
+  consumeBackpackItems: 0
+  interactIndicatorLerpDuration: 0.1
+  item: {fileID: 11400000, guid: f04045be65f4538428598a7c9e18547e, type: 2}
+  itemCount: 1
+  dropRemainder: 1
+  destroyDuration: 0.1
 --- !u!114 &-8763501021503768209
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -397,14 +398,3 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 5361283978612971972, guid: 51d1401b4d66c5c45b6b13ec2c3d26d8, type: 3}
   m_PrefabInstance: {fileID: 9030390486083288533}
   m_PrefabAsset: {fileID: 0}
---- !u!114 &8036857960032717295 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 1358613701485851706, guid: 51d1401b4d66c5c45b6b13ec2c3d26d8, type: 3}
-  m_PrefabInstance: {fileID: 9030390486083288533}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 9b7e11de6366cd04a80a72b2a2bb8872, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 

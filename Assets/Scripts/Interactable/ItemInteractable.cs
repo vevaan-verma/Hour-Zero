@@ -8,6 +8,7 @@ public class ItemInteractable : Interactable {
 
     [Header("Settings")]
     [SerializeField, Min(1)] private int itemCount;
+    [SerializeField, Tooltip("Whether to drop the remainder of the item stack or keep the remainder in the interactable if the backpack is full")] private bool dropRemainder; // make sure this value is applied to the prefab because after dropping the item, the prefab's setting will be used for future interactions
     [SerializeField] private float destroyDuration;
     private int currCount;
     private bool destroyed; // flag to prevent multiple destruction calls
@@ -23,13 +24,28 @@ public class ItemInteractable : Interactable {
 
         if (!base.Interact() || destroyed) return false; // if the base interaction fails or the interactable is already destroyed, do not proceed
 
-        int remainder = backpack.AddItemStack(new ItemStack(item, itemCount)); // add the item stack to the backpack
+        // if the backpack cannot hold even one item stack of the interactable item, do not proceed with the interaction
+        if (!backpack.CanAddFullItemStacks(new ItemStack[] { new ItemStack(item, 1) }))
+            return false;
 
-        currCount = remainder; // update the current count of the item interactable
+        ItemStack stackToAdd = new ItemStack(item, itemCount);
 
-        // destroy the item interactable if the count reaches zero
-        if (currCount <= 0)
-            StartCoroutine(HandleDestruction());
+        if (dropRemainder) { // check if we should drop the remainder of the item stack
+
+            backpack.AddItemStack(stackToAdd, true); // add the item stack to the backpack and drop the remainder if the backpack is full
+            currCount = 0; // update the current count of the item interactable to zero since we dropped the entire stack
+            StartCoroutine(HandleDestruction()); // start the destruction coroutine to destroy the interactable
+
+        } else {
+
+            int remainder = backpack.AddItemStack(stackToAdd, false);
+            currCount = remainder; // update the current count of the item interactable
+
+            // destroy the item interactable if the count reaches zero
+            if (currCount <= 0)
+                StartCoroutine(HandleDestruction());
+
+        }
 
         return true;
 

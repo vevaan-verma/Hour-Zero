@@ -4,6 +4,7 @@ using UnityEngine.EventSystems;
 public class DraggableSlotItemHolder : SlotItemHolder, IBeginDragHandler, IDragHandler, IEndDragHandler {
 
     [Header("References")]
+    private PlayerController playerController;
     private Slot initialSlot; // the original slot that the item was in before the drag operation started
     private Color initialColor;
 
@@ -13,6 +14,8 @@ public class DraggableSlotItemHolder : SlotItemHolder, IBeginDragHandler, IDragH
     public override void Initialize(InventoryUI inventoryUI) {
 
         base.Initialize(inventoryUI);
+
+        playerController = FindFirstObjectByType<PlayerController>();
         initialColor = itemIcon.color;
 
     }
@@ -44,9 +47,17 @@ public class DraggableSlotItemHolder : SlotItemHolder, IBeginDragHandler, IDragH
         if (initialSlot.IsLocked()) return; // if the initial slot is locked, do not process the end drag event
 
         // eventData.pointerCurrentRaycast returns the raycast result of what the pointer is currently over, whereas eventData.pointerDrag is the item being dragged
-        // if the pointer is not over a valid slot, destroy the dragged item
-        if (eventData.pointerCurrentRaycast.gameObject == null || !eventData.pointerCurrentRaycast.gameObject.GetComponent<Slot>())
-            Destroy(eventData.pointerDrag);
+        if (eventData.pointerCurrentRaycast.gameObject == null) { // check if the pointer is not over any UI element (meaning the item can be dropped in the world)
+
+            initialSlot.GetInventory().RemoveItemStack(itemStack, initialSlot.GetIndex()); // remove the dragged item stack from the inventory
+            playerController.DropItemStack(itemStack); // drop the removed item stack in the world
+            Destroy(eventData.pointerDrag); // destroy the dragged item
+
+        } else if (!eventData.pointerCurrentRaycast.gameObject.GetComponent<Slot>()) { // check if the pointer is not over a slot
+
+            Destroy(eventData.pointerDrag); // destroy the dragged item
+
+        }
 
         initialSlot.SetItemStack(itemStack); // reset the item and count in the initial slot
         itemIcon.color = initialColor; // reset the image color when dragging ends

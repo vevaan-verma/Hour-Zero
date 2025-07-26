@@ -131,9 +131,7 @@ public class Slot : MonoBehaviour, IDropHandler, IPointerEnterHandler, IPointerE
                     //if (remainder == sourceStack.GetCount()) return;
 
                     sourceInventory.SetItemStack(new ItemStack(sourceStack.GetItem(), remainder), sourceIndex); // since a remainder was returned, we need to set the source slot to the item in the source stack with the remainder count because we prioritize the remainder over the target slot item
-                    remainder = sourceInventory.AddItemStack(new ItemStack(targetStack.GetItem(), targetStack.GetCount())); // add the target slot item to the source inventory if possible and get the remainder of items that couldn't be added (since we prioritize the remainder of the dropped item over the target slot item)
-
-                    // TODO: drop the remainder on the ground if it is still greater than 0 since we couldn't add it to the source inventory (no space)
+                    sourceInventory.AddItemStack(new ItemStack(targetStack.GetItem(), targetStack.GetCount()), true); // add the target slot item to the source inventory if possible and get the remainder of items that couldn't be added (since we prioritize the remainder of the dropped item over the target slot item); drop the remainder if the source inventory is full
 
                 } else {
 

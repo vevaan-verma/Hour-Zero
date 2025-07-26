@@ -5,8 +5,9 @@ using UnityEngine;
 public class TaskManager : MonoBehaviour {
 
     [Header("References")]
-    private TaskDatabase taskDatabase;
+    private Backpack backpack;
     private Hotbar hotbar;
+    private TaskDatabase taskDatabase;
     private List<Item> dropoffItems;
     private BaseTask activeTask;
     private List<BaseTask> completedTasks;
@@ -20,8 +21,9 @@ public class TaskManager : MonoBehaviour {
 
     private void Start() {
 
-        taskDatabase = FindFirstObjectByType<TaskDatabase>();
+        backpack = FindFirstObjectByType<Backpack>();
         hotbar = FindFirstObjectByType<Hotbar>();
+        taskDatabase = FindFirstObjectByType<TaskDatabase>();
 
         completedTasks = new List<BaseTask>();
 
@@ -48,7 +50,7 @@ public class TaskManager : MonoBehaviour {
 
                 Item item = dropoffItems[UnityEngine.Random.Range(0, dropoffItems.Count)]; // randomly select a dropoff item from the list
                 dropoffItemStack = new ItemStack(item, item.GetDropoffCount()); // create a new item stack with the selected item and its dropoff count
-                activeTask = new DoomsdayDropoffTask(npcData, randomTaskData, dropoffItemStack, hotbar);
+                activeTask = new DoomsdayDropoffTask(npcData, randomTaskData, dropoffItemStack, backpack, hotbar);
                 break;
 
             case TaskType.LastMinuteRepairs:
@@ -141,14 +143,16 @@ public abstract class BaseTask {
 public class DoomsdayDropoffTask : BaseTask {
 
     [Header("References")]
+    private readonly Backpack backpack; // reference to the player's backpack to remove the item stack from the inventory
     private readonly Hotbar hotbar; // reference to the hotbar to check if the player is holding the correct item
 
     [Header("Data")]
     private readonly ItemStack dropoffItemStack;
 
-    public DoomsdayDropoffTask(NPCData npcData, TaskData taskData, ItemStack dropoffItemStack, Hotbar hotbar) : base(npcData, taskData) {
+    public DoomsdayDropoffTask(NPCData npcData, TaskData taskData, ItemStack dropoffItemStack, Backpack backpack, Hotbar hotbar) : base(npcData, taskData) {
 
         this.dropoffItemStack = dropoffItemStack;
+        this.backpack = backpack;
         this.hotbar = hotbar;
 
     }
@@ -163,7 +167,7 @@ public class DoomsdayDropoffTask : BaseTask {
         // check if player is holding the correct item and enough of it
         if (heldItemStack.GetItem().Equals(dropoffItemStack.GetItem()) && heldItemStack.GetCount() >= dropoffItemStack.GetCount()) {
 
-            hotbar.RemoveItemStack(new ItemStack(heldItemStack.GetItem(), dropoffItemStack.GetCount())); // remove the item stack from the hotbar
+            backpack.RemoveItemStack(new ItemStack(heldItemStack.GetItem(), dropoffItemStack.GetCount())); // remove the item stack from the hotbar
             return true; // task completed
 
         }
