@@ -108,13 +108,13 @@ public class UIManager : MonoBehaviour {
 
     }
 
-    public void OpenSystemRepairMenu(ItemStack[] repairStacks, int repairPercent, BunkerSystemType systemType) {
+    public void OpenSystemRepairMenu(RepairData repairData) {
 
         if (IsMenuOpen()) return; // do nothing if a menu is open
 
         hotbarUI.CloseInventory(); // close the hotbar UI if it is open (this is done to ensure the hotbar is not visible when the system repair menu is open)
         crosshair.gameObject.SetActive(false); // hide the crosshair when the system repair menu is open
-        systemRepairMenu.OpenMenu(repairStacks, repairPercent, systemType); // open the system repair menu
+        systemRepairMenu.OpenMenu(repairData); // open the system repair menu
 
     }
 

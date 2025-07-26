@@ -1,149 +1,42 @@
-using System.Collections;
 using System.Linq;
-using System.Collections.Generic;
 using System.Text.RegularExpressions;
 using UnityEngine;
-using UnityEngine.UI;
 
-public class SystemRepairMenu : MonoBehaviour {
+public class SystemRepairMenu : ExchangeMenu {
 
     [Header("References")]
-    private RepairInventory repairInventory;
-    private Backpack backpack;
     private BunkerManager bunkerManager;
-    private AlertManager alertManager;
-    private UIManager uiManager;
-    private Coroutine processRepairCoroutine;
-    private Coroutine fadeCoroutine;
 
-    [Header("UI References")]
-    [SerializeField] private CanvasGroup menuPanel;
-    [SerializeField] private RepairInventoryUI repairInventoryUI;
-    [SerializeField] private Button closeMenuButton;
-    private BackpackUI repairBackpackUI; // reference to the backpack UI used for repairing systems
-    private bool isMenuOpen;
+    private new void OnEnable() {
 
-    [Header("Settings")]
-    [SerializeField] private float menuFadeDuration;
-    [SerializeField, Min(0.1f)] private float repairProcessingDuration;
+        exchangeInventory = FindFirstObjectByType<RepairInventory>(); // find the repair inventory (must be done before base.Initialize() to ensure exchange inventory is set)
+        base.OnEnable();
 
-    private void Start() {
+    }
 
-        repairInventory = FindFirstObjectByType<RepairInventory>();
-        backpack = FindFirstObjectByType<Backpack>();
-        repairBackpackUI = FindObjectsByType<BackpackUI>(FindObjectsInactive.Include, FindObjectsSortMode.None).FirstOrDefault(ui => ui.GetBackpackType() == BackpackType.Repair); // find the repair backpack UI
+    private new void Start() {
+
         bunkerManager = FindFirstObjectByType<BunkerManager>();
-        alertManager = FindFirstObjectByType<AlertManager>();
-        uiManager = FindFirstObjectByType<UIManager>();
 
+        exchangeBackpackUI = FindObjectsByType<BackpackUI>(FindObjectsInactive.Include, FindObjectsSortMode.None).FirstOrDefault(ui => ui.GetBackpackType() == BackpackType.Repair); // find the repair backpack UI (must be done before base.Start() to ensure the repair backpack UI is set)
         closeMenuButton.onClick.AddListener(() => uiManager.CloseSystemRepairMenu()); // add listener to close menu button; call the UIManager method to close the system repair menu rather than this class directly to ensure the extra logic is executed (e.g., re-opening the hotbar UI)
-
-        menuPanel.gameObject.SetActive(false); // make sure the menu is hidden by default
-
-    }
-
-    public void OpenMenu(ItemStack[] repairStacks, int repairPercent, BunkerSystemType systemType) {
-
-        isMenuOpen = true; // set the menu state to open
-        menuPanel.gameObject.SetActive(true); // make sure the menu is active
-
-        repairInventory.Initialize(repairStacks, repairPercent, systemType); // initialize the repair inventory with the required stacks, slot count, and repair percent
-        repairBackpackUI.OpenInventory(); // open the backpack UI for repairing systems (do this after starting the coroutine to ensure the menu is active)
-        repairInventoryUI.OpenInventory(); // open the repair inventory UI
-
-        if (fadeCoroutine != null) StopCoroutine(fadeCoroutine); // stop any ongoing fade coroutine
-        fadeCoroutine = StartCoroutine(Fade(menuPanel, 1f, menuFadeDuration)); // fade in the menu
+        base.Start();
 
     }
 
-    public void CloseMenu(bool repairRequirementsMet) {
+    protected override void ProcessExchange() {
 
-        // if the repair requirements are not met, return all the items in the repair inventory back to the backpack
-        if (!repairRequirementsMet)
-            ReturnAllItems();
+        RepairData currRepairData = (RepairData) currExchangeData; // cast the current exchange data to RepairData to access repair-specific methods
 
-        if (processRepairCoroutine != null) {
-
-            StopCoroutine(processRepairCoroutine); // stop any ongoing repair processing coroutine
-            processRepairCoroutine = null; // reset the coroutine reference
-
-        }
-
-        isMenuOpen = false; // set the menu state to closed
-        repairBackpackUI.CloseInventory(); // close the backpack UI
-        repairInventoryUI.CloseInventory(); // close the repair inventory UI
-
-        if (fadeCoroutine != null) StopCoroutine(fadeCoroutine); // stop any ongoing fade coroutine
-        fadeCoroutine = StartCoroutine(Fade(menuPanel, 0f, menuFadeDuration)); // fade out the menu
-
-    }
-
-    // when the repair requirements are met, the player has put all the necessary items in the repair inventory to repair the system
-    public void OnRepairRequirementsMet(int repairPercent, BunkerSystemType systemType) {
-
-        // if a repair is already being processed, do not start another one
-        if (processRepairCoroutine != null) return;
-
-        processRepairCoroutine = StartCoroutine(ProcessRepair(repairPercent, systemType)); // start the repair processing coroutine
-
-    }
-
-    private IEnumerator ProcessRepair(int repairPercent, BunkerSystemType systemType) {
-
-        // lock the slots in the repair inventory to prevent further modifications while the repair is being processed
-        foreach (Slot slot in repairInventoryUI.GetInventorySlots())
-            slot.SetLocked(true);
-
-        yield return new WaitForSeconds(repairProcessingDuration); // simulate the repair processing time
-
-        // unlock the slots in the repair inventory after the repair is processed
-        foreach (Slot slot in repairInventoryUI.GetInventorySlots())
-            slot.SetLocked(false);
+        BunkerSystemType systemType = currRepairData.GetSystemType(); // get the system type from the repair data
+        int repairPercent = currRepairData.GetRepairPercent(); // get the repair percent from the repair data
 
         uiManager.CloseSystemRepairMenu(true); // close the menu when the repair inventory is full (with a flag that the repair requirements were met); don't call CloseMenu() directly to ensure the UIManager logic is executed (e.g., re-opening the hotbar UI)
         bunkerManager.RepairSystem(systemType, repairPercent); // repair the system using the bunker manager
-        repairInventory.Clear();
+        exchangeInventory.Clear();
 
         string formattedSystemType = Regex.Replace(systemType.ToString(), "(\\B[A-Z])", " $1").ToLower(); // format the system type to be more readable by adding spaces in between the words (e.g., "AirFiltration" -> "Air Filtration") and convert to lowercase
         alertManager.SendAlert(new Alert($"System {formattedSystemType} durability repaired ({repairPercent}%)", AlertType.Success));
 
     }
-
-    private void ReturnAllItems() {
-
-        List<ItemStack> itemsToReturn = repairInventory.GetContents(); // get all the items in the repair inventory
-
-        foreach (ItemStack itemStack in itemsToReturn)
-            if (itemStack.GetItem() != null) // check if the item is not null
-                backpack.AddItemStack(itemStack, true); // add the item stack back to the repair backpack and drop the remainder if the backpack is full
-
-    }
-
-    private IEnumerator Fade(CanvasGroup ui, float targetAlpha, float duration) {
-
-        float currentTime = 0f;
-        float startAlpha = ui.alpha;
-
-        ui.gameObject.SetActive(true); // ensure UI is active before fading
-
-        while (currentTime < duration) {
-
-            currentTime += Time.deltaTime;
-            ui.alpha = Mathf.Lerp(startAlpha, targetAlpha, currentTime / duration);
-            yield return null;
-
-        }
-
-        ui.alpha = targetAlpha; // ensure final alpha is set
-
-        // if the target alpha is 0, disable the UI
-        if (targetAlpha == 0f)
-            ui.gameObject.SetActive(false);
-
-        fadeCoroutine = null; // reset the coroutine reference
-
-    }
-
-    public bool IsMenuOpen() => isMenuOpen;
-
 }

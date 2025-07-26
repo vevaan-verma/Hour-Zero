@@ -108,7 +108,7 @@ public class TaskManager : MonoBehaviour {
 public enum TaskType {
 
     DoomsdayDropoff, // bring item to NPC (TODO: should it be called LastMinuteDropoff if LastMinuteRepairs isn't used?)
-    LastMinuteRepairs, // hammer an object in the world (TODO: should it be called BangBeforeTheBoom?)
+    LastMinuteRepairs, // hammer an object in the world
     DanceOff,
     CrowbarTherapy, // attack the NPC with a crowbar
     AcademicFraud
@@ -178,7 +178,7 @@ public class DoomsdayDropoffTask : BaseTask {
 
     public override TaskType GetTaskType() => TaskType.DoomsdayDropoff; // return the type of the task
 
-    public override Sprite GetTaskIcon() => dropoffItemStack.GetItem().GetItemIcon(); // return the icon of the item to be dropped off
+    public override Sprite GetTaskIcon() => dropoffItemStack.GetItem().GetIcon(); // return the icon of the item to be dropped off
 
     public ItemStack GetDropoffItemStack() => dropoffItemStack; // getter for the item stack to be dropped off
 

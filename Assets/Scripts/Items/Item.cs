@@ -26,7 +26,7 @@ public class Item : ScriptableObject {
 
     public string GetDescription() => itemDescription;
 
-    public Sprite GetItemIcon() => itemIcon;
+    public Sprite GetIcon() => itemIcon;
 
     public int GetStackSize() => stackLimit;
 

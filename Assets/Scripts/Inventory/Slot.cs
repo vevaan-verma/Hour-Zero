@@ -1,3 +1,4 @@
+using TMPro;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
@@ -7,6 +8,7 @@ public class Slot : MonoBehaviour, IDropHandler, IPointerEnterHandler, IPointerE
     [Header("References")]
     [SerializeField] private ItemInfoWidget itemInfoWidgetPrefab;
     [SerializeField] private Image placeholder;
+    [SerializeField] private TMP_Text placeholderCountText;
     protected Image image;
     private ItemInfoWidget currItemInfoWidget;
     private SlotItemHolder slotItemHolder;
@@ -18,7 +20,7 @@ public class Slot : MonoBehaviour, IDropHandler, IPointerEnterHandler, IPointerE
     private bool isLocked;
 
     [Header("Data")]
-    private ItemStack itemStack;
+    private ItemStack currItemStack;
     private int index;
 
     public virtual void Initialize(Inventory inventory, InventoryUI inventoryUI, int index, ItemStack itemStack, bool showItemInfoWidgetOnHover, Color? slotColor = null) {
@@ -31,6 +33,8 @@ public class Slot : MonoBehaviour, IDropHandler, IPointerEnterHandler, IPointerE
 
         slotItemHolder = GetComponentInChildren<SlotItemHolder>();
         image = GetComponent<Image>();
+
+        placeholderCountText.gameObject.SetActive(false); // hide the placeholder count text by default
 
         // set the color of the slot to the one provided if it is not null, otherwise use the default color of the slot
         if (slotColor != null)
@@ -50,8 +54,8 @@ public class Slot : MonoBehaviour, IDropHandler, IPointerEnterHandler, IPointerE
         if (isLocked) return; // if the slot is locked, do not process the pointer click event
 
         // check if shift + left click is pressed to activate quick transfer and make sure the item is not null to make sure there is something to transfer
-        if (Input.GetKey(KeyCode.LeftShift) && itemStack.GetItem() != null)
-            inventory.QuickTransferItem(inventoryUI.GetQuickTransferInventory(), itemStack, index);
+        if (Input.GetKey(KeyCode.LeftShift) && currItemStack.GetItem() != null)
+            inventory.QuickTransferItem(inventoryUI.GetQuickTransferInventory(), currItemStack, index);
 
     }
 
@@ -59,13 +63,13 @@ public class Slot : MonoBehaviour, IDropHandler, IPointerEnterHandler, IPointerE
 
         // this event gets processed even when the slot is locked because the item widget is still shown when hovering over a locked slot
 
-        if (eventData.dragging || itemStack.GetItem() == null || !showItemInfoWidgetOnHover) return; // if the slot is empty or the item info widget is disabled, do nothing
+        if (currItemStack.GetItem() == null || !showItemInfoWidgetOnHover) return; // if the slot is empty or the item info widget is disabled, do nothing
 
         DestroyCurrentItemInfoWidget(); // destroy the item info widget if it exists
 
         currItemInfoWidget = Instantiate(itemInfoWidgetPrefab, Input.mousePosition, Quaternion.identity, transform.root); // instantiate the special item info widget at the mouse position and set its parent to the root transform; the root transform is used to ensure that the special item info widget is always in the same space as the root object and not in world space
         currItemInfoWidget.transform.SetAsLastSibling(); // set the widget to the front
-        currItemInfoWidget.Initialize(itemStack); // initialize the widget with the special item
+        currItemInfoWidget.Initialize(currItemStack); // initialize the widget with the special item
 
     }
 
@@ -146,7 +150,7 @@ public class Slot : MonoBehaviour, IDropHandler, IPointerEnterHandler, IPointerE
 
         if (!force && isLocked) return; // if the slot is locked, do not allow setting the item stack; if force is true, we ignore the locked state
 
-        this.itemStack = itemStack; // set the item stack in this slot to the one being dropped
+        this.currItemStack = itemStack; // set the item stack in this slot to the one being dropped
 
         slotItemHolder.SetItemStack(itemStack); // set the item stack in the new slot item holder
         slotItemHolder.transform.SetParent(transform); // set the parent of the new item to this slot
@@ -162,7 +166,14 @@ public class Slot : MonoBehaviour, IDropHandler, IPointerEnterHandler, IPointerE
 
     }
 
-    public void SetPlaceholderItem(Item placeholderItem) => placeholder.sprite = placeholderItem.GetItemIcon(); // set the placeholder sprite to the sprite of the placeholder item
+    public void SetPlaceholder(ItemStack placeholderItemStack) {
+
+        placeholder.sprite = placeholderItemStack.GetItem().GetIcon(); // set the placeholder sprite to the sprite of the placeholder item
+        placeholderCountText.text = placeholderItemStack.GetCount().ToString(); // set the placeholder count text to the count of the placeholder item
+
+        placeholderCountText.gameObject.SetActive(placeholderItemStack.GetCount() > 1); // only show the count text if there is more than one item in the stack
+
+    }
 
     public void SetLocked(bool isLocked) => this.isLocked = isLocked;
 
@@ -174,6 +185,6 @@ public class Slot : MonoBehaviour, IDropHandler, IPointerEnterHandler, IPointerE
 
     public int GetIndex() => index;
 
-    public bool IsItemStackSet() => itemStack != null && itemStack.GetItem() != null; // check if the item stack is set and the item is not null
+    public bool IsItemStackSet() => currItemStack != null && currItemStack.GetItem() != null; // check if the item stack is set and the item is not null
 
 }

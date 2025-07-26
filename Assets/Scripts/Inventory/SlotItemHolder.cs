@@ -18,18 +18,20 @@ public class SlotItemHolder : MonoBehaviour {
         this.inventoryUI = inventoryUI;
         itemIcon = GetComponent<Image>();
 
+        countText.gameObject.SetActive(false); // hide the count text by default
+
     }
 
     public void SetItemStack(ItemStack itemStack) {
 
         this.itemStack = itemStack;
 
-        itemIcon.sprite = itemStack.GetItem() == null ? emptyIcon : itemStack.GetItem().GetItemIcon(); // set the image sprite to the item's icon
+        itemIcon.sprite = itemStack.GetItem() == null ? emptyIcon : itemStack.GetItem().GetIcon(); // set the image sprite to the item's icon
 
         int count = itemStack.GetCount(); // get the count from the item stack
         countText.text = count.ToString(); // set the count text to the item's stack size or empty if no item
 
-        countText.gameObject.SetActive(itemStack.GetItem() != null && count > 1); // only show the count text if there is an item and its stack size is greater than 1
+        countText.gameObject.SetActive(itemStack.GetItem() != null && count > 1); // only show the count text if there is an item and its count is greater than 1
 
     }
 

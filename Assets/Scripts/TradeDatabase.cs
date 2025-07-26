@@ -35,16 +35,3 @@ public class TradeDatabase : MonoBehaviour {
     public TradeData GetRandomTradeData() => tradeData[UnityEngine.Random.Range(0, tradeData.Length)];
 
 }
-
-[Serializable]
-public class TradeData {
-
-    [Header("Data")]
-    [SerializeField] private ItemStack[] inputItemStacks;
-    [SerializeField] private ItemStack[] outputItemStacks;
-
-    public ItemStack[] GetInputItemStacks() => inputItemStacks;
-
-    public ItemStack[] GetOutputItemStacks() => outputItemStacks;
-
-}

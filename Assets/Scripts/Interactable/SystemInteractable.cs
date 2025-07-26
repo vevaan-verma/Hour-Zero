@@ -6,10 +6,7 @@ public class SystemInteractable : Interactable {
     private UIManager uiManager;
 
     [Header("Settings")]
-    [SerializeField] private BunkerSystemType systemType;
-    [SerializeField] private ItemStack[] repairStacks;
-    [SerializeField, Min(1)] private int repairSlotCount;
-    [SerializeField] private int repairPercent;
+    [SerializeField] private RepairData repairData;
 
     private new void Start() {
 
@@ -22,7 +19,7 @@ public class SystemInteractable : Interactable {
 
         if (!base.Interact()) return false; // if the base interaction fails, do not proceed
 
-        uiManager.OpenSystemRepairMenu(repairStacks, repairPercent, systemType); // open the system repair menu
+        uiManager.OpenSystemRepairMenu(repairData); // open the system repair menu
         return true;
 
     }
