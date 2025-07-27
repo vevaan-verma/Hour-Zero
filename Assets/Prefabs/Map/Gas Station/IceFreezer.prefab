@@ -461,11 +461,11 @@ MonoBehaviour:
   requireBackpackItems: 0
   requiredBackpackItems: []
   consumeBackpackItems: 0
-  indicator: {fileID: 4785103850579703742}
+  interactIndicatorLerpDuration: 0
   isInitiallyOpen: 0
   itemLockIntact: 0
   breakItemLockOnInteract: 0
-  linkedOpenable: {fileID: 0}
+  waitForAnimation: 0
   openSound: 5
   closeSound: 6
   openedText: Close
@@ -582,7 +582,7 @@ GameObject:
   - component: {fileID: 2940668606333414692}
   - component: {fileID: 304562193943571299}
   m_Layer: 0
-  m_Name: Bulb
+  m_Name: Static Light
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -860,11 +860,11 @@ MonoBehaviour:
   requireBackpackItems: 0
   requiredBackpackItems: []
   consumeBackpackItems: 0
-  indicator: {fileID: 489737255261320723}
+  interactIndicatorLerpDuration: 0
   isInitiallyOpen: 1
   itemLockIntact: 0
   breakItemLockOnInteract: 0
-  linkedOpenable: {fileID: 0}
+  waitForAnimation: 0
   openSound: 6
   closeSound: 5
   openedText: Open
@@ -1029,17 +1029,6 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 1869971601973036889, guid: af12b3f92c68bd743abf1c5d79d22510, type: 3}
   m_PrefabInstance: {fileID: 847791357599386107}
   m_PrefabAsset: {fileID: 0}
---- !u!114 &4785103850579703742 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 5308599532315196997, guid: af12b3f92c68bd743abf1c5d79d22510, type: 3}
-  m_PrefabInstance: {fileID: 847791357599386107}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 9b7e11de6366cd04a80a72b2a2bb8872, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!1001 &5719582892843305046
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -1109,17 +1098,6 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: af12b3f92c68bd743abf1c5d79d22510, type: 3}
---- !u!114 &489737255261320723 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 5308599532315196997, guid: af12b3f92c68bd743abf1c5d79d22510, type: 3}
-  m_PrefabInstance: {fileID: 5719582892843305046}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 9b7e11de6366cd04a80a72b2a2bb8872, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!4 &6238456446845472527 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 1869971601973036889, guid: af12b3f92c68bd743abf1c5d79d22510, type: 3}

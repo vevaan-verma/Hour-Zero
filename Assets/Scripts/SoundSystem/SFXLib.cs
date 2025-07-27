@@ -11,53 +11,33 @@ public class SFXLib : MonoBehaviour {
     [Header("Debug")]
     [SerializeField, ReadOnly] private bool hasErrors = false;
 
+    // ONLY append new items to the END of the list, or else the SFXLib WILL break. 
     public enum Sounds {
 
-        #region Item Sounds
+        CrowbarHit,
+        KeyJangle,
+        WoodenBreak,
+        DoorOpen,
+        SoftBells,
+        MetalDoorOpen,
+        MetalDoorClose,
+        WoodDoorOpen,
+        SlideOpen,
+        SlideShut,
+        FridgeDoorOpen,
+        FridgeDoorClose,
+        RadioSong1,
+        RadioSong2,
+        RadioSong3,
+        RadioSong4,
+        Thump,
+        Creak,
+        LongCreak,
+        Slam,
+        Test,
+        NoSound,
+        Oof
 
-        Item_CrowbarHit,
-        Item_KeyJangle,
-
-        #endregion
-
-        #region Object Sounds
-
-        Object_WoodenBreak,
-        Object_DoorOpen,
-        Object_SoftBells,
-        Object_MetalDoorOpen,
-        Object_MetalDoorClose,
-        Object_WoodDoorOpen,
-
-        #endregion
-
-        #region Music
-
-        Music_RadioSong1,
-        Music_RadioSong2,
-        Music_RadioSong3,
-        Music_RadioSong4,
-
-        #endregion
-
-        #region General
-
-        //General
-        General_Thump,
-        General_Creak,
-        General_LongCreak,
-        General_Slam,
-
-        #endregion
-
-        #region Misc
-
-        //Misc
-        Misc_Test,
-        Misc_NoSound,
-        Misc_Oof
-
-        #endregion
     }
     private void Start() => ValidateDict(modifyDict: false);
 
@@ -87,8 +67,31 @@ public class SFXLib : MonoBehaviour {
 
             }
 
-            // automatically alphabetize
-            //soundDict = soundDict.OrderBy(entry => entry.Key.ToString()).ToList();
+            // auto sort
+
+            // TODO: sort by int value of the label instead
+            // TODO: within the label groupings, sort by int value of key
+
+            List<SFXEntry> organizedDict = new List<SFXEntry>();
+
+            // copy soundDict elements into organizedDict, grouped by labels
+
+            for (int i = 0; i < soundDict.Count; i++) {
+
+                // get entry from the unsorted dict
+                SFXEntry toOrganize = soundDict[i];
+
+                // find the index of the first object in the organizedDict with the same label as toOrganize
+                int idxToPlaceElement = organizedDict.FindIndex(entry => entry.Label == toOrganize.Label);
+
+                // add element to found index. if found index is -1 (no entry found), add to the end of the list
+                organizedDict.Insert(idxToPlaceElement != -1 ? idxToPlaceElement : organizedDict.Count, toOrganize);
+
+            }
+
+            // replace dict with organized dict
+            for (int i = 0; i < organizedDict.Count; i++)
+                soundDict[i] = organizedDict[i];
 
         }
 
@@ -159,7 +162,7 @@ public class SFXLib : MonoBehaviour {
         int totalErrors = duplicateKeyLog.Count + duplicateSoundLog.Count + missingRefLog.Count;
         hasErrors = totalErrors > 0;
 
-        if (!hasErrors && modifyDict)
+        if (!hasErrors)
             Debug.Log("SFXLib has no errors: good to go!");
         else if (hasErrors) {
 
