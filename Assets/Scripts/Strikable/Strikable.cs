@@ -49,7 +49,7 @@ public abstract class Strikable : MonoBehaviour {
             if (selectedItemStack.GetItem() == null || !selectedItemStack.GetItem().Equals(requiredHeldItem.GetItem()))
                 return false;
 
-            // if the held item should be consumed, use the backpack inventory to remove as much of the item stack from the current selected hotbar slot as possible, then remove the remainder as normal
+            // if the held item should be consumed, use the backpack inventory to remove as much of the item stack from the current selected hotbar slot as possible, then remove the remainder as normal (backpack handles all this logic)
             if (consumeHeldItem)
                 backpack.RemoveItemStack(new ItemStack(requiredHeldItem.GetItem(), requiredHeldItem.GetCount()), hotbar.GetSelectedIndex());
 

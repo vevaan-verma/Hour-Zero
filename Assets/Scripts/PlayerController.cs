@@ -177,8 +177,11 @@ public class PlayerController : MonoBehaviour {
         #endregion
 
         #region TOOL USAGE
-        if (Input.GetMouseButtonDown(0) && currHeldItem) // check for left mouse button press and if there is a currently held item
-            currHeldItem.Attack(); // call the use method on the held item
+        if (currHeldItem) // check if there is a currently held item
+            if (Input.GetMouseButtonDown(0)) // check if the left mouse button is pressed
+                currHeldItem.Attack(); // call the attack method on the held item
+            else if (Input.GetMouseButtonDown(1)) // check if the right mouse button is pressed
+                currHeldItem.Use(); // call the use method on the held item
         #endregion
 
         #region GRABBING

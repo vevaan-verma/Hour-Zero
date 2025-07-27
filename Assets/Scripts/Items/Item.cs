@@ -14,9 +14,14 @@ public class Item : ScriptableObject {
     [SerializeField] private HeldItem heldItemPrefab;
     [SerializeField] private SFXLib.Sounds hitSound;
     [Space]
+    [SerializeField] private bool canAttack;
     [SerializeField] private float attackDistance;
     [SerializeField] private float attackForce;
-    [SerializeField] private float attackCooldown;
+    [SerializeField, Min(0.1f)] private float attackCooldown;
+    [Space]
+    [SerializeField] private bool canUse;
+    [SerializeField, Min(0.1f)] private float useCooldown;
+    [SerializeField] private bool consumeOnUse;
 
     [Header("Tasks")]
     [SerializeField, Tooltip("Whether this item is a dropoff item that can be used in the DoomsdayDropoff task")] private bool isDropoffItem;
@@ -38,11 +43,19 @@ public class Item : ScriptableObject {
 
     public SFXLib.Sounds GetHitSound() => hitSound;
 
+    public bool CanAttack() => canAttack;
+
     public float GetAttackDistance() => attackDistance;
 
     public float GetAttackForce() => attackForce;
 
     public float GetAttackCooldown() => attackCooldown;
+
+    public bool CanUse() => canUse;
+
+    public float GetUseCooldown() => useCooldown;
+
+    public bool ConsumeOnUse() => consumeOnUse;
 
     public bool IsDropoffItem() => isDropoffItem;
 

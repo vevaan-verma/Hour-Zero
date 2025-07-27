@@ -71,7 +71,7 @@ public abstract class ExchangeInventoryUI : InventoryUI {
 
         }
 
-        UpdatePlaceholderCycle(); // update the placeholder cycle to ensure it reflects the current state of the inventory
+        UpdatePlaceholders(); // update the placeholder cycle to ensure it reflects the current state of the inventory
 
         // refresh the layout if the rect transform is active in hierarchy
         if (rectTransform.gameObject.activeInHierarchy)
@@ -108,7 +108,7 @@ public abstract class ExchangeInventoryUI : InventoryUI {
 
     }
 
-    private void UpdatePlaceholderCycle() {
+    private void UpdatePlaceholders() {
 
         List<ItemStack> placeholderItems = exchangeInventory.GetExchangeData().GetInputItemStacks().ToList();
 

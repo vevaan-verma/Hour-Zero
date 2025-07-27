@@ -21,6 +21,7 @@ public class Slot : MonoBehaviour, IDropHandler, IPointerEnterHandler, IPointerE
 
     [Header("Data")]
     private ItemStack currItemStack;
+    private ItemStack currPlaceholderItemStack;
     private int index;
 
     public virtual void Initialize(Inventory inventory, InventoryUI inventoryUI, int index, ItemStack itemStack, bool showItemInfoWidgetOnHover, Color? slotColor = null) {
@@ -63,14 +64,29 @@ public class Slot : MonoBehaviour, IDropHandler, IPointerEnterHandler, IPointerE
 
         // this event gets processed even when the slot is locked because the item widget is still shown when hovering over a locked slot
 
-        if (currItemStack.GetItem() == null || !showItemInfoWidgetOnHover) return; // if the slot is empty or the item info widget is disabled, do nothing
+        if (!showItemInfoWidgetOnHover) return; // if the showItemInfoWidgetOnHover setting is disabled, do nothing
 
-        DestroyCurrentItemInfoWidget(); // destroy the item info widget if it exists
+        if (currItemStack.GetItem() != null) { // check if the item stack in this slot is not empty
 
-        currItemInfoWidget = Instantiate(itemInfoWidgetPrefab, Input.mousePosition, Quaternion.identity, transform.root); // instantiate the special item info widget at the mouse position and set its parent to the root transform; the root transform is used to ensure that the special item info widget is always in the same space as the root object and not in world space
-        currItemInfoWidget.transform.SetAsLastSibling(); // set the widget to the front
-        currItemInfoWidget.Initialize(currItemStack); // initialize the widget with the special item
+            DestroyCurrentItemInfoWidget(); // destroy the item info widget if it exists
 
+            currItemInfoWidget = Instantiate(itemInfoWidgetPrefab, Input.mousePosition, Quaternion.identity, transform.root); // instantiate the special item info widget at the mouse position and set its parent to the root transform; the root transform is used to ensure that the special item info widget is always in the same space as the root object and not in world space
+            currItemInfoWidget.transform.SetAsLastSibling(); // set the widget to the front
+            currItemInfoWidget.Initialize(currItemStack); // initialize the widget with the special item
+            return;
+
+        }
+
+        if (currPlaceholderItemStack != null && currPlaceholderItemStack.GetItem() != null) { // check if the placeholder item stack is set and has an item (essentially, this confirms that there is an actual placeholder active); this is placed after the check for the current item stack to ensure that the placeholder is only shown when there is no item in the slot
+
+            DestroyCurrentItemInfoWidget(); // destroy the item info widget if it exists
+
+            currItemInfoWidget = Instantiate(itemInfoWidgetPrefab, Input.mousePosition, Quaternion.identity, transform.root); // instantiate the special item info widget at the mouse position and set its parent to the root transform
+            currItemInfoWidget.transform.SetAsLastSibling(); // set the widget to the front
+            currItemInfoWidget.Initialize(currPlaceholderItemStack); // initialize the widget with the placeholder item
+            return;
+
+        }
     }
 
     public void OnPointerExit(PointerEventData eventData) => DestroyCurrentItemInfoWidget(); // destroy the item info widget if it exists
@@ -167,6 +183,8 @@ public class Slot : MonoBehaviour, IDropHandler, IPointerEnterHandler, IPointerE
     }
 
     public void SetPlaceholder(ItemStack placeholderItemStack) {
+
+        this.currPlaceholderItemStack = placeholderItemStack; // set the placeholder item stack to the one provided
 
         placeholder.sprite = placeholderItemStack.GetItem().GetIcon(); // set the placeholder sprite to the sprite of the placeholder item
         placeholderCountText.text = placeholderItemStack.GetCount().ToString(); // set the placeholder count text to the count of the placeholder item
