@@ -8,8 +8,9 @@ public abstract class ExchangeInventoryUI : InventoryUI {
     [SerializeField] private Transform inputSlotsContainer;
     [SerializeField] private Transform outputSlotsContainer;
     protected ExchangeInventory exchangeInventory; // more specific reference to the exchange inventory (could be TradeInventory, RepairInventory, etc.); allows for more specific methods to be called on the exchange inventory
-    private Slot[] inputSlots;
-    private Slot[] outputSlots;
+    private Slot[] inputSlots; // as the name suggests, this stores all the input slots in the exchange inventory
+    private Slot[] outputSlots; // as the name suggests, this stores all the output slots in the exchange inventory
+    // we still do use inventorySlots; it stores all the slots in the exchange inventory, which includes both input and output slots
 
     public void FillOutputSlots() {
 
@@ -30,7 +31,7 @@ public abstract class ExchangeInventoryUI : InventoryUI {
 
         ExchangeData exchangeData = exchangeInventory.GetExchangeData(); // get the exchange data from the inventory
 
-        inventorySlots = new Slot[exchangeInventory.GetInitialSlotCount()];
+        inventorySlots = new Slot[exchangeData.GetInputItemStacks().Length + exchangeData.GetOutputItemStacks().Length]; // create an array for inventory slots based on the total number of input and output item stacks (which would be the total number of slots in the exchange inventory)
         inputSlots = new Slot[exchangeData.GetInputItemStacks().Length]; // create an array for input slots based on the number of input item stacks
         outputSlots = new Slot[exchangeData.GetOutputItemStacks().Length]; // create an array for output slots based on the number of output item stacks
 
@@ -113,9 +114,9 @@ public abstract class ExchangeInventoryUI : InventoryUI {
         List<ItemStack> placeholderItems = exchangeInventory.GetExchangeData().GetInputItemStacks().ToList();
 
         // loop through the filled slot items and remove them from the placeholder items array so only the items that haven't been set in the slots are used as placeholders
-        for (int i = 0; i < inventorySlots.Length; i++)
-            if (inventorySlots[i].IsItemStackSet())
-                placeholderItems.Remove(inventorySlots[i].GetItemStack()); // remove the item from the placeholder items list
+        for (int i = 0; i < inputSlots.Length; i++)
+            if (inputSlots[i].IsItemStackSet())
+                placeholderItems.RemoveAll(item => item.GetItem().Equals(inputSlots[i].GetItemStack().GetItem())); // find the item stack in the placeholder items list with the same item as the slot's item stack and remove it
 
         // if there are no placeholder items left, return as there is nothing to cycle through (all exchange items have been set in the slots)
         if (placeholderItems.Count == 0)
@@ -124,13 +125,13 @@ public abstract class ExchangeInventoryUI : InventoryUI {
         // offset shifts the starting index for cycling through placeholder items, creating a rotating effect in the inventory slots (offset decreasing each cycle makes the placeholder items appear to shift right)
         for (int offset = placeholderItems.Count - 1; offset >= 0; offset--) {
 
-            // cycle through the INPUT slots and set the placeholder items (subtract outputSlots.Length from the total length to only set placeholders for input slots)
-            for (int i = 0; i < inventorySlots.Length - outputSlots.Length; i++) {
+            // cycle through the INPUT slots and set the placeholder items
+            for (int i = 0; i < inputSlots.Length; i++) {
 
-                if (inventorySlots[i].IsItemStackSet()) continue; // skip the slot if it already has an item stack set since it doesn't need a placeholder
+                if (inputSlots[i].IsItemStackSet()) continue; // skip the slot if it already has an item stack set since it doesn't need a placeholder
 
                 int itemIndex = (i + offset) % placeholderItems.Count; // calculate the index of the placeholder item to set in the slot, wrapping around if necessary
-                inventorySlots[i].SetPlaceholder(placeholderItems[itemIndex]);
+                inputSlots[i].SetPlaceholder(placeholderItems[itemIndex]);
 
             }
         }

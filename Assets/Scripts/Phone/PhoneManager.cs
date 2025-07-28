@@ -1,5 +1,6 @@
 using System;
 using System.Collections;
+using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -21,6 +22,13 @@ public class PhoneManager : MonoBehaviour {
     [SerializeField] private PhoneApp[] phoneApps;
     private PhoneApp openedApp; // reference to the currently opened app; null signifies home menu is open
 
+    [Header("Notifications")]
+    [SerializeField] private Transform notificationSection;
+    [SerializeField] private NotificationBanner notificationBannerPrefab;
+    [SerializeField] private float notificationDisplayDuration;
+    private NotificationBanner currNotificationBanner; // reference to the currently displayed notification banner; null signifies no notification is being displayed
+    private Queue<NotificationData> notificationQueue;
+
     [Header("State")]
     [SerializeField] private KeyCode phoneCycleKey;
     private PhoneState phoneState;
@@ -34,6 +42,8 @@ public class PhoneManager : MonoBehaviour {
         timeManager = FindFirstObjectByType<TimeManager>();
         uiManager = FindFirstObjectByType<UIManager>();
         animator = GetComponent<Animator>();
+
+        notificationQueue = new Queue<NotificationData>(); // initialize the notification queue
 
         // clear all children of the home menu to avoid duplicates
         foreach (Transform child in homeMenu)
@@ -61,6 +71,8 @@ public class PhoneManager : MonoBehaviour {
 
         phoneState = PhoneState.Pocket; // initialize phone state to PutAway by default
         animator.SetTrigger("phoneToPocket"); // set the initial animation state to put away the phone
+
+        homeMenu.gameObject.SetActive(true); // make sure the home menu is active by default
 
         UpdateTimeHUD(timeManager.GetDay(), timeManager.GetHour(), timeManager.GetMinute(), timeManager.IsAM());
 
@@ -109,6 +121,40 @@ public class PhoneManager : MonoBehaviour {
     }
 
     public void OnAppOpened(PhoneApp app) => openedApp = app; // set the currently opened app
+
+    public void SendNotification(NotificationData notificationData) {
+
+        notificationQueue.Enqueue(notificationData);
+
+        // if there is no current notification banner being displayed, display the next notification
+        if (currNotificationBanner == null)
+            DisplayNextNotification();
+
+    }
+
+    private void DisplayNextNotification() {
+
+        if (notificationQueue.Count <= 0) return; // if there are no notifications in the queue, do nothing
+
+        NotificationData nextNotificationData = notificationQueue.Peek(); // get the next notification data from the queue
+
+        currNotificationBanner = Instantiate(notificationBannerPrefab, notificationSection);
+        currNotificationBanner.Initialize(nextNotificationData, notificationDisplayDuration); // initialize the notification banner with the notification data and display duration
+        currNotificationBanner.Display(); // display the notification banner
+        currNotificationBanner.onNotificationDismiss += OnNotificationDismiss; // add a listener to handle notification dismissal
+
+    }
+
+    private void OnNotificationDismiss() {
+
+        notificationQueue.Dequeue(); // remove the current notification from the queue
+        currNotificationBanner.onNotificationDismiss -= DisplayNextNotification; // remove the listener from the current notification banner
+        Destroy(currNotificationBanner.gameObject); // destroy the current notification banner to free up resources
+        currNotificationBanner = null; // reset the current notification banner reference
+
+        DisplayNextNotification(); // display the next notification if available
+
+    }
 
     private void UpdateTimeHUD(int day, int hour, int minute, bool isAM) {
 

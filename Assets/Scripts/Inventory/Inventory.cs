@@ -9,14 +9,13 @@ public abstract class Inventory : MonoBehaviour {
 
     [Header("Settings")]
     [SerializeField, Tooltip("The number of slots to show per row in the inventory UI (used to calculate the size of the inventory contents grid layout group)")] protected int slotsPerRow;
-    [SerializeField, Min(1)] protected int initialSlotCount;
+    [SerializeField, Min(1)] protected int slotCount;
     [SerializeField, Tooltip("The maximum number of items that can be stacked in a slot. If set to 0, it will either use the item's stack limit, or if that is set to 0, an infinite limit")] private int slotStackLimit;
     [SerializeField, Tooltip("Type of filter to apply to the item types in the filteredItemTypes array (e.g., whitelist or blacklist)")] protected FilterType itemTypeFilterType;
     [SerializeField] protected ItemType[] filteredItemTypes;
     [SerializeField, Tooltip("Type of filter to apply to the filteredItems array (e.g., whitelist or blacklist)")] protected FilterType itemFilterType;
     [SerializeField] protected Item[] filteredItems;
     [SerializeField] private bool visibleByDefault;
-    protected int currSlotCount;
 
     [Header("Data")]
     protected List<ItemStack> contents; // a list is used because the inventory size can change
@@ -52,11 +51,10 @@ public abstract class Inventory : MonoBehaviour {
 
         playerController = FindFirstObjectByType<PlayerController>();
 
-        contents = new List<ItemStack>(currSlotCount);
-        currSlotCount = initialSlotCount;
+        contents = new List<ItemStack>(slotCount);
 
         // initialize the contents with empty ItemStacks
-        for (int i = 0; i < currSlotCount; i++)
+        for (int i = 0; i < slotCount; i++)
             contents.Add(new ItemStack(null, 0));
 
     }
@@ -67,7 +65,7 @@ public abstract class Inventory : MonoBehaviour {
         Item item = itemStack.GetItem();
         int count = itemStack.GetCount();
 
-        if (count < 0 || index < 0 || index >= contents.Count) return count; // return the count since we couldn't add anything
+        if (count < 0 || index < 0 || index >= slotCount) return count; // return the count since we couldn't add anything
 
         // if the item is null, set the slot to an empty stack
         if (item == null || count == 0) {
@@ -131,7 +129,7 @@ public abstract class Inventory : MonoBehaviour {
         }
 
         // first, try to stack into existing stacks
-        for (int i = 0; i < contents.Count; i++) {
+        for (int i = 0; i < slotCount; i++) {
 
             ItemStack stack = contents[i];
 
@@ -147,7 +145,7 @@ public abstract class Inventory : MonoBehaviour {
         }
 
         // then, try to add to empty slots (including whatever wasn't able to be stacked), starting from the first slot (top left to bottom right)
-        for (int i = 0; i < contents.Count; i++) {
+        for (int i = 0; i < slotCount; i++) {
 
             ItemStack stack = contents[i];
 
@@ -186,7 +184,7 @@ public abstract class Inventory : MonoBehaviour {
         if (item == null || count <= 0) return 0; // return 0 since we couldn't remove anything
 
         // if the slot index is specified, remove from there first
-        if (slotIndex.HasValue && slotIndex >= 0 && slotIndex < contents.Count) {
+        if (slotIndex.HasValue && slotIndex >= 0 && slotIndex < slotCount) {
 
             ItemStack stack = contents[(int) slotIndex];
 
@@ -209,7 +207,7 @@ public abstract class Inventory : MonoBehaviour {
         // if the slot index is not specified or there is still count left to remove, we need to search through the inventory contents
 
         // remove from the last slots first
-        for (int i = contents.Count - 1; i >= 0; i--) {
+        for (int i = slotCount - 1; i >= 0; i--) {
 
             ItemStack stack = contents[i];
 
@@ -240,9 +238,9 @@ public abstract class Inventory : MonoBehaviour {
         if (itemStacks == null || itemStacks.Length == 0) return false; // cannot add null or empty array
 
         // create a copy of the current contents to simulate adding
-        List<ItemStack> simulatedContents = new List<ItemStack>(contents.Count);
+        List<ItemStack> simulatedContents = new List<ItemStack>(slotCount);
 
-        for (int i = 0; i < contents.Count; i++) {
+        for (int i = 0; i < slotCount; i++) {
 
             ItemStack stack = contents[i];
             simulatedContents.Add(new ItemStack(stack.GetItem(), stack.GetCount()));
@@ -278,7 +276,7 @@ public abstract class Inventory : MonoBehaviour {
             int remaining = count;
 
             // first, try to stack into existing stacks
-            for (int i = 0; i < simulatedContents.Count; i++) {
+            for (int i = 0; i < slotCount; i++) {
 
                 ItemStack stack = simulatedContents[i];
 
@@ -301,7 +299,7 @@ public abstract class Inventory : MonoBehaviour {
             }
 
             // then, try to add to empty slots
-            for (int i = 0; i < simulatedContents.Count && remaining > 0; i++) {
+            for (int i = 0; i < slotCount && remaining > 0; i++) {
 
                 ItemStack stack = simulatedContents[i];
 
@@ -353,10 +351,10 @@ public abstract class Inventory : MonoBehaviour {
 
     public void Clear() {
 
-        contents = new List<ItemStack>(currSlotCount);
+        contents = new List<ItemStack>(slotCount);
 
         // initialize the contents with empty ItemStacks
-        for (int i = 0; i < currSlotCount; i++)
+        for (int i = 0; i < slotCount; i++)
             contents.Add(new ItemStack(null, 0));
 
     }
@@ -399,9 +397,7 @@ public abstract class Inventory : MonoBehaviour {
 
     public int GetSlotsPerRow() => slotsPerRow;
 
-    public int GetInitialSlotCount() => initialSlotCount;
-
-    public int GetCurrentSlotCount() => currSlotCount;
+    public int GetSlotCount() => slotCount;
 
     public Item[] GetFilteredItems() => filteredItems;
 

@@ -36,7 +36,7 @@ public class SystemRepairMenu : ExchangeMenu {
         exchangeInventory.Clear();
 
         string formattedSystemType = Regex.Replace(systemType.ToString(), "(\\B[A-Z])", " $1").ToLower(); // format the system type to be more readable by adding spaces in between the words (e.g., "AirFiltration" -> "Air Filtration") and convert to lowercase
-        alertManager.SendAlert(new Alert($"System {formattedSystemType} durability repaired ({repairPercent}%)", AlertType.Success));
+        phoneManager.SendNotification(new NotificationData(null, "Bunka", $"The {formattedSystemType} system has been repaired by {repairPercent}%"));
 
     }
 }

@@ -70,7 +70,7 @@ public abstract class InventoryUI : MonoBehaviour {
 
         }
 
-        inventorySlots = new Slot[inventory.GetCurrentSlotCount()];
+        inventorySlots = new Slot[inventory.GetSlotCount()];
 
         // delete all existing slots in the inventory contents
         foreach (Transform child in inventoryContents.transform)

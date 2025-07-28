@@ -15,7 +15,6 @@ public abstract class Interactable : MonoBehaviour {
     [SerializeField, Tooltip("Whether to require specific item stacks in the backpack to interact with this object")] protected bool requireBackpackItems;
     [SerializeField, Tooltip("The item stacks that must be in the backpack to interact with this object")] protected ItemStack[] requiredBackpackItems;
     [SerializeField, Tooltip("Whether to consume the backpack item stacks after interaction")] protected bool consumeBackpackItems;
-    [SerializeField] protected float interactIndicatorLerpDuration;
     protected bool canInteract;
 
     [Header("Indicator")]
@@ -23,6 +22,9 @@ public abstract class Interactable : MonoBehaviour {
     private Vector3 indicatorDefaultSize;
     private Coroutine indicatorLerpCoroutine;
     private bool isIndicatorVisible;
+
+    [Header("Constants")]
+    private const float interactIndicatorLerpDuration = 0.1f;
 
     protected void Start() {
 

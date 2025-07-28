@@ -2,18 +2,8 @@ using UnityEngine;
 
 public class Backpack : Inventory {
 
-    [Header("References")]
-    private AlertManager alertManager;
-
     [Header("Settings")]
     [SerializeField] private Color hotbarSlotColor;
-
-    public override void Initialize() {
-
-        base.Initialize();
-        alertManager = FindFirstObjectByType<AlertManager>();
-
-    }
 
     public Color GetHotbarSlotColor() => hotbarSlotColor;
 

@@ -11,7 +11,7 @@ public abstract class ExchangeInventory : Inventory {
 
         this.exchangeData = exchangeData; // set the exchange data for this exchange inventory
 
-        this.initialSlotCount = exchangeData.GetInputItemStacks().Length + exchangeData.GetOutputItemStacks().Length; // set the initial slot count to the number of input item stacks plus the number of output item stacks
+        this.slotCount = exchangeData.GetInputItemStacks().Length + exchangeData.GetOutputItemStacks().Length; // set the slot count to the number of input item stacks plus the number of output item stacks
 
         this.itemTypeFilterType = FilterType.Whitelist;
         this.filteredItemTypes = new ItemType[0]; // initialize the filtered item types to an empty array
@@ -26,6 +26,8 @@ public abstract class ExchangeInventory : Inventory {
     }
 
     public void SetFilters() {
+
+        this.slotCount = exchangeData.GetInputItemStacks().Length; // update the slot count to only include the input item stacks, which is the number of input slots in the inventory; doing this prevents items from being added to the output slots
 
         ItemStack[] inputStacks = exchangeData.GetInputItemStacks(); // get the input stacks for the exchange
 
@@ -73,7 +75,7 @@ public abstract class ExchangeInventory : Inventory {
 }
 
 #if UNITY_EDITOR
-[UnityEditor.CustomEditor(typeof(ExchangeInventory))]
+[UnityEditor.CustomEditor(typeof(ExchangeInventory), true)]
 // using UnityEditor prefix to avoid needing to hide the import in the final build
 public class ExchangeInventoryEditor : UnityEditor.Editor {
 

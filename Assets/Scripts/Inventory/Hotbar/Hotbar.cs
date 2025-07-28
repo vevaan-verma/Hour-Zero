@@ -21,8 +21,7 @@ public class Hotbar : Inventory {
         playerController = FindFirstObjectByType<PlayerController>(); // set the playerController here even though it is already set in the base class Initialize method, because the base method isn't called in this class
         backpack = FindFirstObjectByType<Backpack>();
 
-        initialSlotCount = Mathf.Min(backpack.GetSlotsPerRow(), backpack.GetInitialSlotCount()); // set the initial slot count to the number of slots per row in the backpack (since the top row of the backpack is the hotbar)
-        currSlotCount = initialSlotCount;
+        slotCount = Mathf.Min(backpack.GetSlotsPerRow(), backpack.GetSlotCount()); // set the slot count to the number of slots per row in the backpack (since the top row of the backpack is the hotbar)
 
         backpack.onContentsUpdated += UpdateHeldItem; // subscribe to the backpack's contents updated event to update the held item when the contents change; backpack is used since the hotbar is a part of the backpack (the top row)
 
@@ -36,7 +35,7 @@ public class Hotbar : Inventory {
 
     public void SelectSlot(int index) {
 
-        if (index < 0 || index >= currSlotCount) return; // do nothing if the index is out of bounds
+        if (index < 0 || index >= slotCount) return; // do nothing if the index is out of bounds
         selectedIndex = index; // set the selected index to the given index
 
         UpdateHeldItem(); // update the held item
@@ -46,8 +45,8 @@ public class Hotbar : Inventory {
 
     public void CycleSlot(int cycleAmount) {
 
-        selectedIndex = (selectedIndex + cycleAmount) % currSlotCount; // cycle through the slots, wrapping around if necessary
-        if (selectedIndex < 0) selectedIndex += currSlotCount; // ensure the index is not negative
+        selectedIndex = (selectedIndex + cycleAmount) % slotCount; // cycle through the slots, wrapping around if necessary
+        if (selectedIndex < 0) selectedIndex += slotCount; // ensure the index is not negative
 
         SelectSlot(selectedIndex); // select the new slot
 
@@ -90,7 +89,7 @@ public class Hotbar : Inventory {
 
     public override bool ContainsItemStack(ItemStack itemStack) {
 
-        for (int i = 0; i < currSlotCount; i++)
+        for (int i = 0; i < slotCount; i++)
             if (backpack.GetItemStack(i).GetItem() == itemStack.GetItem()) // check if the item in the slot is the same as the item in the stack; use the backpack's GetItemStack method to get the item stack in the hotbar
                 return true; // if it is, return true
 

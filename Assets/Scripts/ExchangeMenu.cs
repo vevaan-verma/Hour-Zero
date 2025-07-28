@@ -7,10 +7,10 @@ public abstract class ExchangeMenu : Menu {
 
     [Header("References")]
     protected ExchangeInventory exchangeInventory;
+    protected PhoneManager phoneManager;
     protected UIManager uiManager;
     protected Backpack backpack;
     protected ExchangeData currExchangeData; // current exchange data being processed
-    protected AlertManager alertManager;
     private Coroutine fadeCoroutine;
 
     [Header("UI References")]
@@ -31,7 +31,7 @@ public abstract class ExchangeMenu : Menu {
     protected void Start() {
 
         backpack = FindFirstObjectByType<Backpack>();
-        alertManager = FindFirstObjectByType<AlertManager>();
+        phoneManager = FindFirstObjectByType<PhoneManager>();
         uiManager = FindFirstObjectByType<UIManager>();
 
         exchangeButton.onClick.AddListener(ProcessExchange); // add listener to exchange button
