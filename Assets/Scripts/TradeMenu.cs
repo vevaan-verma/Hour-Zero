@@ -29,7 +29,5 @@ public class TradeMenu : ExchangeMenu {
 
         exchangeInventory.Clear();
 
-        phoneManager.SendNotification(new NotificationData(null, "Tradr", "Trade successful!")); // send a notification to the player that the trade was successful
-
     }
 }

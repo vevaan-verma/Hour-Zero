@@ -19,8 +19,8 @@ public class PhoneManager : MonoBehaviour {
     [SerializeField] private Button homeButton;
 
     [Header("Apps")]
-    [SerializeField] private PhoneApp[] phoneApps;
-    private PhoneApp openedApp; // reference to the currently opened app; null signifies home menu is open
+    [SerializeField] private AppData[] phoneAppData;
+    private AppData openedAppData; // reference to the currently opened app; null signifies home menu is open
 
     [Header("Notifications")]
     [SerializeField] private Transform notificationSection;
@@ -50,13 +50,13 @@ public class PhoneManager : MonoBehaviour {
             Destroy(child.gameObject);
 
         // create a button for each app and initialize it
-        foreach (PhoneApp app in phoneApps) {
+        foreach (AppData appData in phoneAppData) {
 
             AppButton appButton = Instantiate(appButtonPrefab, homeMenu);
-            appButton.transform.name = app.GetAppName() + "AppButton"; // set the name of the button to the app name
-            appButton.Initialize(app.GetAppName(), app.GetAppIcon());
-            app.Initialize(this, appButton);
-            app.ForceCloseApp(); // ensure the app is closed initially
+            appButton.transform.name = appData.GetName() + "AppButton"; // set the name of the button to the app name
+            appButton.Initialize(appData.GetName(), appData.GetIcon());
+            appData.Initialize(this, appButton);
+            appData.ForceCloseApp(); // ensure the app is closed initially
 
         }
 
@@ -64,7 +64,7 @@ public class PhoneManager : MonoBehaviour {
 
         homeButton.onClick.AddListener(() => {
 
-            openedApp?.CloseApp();
+            openedAppData?.CloseApp();
             animator.SetTrigger("pressHomeButton"); // trigger the animation to press the home button
 
         });
@@ -120,11 +120,13 @@ public class PhoneManager : MonoBehaviour {
 
     }
 
-    public void OnAppOpened(PhoneApp app) => openedApp = app; // set the currently opened app
+    public void OnAppOpened(AppData appData) => openedAppData = appData; // set the currently opened app
 
-    public void SendNotification(NotificationData notificationData) {
+    public void SendNotification(AppType appType, string description) {
 
-        notificationQueue.Enqueue(notificationData);
+        AppData appData = Array.Find(phoneAppData, app => app.GetAppType() == appType); // find the app data for the specified app type
+
+        notificationQueue.Enqueue(new NotificationData(appData.GetIcon(), appData.GetName(), description));
 
         // if there is no current notification banner being displayed, display the next notification
         if (currNotificationBanner == null)
@@ -185,7 +187,7 @@ public class PhoneManager : MonoBehaviour {
 }
 
 [Serializable]
-public class PhoneApp {
+public class AppData {
 
     [Header("References")]
     private PhoneManager phoneManager;
@@ -199,6 +201,7 @@ public class PhoneApp {
     [Header("Data")]
     [SerializeField] private string appName;
     [SerializeField] private Sprite appIcon;
+    [SerializeField] private AppType appType;
 
     public void Initialize(PhoneManager phoneManager, AppButton appButton) {
 
@@ -238,16 +241,26 @@ public class PhoneApp {
     private IEnumerator HandleAppClose() {
 
         appAnimator.SetTrigger("closeApp"); // trigger the animation to close the app
+
         yield return null; // wait for the next frame to ensure the animation starts
         yield return new WaitForSeconds(appAnimator.GetCurrentAnimatorStateInfo(0).length); // wait for the animation to finish
+
         appMenu.gameObject.SetActive(false); // hide the app menu after the animation is done
         phoneManager.OnAppOpened(null); // notify the PhoneManager that no app is opened (home screen is open)
 
     }
 
-    public string GetAppName() => appName;
+    public string GetName() => appName;
 
-    public Sprite GetAppIcon() => appIcon;
+    public Sprite GetIcon() => appIcon;
+
+    public AppType GetAppType() => appType;
+
+}
+
+public enum AppType {
+
+    Bunka, Todo, Notes, GPS
 
 }
 

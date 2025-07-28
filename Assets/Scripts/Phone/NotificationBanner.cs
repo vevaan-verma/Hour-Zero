@@ -26,7 +26,7 @@ public class NotificationBanner : MonoBehaviour {
 
     public void Initialize(NotificationData notificationData, float notificationDisplayDuration) {
 
-        //this.icon.sprite = notificationData.GetIcon();
+        this.icon.sprite = notificationData.GetIcon();
         this.appNameText.text = notificationData.GetAppName();
         this.descriptionText.text = notificationData.GetDescription();
         this.notificationDisplayDuration = notificationDisplayDuration;
