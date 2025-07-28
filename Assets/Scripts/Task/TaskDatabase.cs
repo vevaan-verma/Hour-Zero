@@ -9,9 +9,9 @@ public class TaskDatabase : MonoBehaviour {
     private void Start() {
 
         #region VALIDATION
+        // make sure exactly one task data exists for each task type
         TaskType[] taskTypes = (TaskType[]) Enum.GetValues(typeof(TaskType)); // get all task types
 
-        // make sure exactly one task data exists for each task type
         foreach (TaskType taskType in taskTypes) {
 
             int count = 0;

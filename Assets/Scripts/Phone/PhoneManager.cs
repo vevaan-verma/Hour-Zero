@@ -31,6 +31,7 @@ public class PhoneManager : MonoBehaviour {
 
     [Header("State")]
     [SerializeField] private KeyCode phoneCycleKey;
+    private PhoneState[] phoneStateOrder;
     private PhoneState phoneState;
 
     [Header("Time")]
@@ -42,6 +43,8 @@ public class PhoneManager : MonoBehaviour {
         timeManager = FindFirstObjectByType<TimeManager>();
         uiManager = FindFirstObjectByType<UIManager>();
         animator = GetComponent<Animator>();
+
+        phoneStateOrder = (PhoneState[]) Enum.GetValues(typeof(PhoneState)); // get all phone states in order (order is defined by the enum declaration)
 
         notificationQueue = new Queue<NotificationData>(); // initialize the notification queue
 
@@ -85,9 +88,9 @@ public class PhoneManager : MonoBehaviour {
             // cycle through phone states and loop around
             phoneState++;
 
-            // reset to Pocket if it exceeds the last state
-            if (phoneState > PhoneState.Hand)
-                phoneState = PhoneState.Pocket;
+            // reset to first state if it exceeds the last state
+            if (phoneState > phoneStateOrder[^1])
+                phoneState = phoneStateOrder[0];
 
             switch (phoneState) {
 

@@ -51,8 +51,12 @@ public class PlayerController : MonoBehaviour {
     [SerializeField] private float grabRange;
     [SerializeField] private float grabStrength;
     [SerializeField] private LineRenderer grabLine;
+    [SerializeField] private float grabRotationMultiplier;
+    [SerializeField, Tooltip("If true, the grab rotation axes will be relative to the player, otherwise they will be relative to the world")] private bool axesRelativeToPlayer;
     private Rigidbody currGrabbedObject;
     private float currGrabbedObjectDistance;
+    private GrabRotateAxis grabRotateAxis;
+    private GrabRotateAxis[] grabRotateAxes;
     private Dictionary<GameObject, LayerMask> currGrabbedObjectLayers;
     private Vector3 grabOffset; // offset from the grab point to the grabbed object's position
 
@@ -95,6 +99,8 @@ public class PlayerController : MonoBehaviour {
         itemHolder = FindFirstObjectByType<ItemHolder>();
         phoneHolder = FindFirstObjectByType<PhoneHolder>();
         collider = GetComponent<Collider>();
+
+        grabRotateAxes = (GrabRotateAxis[]) System.Enum.GetValues(typeof(GrabRotateAxis)); // get all values of the GrabRotateAxis enum
 
         defaultYPos = cameraPos.localPosition.y; // for headbob
 
@@ -162,13 +168,17 @@ public class PlayerController : MonoBehaviour {
         #endregion
 
         #region HOTBAR
-        if (Input.mouseScrollDelta.y != 0f)
-            hotbar.CycleSlot(Input.mouseScrollDelta.y < 0f ? 1 : -1);
+        if (!currGrabbedObject) {
 
-        // check for number keys 1-9 to select hotbar slots
-        for (int i = 0; i < 9; i++)
-            if (Input.GetKeyDown((i + 1).ToString()))
-                hotbar.SelectSlot(i);
+            if (Input.mouseScrollDelta.y != 0f)
+                hotbar.CycleSlot(Input.mouseScrollDelta.y < 0f ? 1 : -1);
+
+            // check for number keys 1-9 to select hotbar slots
+            for (int i = 0; i < 9; i++)
+                if (Input.GetKeyDown((i + 1).ToString()))
+                    hotbar.SelectSlot(i);
+
+        }
         #endregion
 
         #region TOOL USAGE
@@ -196,11 +206,52 @@ public class PlayerController : MonoBehaviour {
             }
         }
 
-        if (currGrabbedObject)
+        if (currGrabbedObject) {
+
+            if (Input.GetMouseButtonDown(2)) { // check if the middle mouse button is pressed and cycle the rotation axis
+
+                // cycle through the grab rotate axes and loop around
+                grabRotateAxis++;
+
+                // reset to first axis if it exceeds the last axis
+                if (grabRotateAxis > grabRotateAxes[^1])
+                    grabRotateAxis = grabRotateAxes[0];
+
+            }
+
+            // check if the scroll wheel is used to rotate the grabbed object
+            if (Input.mouseScrollDelta.y != 0f) {
+
+                float rotationAmount = Input.mouseScrollDelta.y * grabRotationMultiplier; // calculate the rotation amount based on the scroll wheel input and the grab rotation multiplier
+                Vector3 axis = Vector3.zero;
+
+                // determine the axis of rotation based on the current grab rotate axis and whether it is relative to the player or world
+                switch (grabRotateAxis) {
+
+                    case GrabRotateAxis.X:
+                        axis = axesRelativeToPlayer ? transform.right : Vector3.right;
+                        break;
+
+                    case GrabRotateAxis.Y:
+                        axis = axesRelativeToPlayer ? transform.up : Vector3.up;
+                        break;
+
+                    case GrabRotateAxis.Z:
+                        axis = axesRelativeToPlayer ? transform.forward : Vector3.forward;
+                        break;
+
+                }
+
+                currGrabbedObject.MoveRotation(Quaternion.AngleAxis(rotationAmount, axis) * currGrabbedObject.rotation); // rotate the grabbed object around the specified axis by the specified amount; use MoveRotation to ensure the rotation is applied smoothly and physics interactions are preserved
+
+            }
+
             if (Input.GetMouseButtonUp(1)) // check if there is a currently grabbed object and the right mouse button is released and drop the grabbed object if so
                 DropGrabbedItem();
             else if (Vector3.Distance(cameraPos.position, currGrabbedObject.position) > grabRange) // check if the grabbed object is still within grab range and if not, drop it (use else if here because if the other condition is true, the currGrabbedObject will be dropped anyway)
                 DropGrabbedItem();
+
+        }
 
         UpdateGrabLine();
         #endregion
@@ -278,7 +329,7 @@ public class PlayerController : MonoBehaviour {
 
         if (currGrabbedObject) { // check if the player is grabbing an object
 
-            Vector3 targetPos = cameraPos.position + cameraPos.forward * currGrabbedObjectDistance + grabOffset;
+            Vector3 targetPos = cameraPos.position + cameraPos.forward * currGrabbedObjectDistance + cameraPos.rotation * grabOffset; // multiply the grab offset by the camera rotation to ensure the grabbed object follows the camera's orientation; this is the target position for the grabbed object
             Vector3 toTarget = targetPos - currGrabbedObject.position;
 
             float grabVelocityMultiplier = grabStrength / currGrabbedObject.mass; // make the grab velocity multiplier inversely proportional to the mass of the grabbed object, so lighter objects are easier to grab and throw
@@ -438,5 +489,11 @@ public class PlayerController : MonoBehaviour {
     public Transform GetCameraTransform() => cameraPos;
 
     public bool IsLookingAt(GameObject target) => Physics.Raycast(cameraPos.position, cameraPos.forward, out RaycastHit hit, interactRange) && hit.transform.gameObject == target;
+
+}
+
+public enum GrabRotateAxis {
+
+    X, Y, Z
 
 }
