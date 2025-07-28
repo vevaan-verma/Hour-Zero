@@ -8,7 +8,7 @@ public class PlayerController : MonoBehaviour {
     [SerializeField] private LayerMask nonPlayerMask; // mask for raycasts that should not hit the player
     private UIManager uiManager;
     private Rigidbody rb;
-    private Collider col;
+    private new Collider collider;
 
     [Header("Camera")]
     [SerializeField] private Transform cameraHolder;
@@ -43,13 +43,6 @@ public class PlayerController : MonoBehaviour {
     [SerializeField] private float interactRange;
 
     [Header("Holding")]
-    [SerializeField] private float swayAmount;
-    [SerializeField] private float swaySmoothness;
-    [SerializeField] private float rotationSwayAmount;
-    [SerializeField] private float rotationSwaySmoothness;
-    [SerializeField] private float breathingAmplitude;
-    [SerializeField] private float breathingFrequency;
-    [SerializeField, Tooltip("Deadzone for mouse movement to prevent jittering in sway effect")] private float mouseSwayDeadzone;
     [SerializeField] private LayerMask heldItemMask;
     private ItemHolder itemHolder;
     private HeldItem currHeldItem;
@@ -71,6 +64,9 @@ public class PlayerController : MonoBehaviour {
     [SerializeField] private float bobMovementThreshold; // minimum velocity to start headbob
     private float defaultYPos;
     private float timer;
+
+    [Header("Phone")]
+    private PhoneHolder phoneHolder;
 
     [Header("Ground Check")]
     [SerializeField] private Transform feet;
@@ -97,9 +93,8 @@ public class PlayerController : MonoBehaviour {
         rb = GetComponent<Rigidbody>();
         hotbar = FindFirstObjectByType<Hotbar>();
         itemHolder = FindFirstObjectByType<ItemHolder>();
-        col = GetComponent<Collider>();
-
-        itemHolder.Initialize(swayAmount, swaySmoothness, rotationSwayAmount, rotationSwaySmoothness, breathingAmplitude, breathingFrequency, mouseSwayDeadzone); // initialize the held item sway with the settings
+        phoneHolder = FindFirstObjectByType<PhoneHolder>();
+        collider = GetComponent<Collider>();
 
         defaultYPos = cameraPos.localPosition.y; // for headbob
 
@@ -243,13 +238,13 @@ public class PlayerController : MonoBehaviour {
             if (flightModeActive) {
 
                 rb.useGravity = false; // disable gravity when flight mode is activated
-                col.enabled = !noClipFlight; // disable collider when noclip flight is enabled to allow passing through objects
+                collider.enabled = !noClipFlight; // disable collider when noclip flight is enabled to allow passing through objects
 
             } else {
 
                 // no need to set the move speed here since it is already set to walk or sprint speed based on the input
                 rb.useGravity = true; // enable gravity when flight mode is deactivated
-                col.enabled = true; // enable collider when flight mode is deactivated or noclip flight is disabled
+                collider.enabled = true; // enable collider when flight mode is deactivated or noclip flight is disabled
 
             }
         }
@@ -288,7 +283,7 @@ public class PlayerController : MonoBehaviour {
 
             float grabVelocityMultiplier = grabStrength / currGrabbedObject.mass; // make the grab velocity multiplier inversely proportional to the mass of the grabbed object, so lighter objects are easier to grab and throw
 
-            currGrabbedObject.linearVelocity = toTarget * toTarget.magnitude * grabVelocityMultiplier;
+            currGrabbedObject.linearVelocity = grabVelocityMultiplier * toTarget.magnitude * toTarget;
 
         }
     }
@@ -298,10 +293,15 @@ public class PlayerController : MonoBehaviour {
         bool menuOpen = uiManager.IsMenuOpen();
 
         // if a menu is open, smoothly return the held item position to the center point
-        if (menuOpen)
-            itemHolder.SmoothReturnToCenter();
+        if (menuOpen) {
+
+            itemHolder.SmoothReturnToCenter(); // smoothly return the item holder to the center position when a menu is open
+            phoneHolder.SmoothReturnToCenter(); // smoothly return the phone holder to the center position when a menu is open
+
+        }
 
         itemHolder.HandleSway(mouseX, mouseY, true, !menuOpen, !menuOpen); // handle the sway effect for the held item based on mouse movement; use LateUpdate to calculate sway to ensure the sway happens after all other updates, preventing jittering; the breathe effect is always enabled, headbob is enabled when not in a menu, and sway is enabled when not in a menu
+        phoneHolder.HandleSway(mouseX, mouseY, !menuOpen, !menuOpen, !menuOpen); // handle the sway effect for the phone holder based on mouse movement; use LateUpdate to calculate sway to ensure the sway happens after all other updates, preventing jittering; the breathe effect is enabled when not in a menu, headbob is enabled when not in a menu, and sway is enabled when not in a menu
 
         cameraHolder.SetPositionAndRotation(cameraPos.position, cameraPos.rotation);
 
@@ -416,7 +416,7 @@ public class PlayerController : MonoBehaviour {
 
     }
 
-    public void SetCrosshair() {
+    private void SetCrosshair() {
 
         // order of priority:
         // 1. grabbing crosshair

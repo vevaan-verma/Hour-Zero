@@ -122,6 +122,7 @@ public class PhoneManager : MonoBehaviour {
 
     public void OnAppOpened(AppData appData) => openedAppData = appData; // set the currently opened app
 
+    #region NOTIFICATIONS
     public void SendNotification(AppType appType, string description) {
 
         AppData appData = Array.Find(phoneAppData, app => app.GetAppType() == appType); // find the app data for the specified app type
@@ -157,6 +158,7 @@ public class PhoneManager : MonoBehaviour {
         DisplayNextNotification(); // display the next notification if available
 
     }
+    #endregion
 
     private void UpdateTimeHUD(int day, int hour, int minute, bool isAM) {
 
@@ -260,7 +262,7 @@ public class AppData {
 
 public enum AppType {
 
-    Bunka, Todo, Notes, GPS
+    Bunka, Todo, Notes, FindAWay
 
 }
 

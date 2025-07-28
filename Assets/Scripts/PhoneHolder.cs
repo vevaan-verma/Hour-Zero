@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class ItemHolder : MonoBehaviour {
+public class PhoneHolder : MonoBehaviour {
 
     [Header("References")]
     private PlayerController playerController;
@@ -47,7 +47,7 @@ public class ItemHolder : MonoBehaviour {
 
         float breathingOffset = enableBreathing ? Mathf.Sin(Time.time * breathingFrequency) * breathingAmplitude : 0f; // add breathing offset (smooth up and down bobbing)
 
-        float headbobOffset = enableHeadbob ? playerController.GetHeadbobOffset() : 0f; // add headbob offset from the camera movement
+        float headbobOffset = enableHeadbob ? -playerController.GetHeadbobOffset() : 0f; // add headbob offset from the camera movement and flip it since the phone is in the left hand, which is opposite to the camera movement
 
         // calculate the target position and rotation based on mouse movement
         Vector3 targetPosition = initialPosition + new Vector3(mouseX, mouseY + breathingOffset + headbobOffset, 0f);

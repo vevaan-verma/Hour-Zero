@@ -9,8 +9,6 @@ public class HeldItem : MonoBehaviour {
     private Hotbar hotbar;
     private AudioPlayer audioPlayer;
     private Animator animator;
-    private Coroutine attackCoroutine;
-    private Coroutine useCoroutine;
 
     [Header("Settings")]
     private bool canAttack;
@@ -33,7 +31,7 @@ public class HeldItem : MonoBehaviour {
         if (animator == null || !item.CanAttack()) return; // prevent attempts to attack with the item before the animator is set or if the item cannot be attacked with
 
         if (!canAttack) return; // if the item cannot be attacked with, do nothing
-        attackCoroutine = StartCoroutine(HandleAttack());
+        StartCoroutine(HandleAttack());
 
     }
 
@@ -74,7 +72,6 @@ public class HeldItem : MonoBehaviour {
         yield return new WaitForSeconds(item.GetAttackCooldown()); // wait for the attack cooldown before allowing another attack
 
         canAttack = true; // allow attacking again after the cooldown is finished
-        attackCoroutine = null; // reset the attack coroutine to allow for another attack
 
     }
 
@@ -83,7 +80,7 @@ public class HeldItem : MonoBehaviour {
         if (animator == null || !item.CanUse()) return; // prevent attempts to use the item before the animator is set or if the item cannot be used
 
         if (!canUse) return; // if the item cannot be used, do nothing
-        useCoroutine = StartCoroutine(HandleUse());
+        StartCoroutine(HandleUse());
 
     }
 
@@ -110,7 +107,6 @@ public class HeldItem : MonoBehaviour {
         yield return new WaitForSeconds(item.GetUseCooldown()); // wait for the use cooldown before allowing another use
 
         canUse = true; // allow using again after the cooldown is finished
-        useCoroutine = null; // reset the use coroutine to allow for another use
 
     }
 

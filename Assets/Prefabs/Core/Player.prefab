@@ -417,11 +417,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 34800222cc3554b409c1147c03a5a29c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  cameraPos: {fileID: 4336792574799851453}
   dropPoint: {fileID: 6844621675373777242}
   nonPlayerMask:
     serializedVersion: 2
     m_Bits: 8127
+  cameraHolder: {fileID: 0}
+  cameraPos: {fileID: 4336792574799851453}
   walkSpeed: 4500
   sprintSpeed: 7000
   airMultiplier: 0.4
@@ -432,23 +433,16 @@ MonoBehaviour:
   jumpHeight: 12
   fallMultiplier: 2
   interactRange: 4
-  swayAmount: 0.02
-  swaySmoothness: 6
-  rotationSwayAmount: 4
-  rotationSwaySmoothness: 8
-  breathingAmplitude: 0.02
-  breathingFrequency: 1.5
-  mouseSwayDeadzone: 0.01
   heldItemMask:
     serializedVersion: 2
     m_Bits: 64
   grabRange: 5
   grabStrength: 40
   grabLine: {fileID: 4510350839201481505}
-  walkBobSpeed: 10
-  walkBobAmount: 0.08
-  sprintBobSpeed: 15
-  sprintBobAmount: 0.08
+  walkBobSpeed: 8
+  walkBobAmount: 0.12
+  sprintBobSpeed: 12
+  sprintBobAmount: 0.15
   bobMovementThreshold: 0.5
   feet: {fileID: 9201363252189034877}
   groundCheckDistance: 0.25
