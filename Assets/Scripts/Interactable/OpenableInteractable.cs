@@ -12,7 +12,10 @@ public class OpenableInteractable : Interactable {
     [SerializeField, Tooltip("Whether the item lock is intact by default, which requires the specified items to open or close the interactable when intact")] private bool itemLockIntact;
     [SerializeField, Tooltip("Whether the item lock should be broken when the interactable is interacted with")] private bool breakItemLockOnInteract;
     [SerializeField, Tooltip("Whether to wait for the animation to finish before allowing further interactions")] private bool waitForAnimation;
+    [SerializeField, Tooltip("Whether to automatically flip the state of the door after a duration")] private bool autoClose;
+    [SerializeField, Tooltip("Time to wait for autoClose")] private float autoCloseTimer;
     private bool isOpen;
+    private Coroutine autoCloseCoroutine;
 
     [Header("Sounds")]
     [SerializeField] private SFXLib.Sounds openSound;
@@ -67,6 +70,23 @@ public class OpenableInteractable : Interactable {
 
         }
 
+
+        if (autoClose) {
+
+            // if the auto close timer is running, cancel it, because the door is being closed manually prior to the expiration of the timer
+            // otherwise, start a new timer
+
+            if (autoCloseCoroutine != null) {
+
+                StopCoroutine(autoCloseCoroutine);
+                autoCloseCoroutine = null;
+
+            }
+            else
+                autoCloseCoroutine = StartCoroutine(HandleAutoClose(animator.GetCurrentAnimatorStateInfo(0).length));
+
+        }
+
         return true;
 
     }
@@ -99,6 +119,30 @@ public class OpenableInteractable : Interactable {
         yield return new WaitForSeconds(animator.GetCurrentAnimatorStateInfo(0).length); // wait for the interact animation to finish
 
         canInteract = true;
+
+    }
+
+    // additionalWait is used to factor the interact animation duration into the auto close timer
+    private IEnumerator HandleAutoClose(float additionalWait) {
+
+        float time = 0;
+
+        // wait for timer
+
+        while (time < autoCloseTimer + additionalWait) {
+
+            time += Time.deltaTime;
+
+            yield return new WaitForEndOfFrame();
+
+        }
+
+        // flip openable state
+
+        if (isOpen) Close();
+        else Open();
+
+        autoCloseCoroutine = null;
 
     }
 }

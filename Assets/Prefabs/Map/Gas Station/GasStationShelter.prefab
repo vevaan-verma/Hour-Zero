@@ -13,7 +13,7 @@ GameObject:
   - component: {fileID: 76593669992948557}
   - component: {fileID: 235357784662374153}
   - component: {fileID: 4545280760948759744}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: GasStationShelter
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -33,11 +33,11 @@ Transform:
   m_LocalScale: {x: 0.5, y: 0.5, z: 0.5}
   m_ConstrainProportionsScale: 0
   m_Children:
-  - {fileID: 6328834778013296687}
-  - {fileID: 1912469536471666183}
-  - {fileID: 869619049760700949}
-  - {fileID: 380695880526058994}
   - {fileID: 4162947319076554450}
+  - {fileID: 7843998309434488190}
+  - {fileID: 3333984671718109790}
+  - {fileID: 2956377706049601967}
+  - {fileID: 8642107042853560114}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!33 &6292645484299493116
@@ -148,7 +148,7 @@ GameObject:
   - component: {fileID: 1073019056403650353}
   - component: {fileID: 1831889215360055264}
   - component: {fileID: 916146529715803964}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: GasStationSignSmall
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -244,7 +244,7 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 1, y: 1, z: 1}
   m_Center: {x: 0, y: 0, z: 0}
---- !u!1001 &729973614570062450
+--- !u!1001 &3673296047871030408
 PrefabInstance:
   m_ObjectHideFlags: 0
   serializedVersion: 2
@@ -252,85 +252,89 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 6365714966996968923}
     m_Modifications:
-    - target: {fileID: 1429511603019900557, guid: 7e7d941b526fb2f4196dfd5515a0b748, type: 3}
-      propertyPath: m_StaticEditorFlags
-      value: 2147483647
-      objectReference: {fileID: 0}
-    - target: {fileID: 3559172715768475433, guid: 7e7d941b526fb2f4196dfd5515a0b748, type: 3}
-      propertyPath: m_Name
-      value: GasStationLight (9)
-      objectReference: {fileID: 0}
-    - target: {fileID: 3559172715768475433, guid: 7e7d941b526fb2f4196dfd5515a0b748, type: 3}
-      propertyPath: m_StaticEditorFlags
-      value: 2147483647
-      objectReference: {fileID: 0}
-    - target: {fileID: 6770575521001876061, guid: 7e7d941b526fb2f4196dfd5515a0b748, type: 3}
+    - target: {fileID: 2016771055809099047, guid: 25aa578f6d6e40840bab5cc8707042f6, type: 3}
       propertyPath: m_LocalScale.x
       value: 2
       objectReference: {fileID: 0}
-    - target: {fileID: 6770575521001876061, guid: 7e7d941b526fb2f4196dfd5515a0b748, type: 3}
+    - target: {fileID: 2016771055809099047, guid: 25aa578f6d6e40840bab5cc8707042f6, type: 3}
       propertyPath: m_LocalScale.y
       value: 2
       objectReference: {fileID: 0}
-    - target: {fileID: 6770575521001876061, guid: 7e7d941b526fb2f4196dfd5515a0b748, type: 3}
+    - target: {fileID: 2016771055809099047, guid: 25aa578f6d6e40840bab5cc8707042f6, type: 3}
       propertyPath: m_LocalScale.z
       value: 2
       objectReference: {fileID: 0}
-    - target: {fileID: 6770575521001876061, guid: 7e7d941b526fb2f4196dfd5515a0b748, type: 3}
+    - target: {fileID: 2016771055809099047, guid: 25aa578f6d6e40840bab5cc8707042f6, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 1.5
+      value: 0.5
       objectReference: {fileID: 0}
-    - target: {fileID: 6770575521001876061, guid: 7e7d941b526fb2f4196dfd5515a0b748, type: 3}
+    - target: {fileID: 2016771055809099047, guid: 25aa578f6d6e40840bab5cc8707042f6, type: 3}
       propertyPath: m_LocalPosition.y
-      value: -1.98
+      value: -2
       objectReference: {fileID: 0}
-    - target: {fileID: 6770575521001876061, guid: 7e7d941b526fb2f4196dfd5515a0b748, type: 3}
+    - target: {fileID: 2016771055809099047, guid: 25aa578f6d6e40840bab5cc8707042f6, type: 3}
       propertyPath: m_LocalPosition.z
-      value: -6.52
+      value: 23.17
       objectReference: {fileID: 0}
-    - target: {fileID: 6770575521001876061, guid: 7e7d941b526fb2f4196dfd5515a0b748, type: 3}
+    - target: {fileID: 2016771055809099047, guid: 25aa578f6d6e40840bab5cc8707042f6, type: 3}
       propertyPath: m_LocalRotation.w
       value: 1
       objectReference: {fileID: 0}
-    - target: {fileID: 6770575521001876061, guid: 7e7d941b526fb2f4196dfd5515a0b748, type: 3}
+    - target: {fileID: 2016771055809099047, guid: 25aa578f6d6e40840bab5cc8707042f6, type: 3}
       propertyPath: m_LocalRotation.x
       value: -0
       objectReference: {fileID: 0}
-    - target: {fileID: 6770575521001876061, guid: 7e7d941b526fb2f4196dfd5515a0b748, type: 3}
+    - target: {fileID: 2016771055809099047, guid: 25aa578f6d6e40840bab5cc8707042f6, type: 3}
       propertyPath: m_LocalRotation.y
       value: -0
       objectReference: {fileID: 0}
-    - target: {fileID: 6770575521001876061, guid: 7e7d941b526fb2f4196dfd5515a0b748, type: 3}
+    - target: {fileID: 2016771055809099047, guid: 25aa578f6d6e40840bab5cc8707042f6, type: 3}
       propertyPath: m_LocalRotation.z
       value: -0
       objectReference: {fileID: 0}
-    - target: {fileID: 6770575521001876061, guid: 7e7d941b526fb2f4196dfd5515a0b748, type: 3}
+    - target: {fileID: 2016771055809099047, guid: 25aa578f6d6e40840bab5cc8707042f6, type: 3}
       propertyPath: m_LocalEulerAnglesHint.x
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 6770575521001876061, guid: 7e7d941b526fb2f4196dfd5515a0b748, type: 3}
+    - target: {fileID: 2016771055809099047, guid: 25aa578f6d6e40840bab5cc8707042f6, type: 3}
       propertyPath: m_LocalEulerAnglesHint.y
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 6770575521001876061, guid: 7e7d941b526fb2f4196dfd5515a0b748, type: 3}
+    - target: {fileID: 2016771055809099047, guid: 25aa578f6d6e40840bab5cc8707042f6, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 7129318361976511255, guid: 7e7d941b526fb2f4196dfd5515a0b748, type: 3}
-      propertyPath: m_StaticEditorFlags
-      value: 2147483647
+    - target: {fileID: 2664025691540440173, guid: 25aa578f6d6e40840bab5cc8707042f6, type: 3}
+      propertyPath: m_Layer
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 3280057959172688035, guid: 25aa578f6d6e40840bab5cc8707042f6, type: 3}
+      propertyPath: m_Layer
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 6187467866011548151, guid: 25aa578f6d6e40840bab5cc8707042f6, type: 3}
+      propertyPath: m_Layer
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 8605341761636380755, guid: 25aa578f6d6e40840bab5cc8707042f6, type: 3}
+      propertyPath: m_Name
+      value: GasStationLight (Spot) (5)
+      objectReference: {fileID: 0}
+    - target: {fileID: 8605341761636380755, guid: 25aa578f6d6e40840bab5cc8707042f6, type: 3}
+      propertyPath: m_Layer
+      value: 3
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
     m_AddedComponents: []
-  m_SourcePrefab: {fileID: 100100000, guid: 7e7d941b526fb2f4196dfd5515a0b748, type: 3}
---- !u!4 &6328834778013296687 stripped
+  m_SourcePrefab: {fileID: 100100000, guid: 25aa578f6d6e40840bab5cc8707042f6, type: 3}
+--- !u!4 &2956377706049601967 stripped
 Transform:
-  m_CorrespondingSourceObject: {fileID: 6770575521001876061, guid: 7e7d941b526fb2f4196dfd5515a0b748, type: 3}
-  m_PrefabInstance: {fileID: 729973614570062450}
+  m_CorrespondingSourceObject: {fileID: 2016771055809099047, guid: 25aa578f6d6e40840bab5cc8707042f6, type: 3}
+  m_PrefabInstance: {fileID: 3673296047871030408}
   m_PrefabAsset: {fileID: 0}
---- !u!1001 &5152010742662423642
+--- !u!1001 &3871323206842353529
 PrefabInstance:
   m_ObjectHideFlags: 0
   serializedVersion: 2
@@ -338,85 +342,89 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 6365714966996968923}
     m_Modifications:
-    - target: {fileID: 1429511603019900557, guid: 7e7d941b526fb2f4196dfd5515a0b748, type: 3}
-      propertyPath: m_StaticEditorFlags
-      value: 2147483647
-      objectReference: {fileID: 0}
-    - target: {fileID: 3559172715768475433, guid: 7e7d941b526fb2f4196dfd5515a0b748, type: 3}
-      propertyPath: m_Name
-      value: GasStationLight (8)
-      objectReference: {fileID: 0}
-    - target: {fileID: 3559172715768475433, guid: 7e7d941b526fb2f4196dfd5515a0b748, type: 3}
-      propertyPath: m_StaticEditorFlags
-      value: 2147483647
-      objectReference: {fileID: 0}
-    - target: {fileID: 6770575521001876061, guid: 7e7d941b526fb2f4196dfd5515a0b748, type: 3}
+    - target: {fileID: 2016771055809099047, guid: 25aa578f6d6e40840bab5cc8707042f6, type: 3}
       propertyPath: m_LocalScale.x
       value: 2
       objectReference: {fileID: 0}
-    - target: {fileID: 6770575521001876061, guid: 7e7d941b526fb2f4196dfd5515a0b748, type: 3}
+    - target: {fileID: 2016771055809099047, guid: 25aa578f6d6e40840bab5cc8707042f6, type: 3}
       propertyPath: m_LocalScale.y
       value: 2
       objectReference: {fileID: 0}
-    - target: {fileID: 6770575521001876061, guid: 7e7d941b526fb2f4196dfd5515a0b748, type: 3}
+    - target: {fileID: 2016771055809099047, guid: 25aa578f6d6e40840bab5cc8707042f6, type: 3}
       propertyPath: m_LocalScale.z
       value: 2
       objectReference: {fileID: 0}
-    - target: {fileID: 6770575521001876061, guid: 7e7d941b526fb2f4196dfd5515a0b748, type: 3}
+    - target: {fileID: 2016771055809099047, guid: 25aa578f6d6e40840bab5cc8707042f6, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 1.5
+      value: 0.5
       objectReference: {fileID: 0}
-    - target: {fileID: 6770575521001876061, guid: 7e7d941b526fb2f4196dfd5515a0b748, type: 3}
+    - target: {fileID: 2016771055809099047, guid: 25aa578f6d6e40840bab5cc8707042f6, type: 3}
       propertyPath: m_LocalPosition.y
-      value: -1.98
+      value: -2
       objectReference: {fileID: 0}
-    - target: {fileID: 6770575521001876061, guid: 7e7d941b526fb2f4196dfd5515a0b748, type: 3}
+    - target: {fileID: 2016771055809099047, guid: 25aa578f6d6e40840bab5cc8707042f6, type: 3}
       propertyPath: m_LocalPosition.z
-      value: 23.12
+      value: -9.5
       objectReference: {fileID: 0}
-    - target: {fileID: 6770575521001876061, guid: 7e7d941b526fb2f4196dfd5515a0b748, type: 3}
+    - target: {fileID: 2016771055809099047, guid: 25aa578f6d6e40840bab5cc8707042f6, type: 3}
       propertyPath: m_LocalRotation.w
       value: 1
       objectReference: {fileID: 0}
-    - target: {fileID: 6770575521001876061, guid: 7e7d941b526fb2f4196dfd5515a0b748, type: 3}
+    - target: {fileID: 2016771055809099047, guid: 25aa578f6d6e40840bab5cc8707042f6, type: 3}
       propertyPath: m_LocalRotation.x
       value: -0
       objectReference: {fileID: 0}
-    - target: {fileID: 6770575521001876061, guid: 7e7d941b526fb2f4196dfd5515a0b748, type: 3}
+    - target: {fileID: 2016771055809099047, guid: 25aa578f6d6e40840bab5cc8707042f6, type: 3}
       propertyPath: m_LocalRotation.y
       value: -0
       objectReference: {fileID: 0}
-    - target: {fileID: 6770575521001876061, guid: 7e7d941b526fb2f4196dfd5515a0b748, type: 3}
+    - target: {fileID: 2016771055809099047, guid: 25aa578f6d6e40840bab5cc8707042f6, type: 3}
       propertyPath: m_LocalRotation.z
       value: -0
       objectReference: {fileID: 0}
-    - target: {fileID: 6770575521001876061, guid: 7e7d941b526fb2f4196dfd5515a0b748, type: 3}
+    - target: {fileID: 2016771055809099047, guid: 25aa578f6d6e40840bab5cc8707042f6, type: 3}
       propertyPath: m_LocalEulerAnglesHint.x
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 6770575521001876061, guid: 7e7d941b526fb2f4196dfd5515a0b748, type: 3}
+    - target: {fileID: 2016771055809099047, guid: 25aa578f6d6e40840bab5cc8707042f6, type: 3}
       propertyPath: m_LocalEulerAnglesHint.y
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 6770575521001876061, guid: 7e7d941b526fb2f4196dfd5515a0b748, type: 3}
+    - target: {fileID: 2016771055809099047, guid: 25aa578f6d6e40840bab5cc8707042f6, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 7129318361976511255, guid: 7e7d941b526fb2f4196dfd5515a0b748, type: 3}
-      propertyPath: m_StaticEditorFlags
-      value: 2147483647
+    - target: {fileID: 2664025691540440173, guid: 25aa578f6d6e40840bab5cc8707042f6, type: 3}
+      propertyPath: m_Layer
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 3280057959172688035, guid: 25aa578f6d6e40840bab5cc8707042f6, type: 3}
+      propertyPath: m_Layer
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 6187467866011548151, guid: 25aa578f6d6e40840bab5cc8707042f6, type: 3}
+      propertyPath: m_Layer
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 8605341761636380755, guid: 25aa578f6d6e40840bab5cc8707042f6, type: 3}
+      propertyPath: m_Name
+      value: GasStationLight (Spot) (7)
+      objectReference: {fileID: 0}
+    - target: {fileID: 8605341761636380755, guid: 25aa578f6d6e40840bab5cc8707042f6, type: 3}
+      propertyPath: m_Layer
+      value: 3
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
     m_AddedComponents: []
-  m_SourcePrefab: {fileID: 100100000, guid: 7e7d941b526fb2f4196dfd5515a0b748, type: 3}
---- !u!4 &1912469536471666183 stripped
+  m_SourcePrefab: {fileID: 100100000, guid: 25aa578f6d6e40840bab5cc8707042f6, type: 3}
+--- !u!4 &3333984671718109790 stripped
 Transform:
-  m_CorrespondingSourceObject: {fileID: 6770575521001876061, guid: 7e7d941b526fb2f4196dfd5515a0b748, type: 3}
-  m_PrefabInstance: {fileID: 5152010742662423642}
+  m_CorrespondingSourceObject: {fileID: 2016771055809099047, guid: 25aa578f6d6e40840bab5cc8707042f6, type: 3}
+  m_PrefabInstance: {fileID: 3871323206842353529}
   m_PrefabAsset: {fileID: 0}
---- !u!1001 &5900959589408673864
+--- !u!1001 &7787827692626930197
 PrefabInstance:
   m_ObjectHideFlags: 0
   serializedVersion: 2
@@ -424,85 +432,89 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 6365714966996968923}
     m_Modifications:
-    - target: {fileID: 1429511603019900557, guid: 7e7d941b526fb2f4196dfd5515a0b748, type: 3}
-      propertyPath: m_StaticEditorFlags
-      value: 2147483647
-      objectReference: {fileID: 0}
-    - target: {fileID: 3559172715768475433, guid: 7e7d941b526fb2f4196dfd5515a0b748, type: 3}
-      propertyPath: m_Name
-      value: GasStationLight (3)
-      objectReference: {fileID: 0}
-    - target: {fileID: 3559172715768475433, guid: 7e7d941b526fb2f4196dfd5515a0b748, type: 3}
-      propertyPath: m_StaticEditorFlags
-      value: 2147483647
-      objectReference: {fileID: 0}
-    - target: {fileID: 6770575521001876061, guid: 7e7d941b526fb2f4196dfd5515a0b748, type: 3}
+    - target: {fileID: 2016771055809099047, guid: 25aa578f6d6e40840bab5cc8707042f6, type: 3}
       propertyPath: m_LocalScale.x
       value: 2
       objectReference: {fileID: 0}
-    - target: {fileID: 6770575521001876061, guid: 7e7d941b526fb2f4196dfd5515a0b748, type: 3}
+    - target: {fileID: 2016771055809099047, guid: 25aa578f6d6e40840bab5cc8707042f6, type: 3}
       propertyPath: m_LocalScale.y
       value: 2
       objectReference: {fileID: 0}
-    - target: {fileID: 6770575521001876061, guid: 7e7d941b526fb2f4196dfd5515a0b748, type: 3}
+    - target: {fileID: 2016771055809099047, guid: 25aa578f6d6e40840bab5cc8707042f6, type: 3}
       propertyPath: m_LocalScale.z
       value: 2
       objectReference: {fileID: 0}
-    - target: {fileID: 6770575521001876061, guid: 7e7d941b526fb2f4196dfd5515a0b748, type: 3}
+    - target: {fileID: 2016771055809099047, guid: 25aa578f6d6e40840bab5cc8707042f6, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 1.5
+      value: 0.5
       objectReference: {fileID: 0}
-    - target: {fileID: 6770575521001876061, guid: 7e7d941b526fb2f4196dfd5515a0b748, type: 3}
+    - target: {fileID: 2016771055809099047, guid: 25aa578f6d6e40840bab5cc8707042f6, type: 3}
       propertyPath: m_LocalPosition.y
-      value: -1.98
+      value: -2
       objectReference: {fileID: 0}
-    - target: {fileID: 6770575521001876061, guid: 7e7d941b526fb2f4196dfd5515a0b748, type: 3}
+    - target: {fileID: 2016771055809099047, guid: 25aa578f6d6e40840bab5cc8707042f6, type: 3}
       propertyPath: m_LocalPosition.z
       value: 55.5
       objectReference: {fileID: 0}
-    - target: {fileID: 6770575521001876061, guid: 7e7d941b526fb2f4196dfd5515a0b748, type: 3}
+    - target: {fileID: 2016771055809099047, guid: 25aa578f6d6e40840bab5cc8707042f6, type: 3}
       propertyPath: m_LocalRotation.w
       value: 1
       objectReference: {fileID: 0}
-    - target: {fileID: 6770575521001876061, guid: 7e7d941b526fb2f4196dfd5515a0b748, type: 3}
+    - target: {fileID: 2016771055809099047, guid: 25aa578f6d6e40840bab5cc8707042f6, type: 3}
       propertyPath: m_LocalRotation.x
       value: -0
       objectReference: {fileID: 0}
-    - target: {fileID: 6770575521001876061, guid: 7e7d941b526fb2f4196dfd5515a0b748, type: 3}
+    - target: {fileID: 2016771055809099047, guid: 25aa578f6d6e40840bab5cc8707042f6, type: 3}
       propertyPath: m_LocalRotation.y
       value: -0
       objectReference: {fileID: 0}
-    - target: {fileID: 6770575521001876061, guid: 7e7d941b526fb2f4196dfd5515a0b748, type: 3}
+    - target: {fileID: 2016771055809099047, guid: 25aa578f6d6e40840bab5cc8707042f6, type: 3}
       propertyPath: m_LocalRotation.z
       value: -0
       objectReference: {fileID: 0}
-    - target: {fileID: 6770575521001876061, guid: 7e7d941b526fb2f4196dfd5515a0b748, type: 3}
+    - target: {fileID: 2016771055809099047, guid: 25aa578f6d6e40840bab5cc8707042f6, type: 3}
       propertyPath: m_LocalEulerAnglesHint.x
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 6770575521001876061, guid: 7e7d941b526fb2f4196dfd5515a0b748, type: 3}
+    - target: {fileID: 2016771055809099047, guid: 25aa578f6d6e40840bab5cc8707042f6, type: 3}
       propertyPath: m_LocalEulerAnglesHint.y
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 6770575521001876061, guid: 7e7d941b526fb2f4196dfd5515a0b748, type: 3}
+    - target: {fileID: 2016771055809099047, guid: 25aa578f6d6e40840bab5cc8707042f6, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 7129318361976511255, guid: 7e7d941b526fb2f4196dfd5515a0b748, type: 3}
-      propertyPath: m_StaticEditorFlags
-      value: 2147483647
+    - target: {fileID: 2664025691540440173, guid: 25aa578f6d6e40840bab5cc8707042f6, type: 3}
+      propertyPath: m_Layer
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 3280057959172688035, guid: 25aa578f6d6e40840bab5cc8707042f6, type: 3}
+      propertyPath: m_Layer
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 6187467866011548151, guid: 25aa578f6d6e40840bab5cc8707042f6, type: 3}
+      propertyPath: m_Layer
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 8605341761636380755, guid: 25aa578f6d6e40840bab5cc8707042f6, type: 3}
+      propertyPath: m_Name
+      value: GasStationLight (Spot) (6)
+      objectReference: {fileID: 0}
+    - target: {fileID: 8605341761636380755, guid: 25aa578f6d6e40840bab5cc8707042f6, type: 3}
+      propertyPath: m_Layer
+      value: 3
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
     m_AddedComponents: []
-  m_SourcePrefab: {fileID: 100100000, guid: 7e7d941b526fb2f4196dfd5515a0b748, type: 3}
---- !u!4 &869619049760700949 stripped
+  m_SourcePrefab: {fileID: 100100000, guid: 25aa578f6d6e40840bab5cc8707042f6, type: 3}
+--- !u!4 &8642107042853560114 stripped
 Transform:
-  m_CorrespondingSourceObject: {fileID: 6770575521001876061, guid: 7e7d941b526fb2f4196dfd5515a0b748, type: 3}
-  m_PrefabInstance: {fileID: 5900959589408673864}
+  m_CorrespondingSourceObject: {fileID: 2016771055809099047, guid: 25aa578f6d6e40840bab5cc8707042f6, type: 3}
+  m_PrefabInstance: {fileID: 7787827692626930197}
   m_PrefabAsset: {fileID: 0}
---- !u!1001 &6394384086218080175
+--- !u!1001 &8585682162904268889
 PrefabInstance:
   m_ObjectHideFlags: 0
   serializedVersion: 2
@@ -510,81 +522,85 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 6365714966996968923}
     m_Modifications:
-    - target: {fileID: 1429511603019900557, guid: 7e7d941b526fb2f4196dfd5515a0b748, type: 3}
-      propertyPath: m_StaticEditorFlags
-      value: 2147483647
-      objectReference: {fileID: 0}
-    - target: {fileID: 3559172715768475433, guid: 7e7d941b526fb2f4196dfd5515a0b748, type: 3}
-      propertyPath: m_Name
-      value: GasStationLight (5)
-      objectReference: {fileID: 0}
-    - target: {fileID: 3559172715768475433, guid: 7e7d941b526fb2f4196dfd5515a0b748, type: 3}
-      propertyPath: m_StaticEditorFlags
-      value: 2147483647
-      objectReference: {fileID: 0}
-    - target: {fileID: 6770575521001876061, guid: 7e7d941b526fb2f4196dfd5515a0b748, type: 3}
+    - target: {fileID: 2016771055809099047, guid: 25aa578f6d6e40840bab5cc8707042f6, type: 3}
       propertyPath: m_LocalScale.x
       value: 2
       objectReference: {fileID: 0}
-    - target: {fileID: 6770575521001876061, guid: 7e7d941b526fb2f4196dfd5515a0b748, type: 3}
+    - target: {fileID: 2016771055809099047, guid: 25aa578f6d6e40840bab5cc8707042f6, type: 3}
       propertyPath: m_LocalScale.y
       value: 2
       objectReference: {fileID: 0}
-    - target: {fileID: 6770575521001876061, guid: 7e7d941b526fb2f4196dfd5515a0b748, type: 3}
+    - target: {fileID: 2016771055809099047, guid: 25aa578f6d6e40840bab5cc8707042f6, type: 3}
       propertyPath: m_LocalScale.z
       value: 2
       objectReference: {fileID: 0}
-    - target: {fileID: 6770575521001876061, guid: 7e7d941b526fb2f4196dfd5515a0b748, type: 3}
+    - target: {fileID: 2016771055809099047, guid: 25aa578f6d6e40840bab5cc8707042f6, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 1.5
+      value: 0.5
       objectReference: {fileID: 0}
-    - target: {fileID: 6770575521001876061, guid: 7e7d941b526fb2f4196dfd5515a0b748, type: 3}
+    - target: {fileID: 2016771055809099047, guid: 25aa578f6d6e40840bab5cc8707042f6, type: 3}
       propertyPath: m_LocalPosition.y
-      value: -1.98
+      value: -2
       objectReference: {fileID: 0}
-    - target: {fileID: 6770575521001876061, guid: 7e7d941b526fb2f4196dfd5515a0b748, type: 3}
+    - target: {fileID: 2016771055809099047, guid: 25aa578f6d6e40840bab5cc8707042f6, type: 3}
       propertyPath: m_LocalPosition.z
-      value: -36.67
+      value: -36.508026
       objectReference: {fileID: 0}
-    - target: {fileID: 6770575521001876061, guid: 7e7d941b526fb2f4196dfd5515a0b748, type: 3}
+    - target: {fileID: 2016771055809099047, guid: 25aa578f6d6e40840bab5cc8707042f6, type: 3}
       propertyPath: m_LocalRotation.w
       value: 1
       objectReference: {fileID: 0}
-    - target: {fileID: 6770575521001876061, guid: 7e7d941b526fb2f4196dfd5515a0b748, type: 3}
+    - target: {fileID: 2016771055809099047, guid: 25aa578f6d6e40840bab5cc8707042f6, type: 3}
       propertyPath: m_LocalRotation.x
       value: -0
       objectReference: {fileID: 0}
-    - target: {fileID: 6770575521001876061, guid: 7e7d941b526fb2f4196dfd5515a0b748, type: 3}
+    - target: {fileID: 2016771055809099047, guid: 25aa578f6d6e40840bab5cc8707042f6, type: 3}
       propertyPath: m_LocalRotation.y
       value: -0
       objectReference: {fileID: 0}
-    - target: {fileID: 6770575521001876061, guid: 7e7d941b526fb2f4196dfd5515a0b748, type: 3}
+    - target: {fileID: 2016771055809099047, guid: 25aa578f6d6e40840bab5cc8707042f6, type: 3}
       propertyPath: m_LocalRotation.z
       value: -0
       objectReference: {fileID: 0}
-    - target: {fileID: 6770575521001876061, guid: 7e7d941b526fb2f4196dfd5515a0b748, type: 3}
+    - target: {fileID: 2016771055809099047, guid: 25aa578f6d6e40840bab5cc8707042f6, type: 3}
       propertyPath: m_LocalEulerAnglesHint.x
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 6770575521001876061, guid: 7e7d941b526fb2f4196dfd5515a0b748, type: 3}
+    - target: {fileID: 2016771055809099047, guid: 25aa578f6d6e40840bab5cc8707042f6, type: 3}
       propertyPath: m_LocalEulerAnglesHint.y
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 6770575521001876061, guid: 7e7d941b526fb2f4196dfd5515a0b748, type: 3}
+    - target: {fileID: 2016771055809099047, guid: 25aa578f6d6e40840bab5cc8707042f6, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 7129318361976511255, guid: 7e7d941b526fb2f4196dfd5515a0b748, type: 3}
-      propertyPath: m_StaticEditorFlags
-      value: 2147483647
+    - target: {fileID: 2664025691540440173, guid: 25aa578f6d6e40840bab5cc8707042f6, type: 3}
+      propertyPath: m_Layer
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 3280057959172688035, guid: 25aa578f6d6e40840bab5cc8707042f6, type: 3}
+      propertyPath: m_Layer
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 6187467866011548151, guid: 25aa578f6d6e40840bab5cc8707042f6, type: 3}
+      propertyPath: m_Layer
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 8605341761636380755, guid: 25aa578f6d6e40840bab5cc8707042f6, type: 3}
+      propertyPath: m_Name
+      value: GasStationLight (Spot) (4)
+      objectReference: {fileID: 0}
+    - target: {fileID: 8605341761636380755, guid: 25aa578f6d6e40840bab5cc8707042f6, type: 3}
+      propertyPath: m_Layer
+      value: 3
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
     m_AddedComponents: []
-  m_SourcePrefab: {fileID: 100100000, guid: 7e7d941b526fb2f4196dfd5515a0b748, type: 3}
---- !u!4 &380695880526058994 stripped
+  m_SourcePrefab: {fileID: 100100000, guid: 25aa578f6d6e40840bab5cc8707042f6, type: 3}
+--- !u!4 &7843998309434488190 stripped
 Transform:
-  m_CorrespondingSourceObject: {fileID: 6770575521001876061, guid: 7e7d941b526fb2f4196dfd5515a0b748, type: 3}
-  m_PrefabInstance: {fileID: 6394384086218080175}
+  m_CorrespondingSourceObject: {fileID: 2016771055809099047, guid: 25aa578f6d6e40840bab5cc8707042f6, type: 3}
+  m_PrefabInstance: {fileID: 8585682162904268889}
   m_PrefabAsset: {fileID: 0}

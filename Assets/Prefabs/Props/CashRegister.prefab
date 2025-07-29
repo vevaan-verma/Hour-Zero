@@ -30,7 +30,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: -0.19766596, z: 0, w: 0.9802695}
   m_LocalPosition: {x: 210.5095, y: 132.636, z: 69.20246}
-  m_LocalScale: {x: 1.2387, y: 1.2387, z: 1.2387}
+  m_LocalScale: {x: 1.2387002, y: 1.2387, z: 1.2387002}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 1572549852666290908}
@@ -85,11 +85,12 @@ MonoBehaviour:
   requireBackpackItems: 0
   requiredBackpackItems: []
   consumeBackpackItems: 0
-  interactIndicatorLerpDuration: 0.1
   isInitiallyOpen: 0
   itemLockIntact: 0
   breakItemLockOnInteract: 0
-  waitForAnimation: 0
+  waitForAnimation: 1
+  autoClose: 0
+  autoCloseTimer: 0
   openSound: 8
   closeSound: 9
   openedText: Use
@@ -139,6 +140,7 @@ GameObject:
   - component: {fileID: 5413231536787022691}
   - component: {fileID: 4123242975345875222}
   - component: {fileID: 5944549653939721149}
+  - component: {fileID: 2578977995269133928}
   m_Layer: 0
   m_Name: Drawer.002
   m_TagString: Untagged
@@ -216,6 +218,27 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
+--- !u!65 &2578977995269133928
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4273603234957295063}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 0.5468047, y: 0.10826366, z: 0.58360595}
+  m_Center: {x: 0.0001448542, y: 0.01238171, z: -0.027714495}
 --- !u!1 &6081716169918344721
 GameObject:
   m_ObjectHideFlags: 0

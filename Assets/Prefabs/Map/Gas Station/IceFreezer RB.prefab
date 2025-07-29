@@ -58,15 +58,15 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1325624302474737775, guid: b6ef2b98f282a1642af270649aaf1fdd, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 44.94905
+      value: 44.369
       objectReference: {fileID: 0}
     - target: {fileID: 1325624302474737775, guid: b6ef2b98f282a1642af270649aaf1fdd, type: 3}
       propertyPath: m_LocalPosition.y
-      value: -1.0402374
+      value: -0.78
       objectReference: {fileID: 0}
     - target: {fileID: 1325624302474737775, guid: b6ef2b98f282a1642af270649aaf1fdd, type: 3}
       propertyPath: m_LocalPosition.z
-      value: 41.62023
+      value: 42.307
       objectReference: {fileID: 0}
     - target: {fileID: 1325624302474737775, guid: b6ef2b98f282a1642af270649aaf1fdd, type: 3}
       propertyPath: m_LocalRotation.w
@@ -203,6 +203,12 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 5221829853087914528, guid: b6ef2b98f282a1642af270649aaf1fdd, type: 3}
       insertIndex: -1
       addedObject: {fileID: 377089885356436331}
+    - targetCorrespondingSourceObject: {fileID: 5221829853087914528, guid: b6ef2b98f282a1642af270649aaf1fdd, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 2333725119706720274}
+    - targetCorrespondingSourceObject: {fileID: 5221829853087914528, guid: b6ef2b98f282a1642af270649aaf1fdd, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 5727283380869875160}
     - targetCorrespondingSourceObject: {fileID: 8380176763338736061, guid: b6ef2b98f282a1642af270649aaf1fdd, type: 3}
       insertIndex: -1
       addedObject: {fileID: 1105207575762391635}
@@ -276,3 +282,31 @@ Rigidbody:
   m_Interpolate: 1
   m_Constraints: 0
   m_CollisionDetection: 2
+--- !u!114 &2333725119706720274
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4183383712661060389}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 56427b6021941a348bbd3f964a3b1ea8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  colSound: 16
+  linkedToBreakableProp: 0
+  breakableProp: {fileID: 0}
+  ignorePlayerCollisions: 0
+--- !u!114 &5727283380869875160
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4183383712661060389}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f7be6f1ab43efd74f90a10be906d53e5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 

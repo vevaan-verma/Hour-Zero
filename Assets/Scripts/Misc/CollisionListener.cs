@@ -16,6 +16,8 @@ public class CollisionListener : MonoBehaviour {
     [Header("Constants")]
     // prevents spammy and broken collision detections and makes the behavior more reliable
     private const float collisionRegisterDelay = 0.12f;
+    // set on start only
+    private const float initialCollisionRegisterDelay = 1.5f;
     // prevents audio spam 
     private const float minSpeedForSound = 2.5f;
 
@@ -41,7 +43,7 @@ public class CollisionListener : MonoBehaviour {
         rb = GetComponent<Rigidbody>();
         audioPlayer = GetComponent<AudioPlayer>();
 
-        cooldown = collisionRegisterDelay;
+        cooldown = initialCollisionRegisterDelay;
 
         if (linkedToBreakableProp == true && breakableProp == null)
             Debug.LogError("CollisionListener " + gameObject.name + " (Parent: " + transform.parent.gameObject.name + ") is set as linked to a breakable prop, but no breakable prop has been assigned to it.");

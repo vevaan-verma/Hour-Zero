@@ -16,7 +16,7 @@ GameObject:
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
+  m_StaticEditorFlags: 126
   m_IsActive: 1
 --- !u!4 &8295103481306204428
 Transform:
@@ -27,7 +27,7 @@ Transform:
   m_GameObject: {fileID: 3280057959172688035}
   serializedVersion: 2
   m_LocalRotation: {x: -0.70710665, y: -0, z: -0, w: -0.70710695}
-  m_LocalPosition: {x: 0, y: -0.53569263, z: 0}
+  m_LocalPosition: {x: 0, y: -0.68469286, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -44,10 +44,10 @@ Light:
   serializedVersion: 11
   m_Type: 0
   m_Color: {r: 1, g: 1, b: 1, a: 1}
-  m_Intensity: 23
-  m_Range: 24.8
-  m_SpotAngle: 168.904
-  m_InnerSpotAngle: 81.624
+  m_Intensity: 200
+  m_Range: 12
+  m_SpotAngle: 119.688866
+  m_InnerSpotAngle: 0
   m_CookieSize: 10
   m_Shadows:
     m_Type: 2
@@ -83,7 +83,7 @@ Light:
     serializedVersion: 2
     m_Bits: 4294967295
   m_RenderingLayerMask: 1
-  m_Lightmapping: 1
+  m_Lightmapping: 4
   m_LightShadowCasterMode: 0
   m_AreaSize: {x: 1, y: 1}
   m_BounceIntensity: 1
@@ -112,7 +112,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_Version: 3
   m_UsePipelineSettings: 1
-  m_AdditionalLightsShadowResolutionTier: 0
+  m_AdditionalLightsShadowResolutionTier: 2
   m_LightLayerMask: 1
   m_RenderingLayers: 1
   m_CustomShadowLayers: 0
@@ -136,6 +136,10 @@ PrefabInstance:
     - target: {fileID: 873850883872554587, guid: 7e7d941b526fb2f4196dfd5515a0b748, type: 3}
       propertyPath: m_Intensity
       value: 893.8
+      objectReference: {fileID: 0}
+    - target: {fileID: 1429511603019900557, guid: 7e7d941b526fb2f4196dfd5515a0b748, type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 126
       objectReference: {fileID: 0}
     - target: {fileID: 3559172715768475433, guid: 7e7d941b526fb2f4196dfd5515a0b748, type: 3}
       propertyPath: m_Name
