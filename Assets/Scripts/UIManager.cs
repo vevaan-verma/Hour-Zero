@@ -143,7 +143,8 @@ public class UIManager : MonoBehaviour {
 
     }
 
-    public void CloseNPCMenu() {
+    // endInteraction is not always true, for example when the player opens the trade menu from the NPC menu, the NPC menu closes, but the interaction with the NPC is not over
+    public void CloseNPCMenu(bool endInteraction = true) {
 
         if (!npcMenu.IsMenuOpen()) return; // do nothing if the NPC menu is not open
 
@@ -154,13 +155,17 @@ public class UIManager : MonoBehaviour {
         crosshair.gameObject.SetActive(true); // show the crosshair when the NPC menu is closed
         npcMenu.CloseMenu(); // close the NPC menu
 
-        currNPCController.OnEndInteraction(); // tell the NPC to continue walking after the NPC menu is closed
+        if (endInteraction) {
 
+            currNPCController.OnEndInteraction(); // tell the NPC that the interaction is over
+            currNPCController = null; // reset the current NPC controller reference
+
+        }
     }
 
     public void OpenTradeMenu(TradeData tradeData) {
 
-        CloseNPCMenu();
+        CloseNPCMenu(false); // close the NPC menu without ending the interaction
 
         if (IsMenuOpen()) return; // do nothing if a menu is open
 
@@ -178,11 +183,14 @@ public class UIManager : MonoBehaviour {
         crosshair.gameObject.SetActive(true); // show the crosshair when the trade menu is closed
         tradeMenu.CloseMenu(tradeRequirementsMet); // close the trade menu
 
+        currNPCController.OnEndInteraction(); // tell the NPC that the interaction is over
+        currNPCController = null; // reset the current NPC controller reference
+
     }
 
     public void OnPhoneStateCycle() {
 
-        if (phoneManager.IsPhoneToFace()) {
+        if (phoneManager.GetPhoneState() == PhoneState.Face) {
 
             hotbarUI.CloseInventory(); // close the hotbar UI if the phone is to face
             crosshair.gameObject.SetActive(false); // hide the crosshair when the phone is to face
@@ -223,7 +231,7 @@ public class UIManager : MonoBehaviour {
         }
     }
 
-    public bool IsMenuOpen() => primaryBackpackUI.IsInventoryOpen() || systemRepairMenu.IsMenuOpen() || npcMenu.IsMenuOpen() || tradeMenu.IsMenuOpen() || phoneManager.IsPhoneToFace();
+    public bool IsMenuOpen() => primaryBackpackUI.IsInventoryOpen() || systemRepairMenu.IsMenuOpen() || npcMenu.IsMenuOpen() || tradeMenu.IsMenuOpen() || phoneManager.GetPhoneState() == PhoneState.Face;
 
 }
 

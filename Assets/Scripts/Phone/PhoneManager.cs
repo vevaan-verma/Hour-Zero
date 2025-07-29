@@ -83,7 +83,7 @@ public class PhoneManager : MonoBehaviour {
 
     private void Update() {
 
-        if (Input.GetKeyDown(phoneCycleKey) && !(uiManager.IsMenuOpen() && !IsPhoneToFace())) { // check if the phone cycle key is pressed and no menu, other than the phone being to the player's face, is open (because the phone should not be cycled through when a non-phone-to-face menu is open)
+        if (Input.GetKeyDown(phoneCycleKey) && !(uiManager.IsMenuOpen() && phoneState != PhoneState.Face)) { // check if the phone cycle key is pressed and no menu, other than the phone being to the player's face, is open (because the phone should not be cycled through when a non-phone-to-face menu is open)
 
             // cycle through phone states and loop around
             phoneState++;
@@ -170,7 +170,7 @@ public class PhoneManager : MonoBehaviour {
 
     }
 
-    public bool IsPhoneToFace() => phoneState == PhoneState.Face;
+    public PhoneState GetPhoneState() => phoneState;
 
     private void RefreshLayout(RectTransform root) {
 

@@ -70,6 +70,7 @@ public class PlayerController : MonoBehaviour {
     private float timer;
 
     [Header("Phone")]
+    private PhoneManager phoneManager;
     private PhoneHolder phoneHolder;
 
     [Header("Ground Check")]
@@ -97,6 +98,7 @@ public class PlayerController : MonoBehaviour {
         rb = GetComponent<Rigidbody>();
         hotbar = FindFirstObjectByType<Hotbar>();
         itemHolder = FindFirstObjectByType<ItemHolder>();
+        phoneManager = FindFirstObjectByType<PhoneManager>();
         phoneHolder = FindFirstObjectByType<PhoneHolder>();
         collider = GetComponent<Collider>();
 
@@ -342,6 +344,7 @@ public class PlayerController : MonoBehaviour {
     private void LateUpdate() {
 
         bool menuOpen = uiManager.IsMenuOpen();
+        bool phoneInPocket = phoneManager.GetPhoneState() == PhoneState.Pocket;
 
         // if a menu is open, smoothly return the held item position to the center point
         if (menuOpen) {
@@ -352,7 +355,7 @@ public class PlayerController : MonoBehaviour {
         }
 
         itemHolder.HandleSway(mouseX, mouseY, true, !menuOpen, !menuOpen); // handle the sway effect for the held item based on mouse movement; use LateUpdate to calculate sway to ensure the sway happens after all other updates, preventing jittering; the breathe effect is always enabled, headbob is enabled when not in a menu, and sway is enabled when not in a menu
-        phoneHolder.HandleSway(mouseX, mouseY, !menuOpen, !menuOpen, !menuOpen); // handle the sway effect for the phone holder based on mouse movement; use LateUpdate to calculate sway to ensure the sway happens after all other updates, preventing jittering; the breathe effect is enabled when not in a menu, headbob is enabled when not in a menu, and sway is enabled when not in a menu
+        phoneHolder.HandleSway(mouseX, mouseY, !menuOpen && !phoneInPocket, !menuOpen && !phoneInPocket, !menuOpen && !phoneInPocket); // handle the sway effect for the phone holder based on mouse movement; use LateUpdate to calculate sway to ensure the sway happens after all other updates, preventing jittering; the breathe effect is enabled when not in a menu and the phone is not in the pocket, headbob is enabled when not in a menu and the phone is not in the pocket, and sway is enabled when not in a menu and the phone is not in the pocket
 
         cameraHolder.SetPositionAndRotation(cameraPos.position, cameraPos.rotation);
 
