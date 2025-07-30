@@ -3,7 +3,7 @@ using System.Text.RegularExpressions;
 using TMPro;
 using UnityEngine;
 
-public class TodoAppManager : AppManager {
+public class TodoAppManager : ViewManager {
 
     [Header("References")]
     private TaskManager taskManager;
@@ -24,13 +24,13 @@ public class TodoAppManager : AppManager {
 
     }
 
-    private void OnEnable() {
+    private new void OnEnable() {
+
+        base.OnEnable();
 
         // subscribe to events from the task manager to update the app UI
         taskManager.onTaskAssigned += RefreshApp; // subscribe to task assignment event to refresh the app UI
         taskManager.onTaskCompleted += RefreshApp; // subscribe to task completion event to refresh the app UI
-
-        RefreshApp(); // initial refresh to set up the UI with current system statuses
 
     }
 

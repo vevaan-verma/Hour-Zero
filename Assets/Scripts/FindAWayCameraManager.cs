@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class FindAWayManager : MonoBehaviour {
+public class FindAWayCameraManager : MonoBehaviour {
 
     [Header("References")]
     private Transform player;

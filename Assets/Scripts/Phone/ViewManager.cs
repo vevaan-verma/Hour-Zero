@@ -2,10 +2,12 @@ using System.Collections;
 using UnityEngine;
 using UnityEngine.UI;
 
-public abstract class AppManager : MonoBehaviour {
+public abstract class ViewManager : MonoBehaviour {
 
     [Header("References")]
     private Coroutine refreshLayoutCoroutine;
+
+    protected void OnEnable() => RefreshApp();
 
     public abstract void RefreshApp();
 

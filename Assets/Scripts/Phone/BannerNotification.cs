@@ -4,7 +4,7 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class NotificationBanner : MonoBehaviour {
+public class BannerNotification : MonoBehaviour {
 
     [Header("References")]
     private Animator animator;
@@ -73,6 +73,14 @@ public class NotificationBanner : MonoBehaviour {
     public void Dismiss() {
 
         if (dismissCoroutine != null) return;
+
+        if (displayCoroutine != null) {
+
+            StopCoroutine(displayCoroutine); // stop the display coroutine if it is running
+            displayCoroutine = null; // reset the display coroutine reference
+
+        }
+
         dismissCoroutine = StartCoroutine(HandleDismiss());
 
     }
@@ -97,12 +105,14 @@ public class NotificationData {
     [SerializeField, Tooltip("Icon for the notification")] private Sprite icon;
     [SerializeField, Tooltip("Name of the app sending the notification")] private string appName;
     [SerializeField] private string description;
+    private AppType appType;
 
-    public NotificationData(Sprite icon, string appName, string description) {
+    public NotificationData(Sprite icon, string appName, string description, AppType appType) {
 
         this.icon = icon;
         this.appName = appName;
         this.description = description;
+        this.appType = appType;
 
     }
 
@@ -111,5 +121,7 @@ public class NotificationData {
     public string GetAppName() => appName;
 
     public string GetDescription() => description;
+
+    public AppType GetAppType() => appType;
 
 }

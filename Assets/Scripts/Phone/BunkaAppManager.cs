@@ -2,7 +2,7 @@ using System;
 using TMPro;
 using UnityEngine;
 
-public class BunkaAppManager : AppManager {
+public class BunkaAppManager : ViewManager {
 
     [Header("References")]
     private BunkerPanelManager bunkerPanelManager;
@@ -53,13 +53,14 @@ public class BunkaAppManager : AppManager {
 
     }
 
-    private void OnEnable() {
+    private new void OnEnable() {
+
+        base.OnEnable();
 
         // subscribe to events from the bunker panel manager to update the app UI
         bunkerPanelManager.onPanelRefresh += RefreshApp;
         bunkerPanelManager.onRefreshTextUpdate += UpdateRefreshText;
 
-        RefreshApp(); // initial refresh to set up the UI with current system statuses
         UpdateRefreshText(); // initial update of the refresh text
 
     }
