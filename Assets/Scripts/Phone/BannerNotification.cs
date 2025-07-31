@@ -7,6 +7,7 @@ using UnityEngine.UI;
 public class BannerNotification : MonoBehaviour {
 
     [Header("References")]
+    private Button button;
     private Animator animator;
     private Coroutine displayCoroutine;
     private Coroutine dismissCoroutine;
@@ -24,12 +25,20 @@ public class BannerNotification : MonoBehaviour {
     [Header("Actions")]
     public Action onNotificationDismiss;
 
-    public void Initialize(NotificationData notificationData, float notificationDisplayDuration) {
+    public void Initialize(NotificationData notificationData, PhoneManager phoneManager, float notificationDisplayDuration) {
 
         this.icon.sprite = notificationData.GetIcon();
         this.appNameText.text = notificationData.GetAppName();
         this.descriptionText.text = notificationData.GetDescription();
         this.notificationDisplayDuration = notificationDisplayDuration;
+
+        button = GetComponent<Button>();
+        button.onClick.AddListener(() => {
+
+            phoneManager.OpenView(notificationData.GetViewType()); // open the view associated with the notification when the banner is clicked
+            Dismiss(); // dismiss the notification when the banner is clicked
+
+        });
 
         dismissButton.onClick.AddListener(Dismiss); // add listener to dismiss button to call the Dismiss method when clicked
 
@@ -105,14 +114,14 @@ public class NotificationData {
     [SerializeField, Tooltip("Icon for the notification")] private Sprite icon;
     [SerializeField, Tooltip("Name of the app sending the notification")] private string appName;
     [SerializeField] private string description;
-    private AppType appType;
+    private readonly ViewType viewType;
 
-    public NotificationData(Sprite icon, string appName, string description, AppType appType) {
+    public NotificationData(Sprite icon, string appName, string description, ViewType viewType) {
 
         this.icon = icon;
         this.appName = appName;
         this.description = description;
-        this.appType = appType;
+        this.viewType = viewType;
 
     }
 
@@ -122,6 +131,6 @@ public class NotificationData {
 
     public string GetDescription() => description;
 
-    public AppType GetAppType() => appType;
+    public ViewType GetViewType() => viewType;
 
 }

@@ -20,11 +20,11 @@ public class PhoneManager : MonoBehaviour {
 
     [Header("Apps")]
     [SerializeField] private AppView[] phoneAppViews;
-    private PhoneView openedPhoneView; // reference to the currently opened view; null signifies home menu is open
+    private PhoneView[] phoneViews; // array of phone views for easy access by view type
+    private PhoneView openedView; // reference to the currently opened view; null signifies home menu is open
 
     [Header("Tray Notifications")]
     [SerializeField] private NotificationTrayView notificationTrayView;
-    private NotificationTrayManager notificationTrayManager;
     private List<NotificationData> trayNotifications;
 
     [Header("Banner Notifications")]
@@ -51,12 +51,19 @@ public class PhoneManager : MonoBehaviour {
         timeManager = FindFirstObjectByType<TimeManager>();
         uiManager = FindFirstObjectByType<UIManager>();
         animator = GetComponent<Animator>();
-        notificationTrayManager = FindFirstObjectByType<NotificationTrayManager>();
 
         phoneStateOrder = (PhoneState[]) Enum.GetValues(typeof(PhoneState)); // get all phone states in order (order is defined by the enum declaration)
 
         trayNotifications = new List<NotificationData>(); // initialize the list of tray notifications
         notificationQueue = new Queue<NotificationData>(); // initialize the notification queue
+
+        // duplicate phoneAppViews array to phoneViews for easy access by view type
+        phoneViews = new PhoneView[phoneAppViews.Length + 1]; // create a new array with one extra slot for the notification tray view
+
+        for (int i = 0; i < phoneAppViews.Length; i++)
+            phoneViews[i] = phoneAppViews[i]; // copy each app view to the phone views array
+
+        phoneViews[^1] = notificationTrayView; // add the notification tray view to the end of the phone views array
 
         // clear all children of the home menu to avoid duplicates
         foreach (Transform child in homeMenu)
@@ -65,16 +72,23 @@ public class PhoneManager : MonoBehaviour {
         // create a button for each app and initialize it
         foreach (AppView appView in phoneAppViews) {
 
+            ViewType viewType = appView.GetViewType(); // get the view type of the app
+
+            // ensure the app view is not of type NotificationTray
+            if (viewType == ViewType.NotificationTray)
+                Debug.LogError("NotificationTray view type cannot have an app button.");
+
             AppButton appButton = Instantiate(appButtonPrefab, homeMenu);
             appButton.transform.name = appView.GetName() + "AppButton"; // set the name of the button to the app name
             appButton.Initialize(appView.GetName(), appView.GetIcon());
+            appButton.GetComponent<Button>().onClick.AddListener(() => OpenView(viewType)); // add listener to the app button to open the app when clicked; use the PhoneManager OpenView method, not the one in PhoneView, to ensure the PhoneManager logic is executed (e.g., closing other views)
             appView.Initialize(this, appButton);
-            appView.ForceCloseView(); // ensure the app is closed initially
+            ForceCloseView(viewType); // ensure the app is closed initially
 
         }
 
         notificationTrayView.Initialize(this);
-        notificationTrayView.ForceCloseView(); // ensure the notification tray is closed initially
+        ForceCloseView(ViewType.NotificationTray); // ensure the notification tray is closed initially
 
         RefreshLayout(homeMenu.GetComponent<RectTransform>()); // refresh the layout of the home menu to fit the new buttons
 
@@ -82,7 +96,7 @@ public class PhoneManager : MonoBehaviour {
 
         homeButton.onClickReleased += () => {
 
-            openedPhoneView?.CloseView(); // close the currently opened view if there is one
+            CloseView(); // close the currently opened view if there is one
             animator.SetTrigger("releaseHomeButton"); // trigger the animation to release the home button
 
         };
@@ -92,8 +106,8 @@ public class PhoneManager : MonoBehaviour {
             notificationQueue.Clear(); // clear the notification queue when the notification tray is opened
             currBannerNotification?.Dismiss(); // dismiss the currently displayed banner notification if there is one
 
-            openedPhoneView?.CloseView(); // close the currently opened view if there is one
-            notificationTrayView.OpenView(); // open the notification tray view when the home button is long-pressed
+            CloseView(); // close the currently opened view if there is one
+            OpenView(ViewType.NotificationTray); // open the notification tray view
 
             animator.SetTrigger("releaseHomeButton"); // trigger the animation to release the home button
 
@@ -109,9 +123,6 @@ public class PhoneManager : MonoBehaviour {
     }
 
     private void Update() {
-
-        if (Input.GetKeyDown(KeyCode.U))
-            SendNotification(AppType.Bunka, "This is a test notification for the Bunka app!"); // test notification for Bunka app
 
         if (Input.GetKeyDown(phoneCycleKey) && !(uiManager.IsMenuOpen() && phoneState != PhoneState.Face)) { // check if the phone cycle key is pressed and no menu, other than the phone being to the player's face, is open (because the phone should not be cycled through when a non-phone-to-face menu is open)
 
@@ -153,15 +164,59 @@ public class PhoneManager : MonoBehaviour {
 
     }
 
-    public void OnViewOpened(PhoneView phoneView) => openedPhoneView = phoneView; // set the currently opened view
+    public void OpenView(ViewType viewType) {
+
+        if (openedView != null) {
+
+            if (openedView.GetViewType() == viewType) return; // if the view is already opened, do nothing
+            openedView.CloseView(); // close the currently opened view before opening a new one
+
+        }
+
+        PhoneView viewToOpen = Array.Find(phoneViews, app => app.GetViewType() == viewType); // find the view to open based on the specified view type
+        viewToOpen.OpenView(); // open the view
+
+        openedView = viewToOpen; // set the currently opened view to the opened view
+
+    }
+
+    public void CloseView() {
+
+        if (openedView == null) return; // if no view is opened, do nothing
+
+        openedView.CloseView(); // close the currently opened view
+        openedView = null; // reset the currently opened view reference
+
+    }
+
+    public void ForceCloseView(ViewType viewType) {
+
+        PhoneView viewToClose = Array.Find(phoneViews, app => app.GetViewType() == viewType); // find the view to close based on the specified view type
+
+        if (viewToClose != null) { // check if the view to close exists
+
+            viewToClose.ForceCloseView(); // force close the view
+            openedView = null; // reset the currently opened view reference
+
+        }
+    }
 
     #region BANNER NOTIFICATIONS
-    public void SendNotification(AppType appType, string description) {
+    public void SendNotification(ViewType viewType, string description) {
 
-        AppView appView = Array.Find(phoneAppViews, app => app.GetAppType() == appType); // find the app view for the specified app type
+        if (viewType == ViewType.NotificationTray) {
+
+            Debug.LogWarning("Cannot send notification to NotificationTray view type.");
+            return; // do not send the notification if the view type is NotificationTray because the notification tray cannot have notifications
+
+        }
+
+        // at this point, the viewType is guaranteed to be an AppView type
+
+        AppView appView = (AppView) Array.Find(phoneViews, view => view.GetViewType() == viewType); // find the app view for the specified view type
         appView.IncrementNotificationCount(); // increment the notification count for the app
 
-        NotificationData notificationData = new NotificationData(appView.GetIcon(), appView.GetName(), description, appType);
+        NotificationData notificationData = new NotificationData(appView.GetIcon(), appView.GetName(), description, viewType);
         trayNotifications.Add(notificationData);
         notificationQueue.Enqueue(notificationData);
 
@@ -175,12 +230,12 @@ public class PhoneManager : MonoBehaviour {
 
     private void DisplayNextNotification() {
 
-        if (notificationQueue.Count <= 0 || openedPhoneView is NotificationTrayView) return; // if there are no notifications in the queue, do nothing
+        if (notificationQueue.Count <= 0 || openedView is NotificationTrayView) return; // if there are no notifications in the queue, do nothing
 
         NotificationData nextNotificationData = notificationQueue.Peek(); // get the next notification data from the queue
 
         currBannerNotification = Instantiate(bannerNotificationPrefab, bannerNotificationSection);
-        currBannerNotification.Initialize(nextNotificationData, notificationDisplayDuration); // initialize the banner notification with the notification data and display duration
+        currBannerNotification.Initialize(nextNotificationData, this, notificationDisplayDuration); // initialize the banner notification with the notification data and display duration
         currBannerNotification.Display(); // display the banner notification
         currBannerNotification.onNotificationDismiss += OnNotificationDismiss; // add a listener to handle notification dismissal
 
@@ -199,9 +254,18 @@ public class PhoneManager : MonoBehaviour {
 
     }
 
-    public void ClearAppTrayNotifications(AppType appType) {
+    public void ClearAppTrayNotifications(ViewType viewType) {
 
-        AppView appView = Array.Find(phoneAppViews, app => app.GetAppType() == appType); // find the app view for the specified app type
+        if (viewType == ViewType.NotificationTray) {
+
+            Debug.LogWarning("Cannot clear notifications for NotificationTray view type.");
+            return; // do not clear notifications if the view type is NotificationTray because the notification tray cannot have notifications
+
+        }
+
+        // at this point, the viewType is guaranteed to be an AppView type
+
+        AppView appView = (AppView) Array.Find(phoneViews, view => view.GetViewType() == viewType); // find the app view for the specified view type
 
         appView.ResetNotificationCount(); // reset the notification count for the app
         trayNotifications.RemoveAll(notification => notification.GetAppName() == appView.GetName()); // remove all notifications for the app from the tray notifications
@@ -240,9 +304,9 @@ public class PhoneManager : MonoBehaviour {
 
 }
 
-public enum AppType {
+public enum ViewType {
 
-    Bunka, Todo, Notes, FindAWay
+    Bunka, Todo, Notes, FindAWay, NotificationTray
 
 }
 
