@@ -15,6 +15,9 @@ public abstract class PhoneView {
     [SerializeField] private CanvasGroup viewMenu;
     private Animator viewAnimator;
 
+    [Header("Data")]
+    [SerializeField] protected ViewType viewType;
+
     public void Initialize(PhoneManager phoneManager) {
 
         this.phoneManager = phoneManager;
@@ -29,7 +32,6 @@ public abstract class PhoneView {
 
         viewMenu.gameObject.SetActive(true); // show the view menu
         viewAnimator.SetTrigger("openView"); // trigger the animation to open the view
-        phoneManager.OnViewOpened(this); // notify the PhoneManager that this view is opened
 
     }
 
@@ -43,16 +45,13 @@ public abstract class PhoneView {
     public void ForceCloseView() {
 
         if (viewCloseCoroutine != null) coroutineHost.StopCoroutine(viewCloseCoroutine); // stop any existing close coroutine
-
         viewMenu.gameObject.SetActive(false); // hide the view menu immediately without animation
-        phoneManager.OnViewOpened(null); // notify the PhoneManager that no view is opened (home screen is open)
 
     }
 
     private IEnumerator HandleViewClose() {
 
         viewAnimator.SetTrigger("closeView"); // trigger the animation to close the view
-        phoneManager.OnViewOpened(null); // notify the PhoneManager that no view is opened (home screen is open)
 
         yield return null; // wait for the next frame to ensure the animation starts
         yield return new WaitForSeconds(viewAnimator.GetCurrentAnimatorStateInfo(0).length); // wait for the animation to finish
@@ -60,6 +59,9 @@ public abstract class PhoneView {
         viewMenu.gameObject.SetActive(false); // hide the view menu after the animation is done
 
     }
+
+    public ViewType GetViewType() => viewType;
+
 }
 
 [Serializable]
@@ -71,21 +73,18 @@ public class AppView : PhoneView {
     [Header("Data")]
     [SerializeField] private string appName;
     [SerializeField] private Sprite appIcon;
-    [SerializeField] private AppType appType;
     private int notificationCount;
 
     public void Initialize(PhoneManager phoneManager, AppButton appButton) {
 
         base.Initialize(phoneManager);
-
         this.appButton = appButton;
-        appButton.GetComponent<Button>().onClick.AddListener(OpenView); // add listener to the app button to open the app when clicked
 
     }
 
     public override void CloseView() {
 
-        phoneManager.ClearAppTrayNotifications(appType); // clear any notifications for this app type
+        phoneManager.ClearAppTrayNotifications(viewType); // clear any notifications for this view type
         base.CloseView(); // call the base method to close the view
 
     }
@@ -93,8 +92,6 @@ public class AppView : PhoneView {
     public string GetName() => appName;
 
     public Sprite GetIcon() => appIcon;
-
-    public AppType GetAppType() => appType;
 
     public void IncrementNotificationCount() => appButton.SetNotificationCount(++notificationCount);
 
@@ -104,7 +101,6 @@ public class AppView : PhoneView {
         appButton.SetNotificationCount(notificationCount); // update the app button with the new count
 
     }
-
 }
 
 [Serializable]
