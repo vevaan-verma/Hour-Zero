@@ -10,7 +10,7 @@ public class SFXLibValidateButton : Editor {
         SFXLib lib = (SFXLib)target;
 
         if (GUILayout.Button("Validate and auto-organize dictionary"))
-            lib.ValidateDict(modifyDict: true);
+            lib.ValidateDict(modifyDict: true, printSuccessMessage: true);
 
     }
 

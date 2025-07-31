@@ -39,12 +39,12 @@ public class SFXLib : MonoBehaviour {
         Oof
 
     }
-    private void Start() => ValidateDict(modifyDict: false);
+    private void Start() => ValidateDict(modifyDict: false, printSuccessMessage: false);
 
     private void OnValidate() => hasErrors = false;
 
     // make sure the library looks how it should (?)
-    public void ValidateDict(bool modifyDict) {
+    public void ValidateDict(bool modifyDict, bool printSuccessMessage) {
 
         if (modifyDict) {
 
