@@ -1,6 +1,8 @@
 using UnityEditor;
 using UnityEngine;
 
+#if UNITY_EDITOR
+
 [CustomEditor(typeof(ItemSpawnGroup))]
 public class ItemSpawnGroupSetOwnerButton : Editor {
     public override void OnInspectorGUI() {
@@ -25,3 +27,5 @@ public class ItemSpawnGroupSetOwnerButton : Editor {
     }
 
 }
+
+#endif

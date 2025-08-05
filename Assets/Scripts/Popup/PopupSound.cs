@@ -134,6 +134,9 @@ public class PopupSound : Popup {
 
     }
 
+
+#if UNITY_EDITOR
+
     // attempt to find a clip in the assets directory with the same name as this prefab
     public void TryAutoAssignClip() {
 
@@ -150,6 +153,8 @@ public class PopupSound : Popup {
         }
 
     }
+
+#endif
 
     // occlusion
     private void FixedUpdate() {
