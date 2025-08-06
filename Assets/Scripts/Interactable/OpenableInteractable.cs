@@ -16,6 +16,8 @@ public class OpenableInteractable : Interactable {
     [SerializeField, Tooltip("Time to wait for autoClose")] private float autoCloseTimer;
     private bool isOpen;
     private Coroutine autoCloseCoroutine;
+    private bool heldOpen;
+    bool autoMode = false;
 
     [Header("Sounds")]
     [SerializeField] private SFXLib.Sounds openSound;
@@ -43,9 +45,17 @@ public class OpenableInteractable : Interactable {
 
     }
 
+    // tell this OpenableInteractable it cannot be manually opened
+    public void SetAutoOpenable() {
+
+        autoMode = true;
+
+    }
+
     public override bool Interact() {
 
-        if (!canInteract) return false;
+        if (!canInteract || autoMode) return false;
+        print("Hey there lil bro");
 
         // if the item lock is still intact, check if the player has the required item to open or close the interactable
         if (itemLockIntact)
@@ -70,7 +80,6 @@ public class OpenableInteractable : Interactable {
 
         }
 
-
         if (autoClose) {
 
             // if the auto close timer is running, cancel it, because the door is being closed manually prior to the expiration of the timer
@@ -88,6 +97,40 @@ public class OpenableInteractable : Interactable {
         }
 
         return true;
+
+    }
+
+    // only for OpenableSensor 
+    public void SensorInteract() {
+
+
+        if (isOpen)
+            Close();
+        else
+            Open();
+
+        if (waitForAnimation) {
+
+            canInteract = false; // set canInteract to false to prevent further interactions until the animation is done
+            interactCooldownCoroutine = StartCoroutine(HandleInteractCooldown()); // start the interact cooldown coroutine
+
+        }
+
+        if (autoClose) {
+
+            // if the auto close timer is running, cancel it, because the door is being closed manually prior to the expiration of the timer
+            // otherwise, start a new timer
+
+            if (autoCloseCoroutine != null) {
+
+                StopCoroutine(autoCloseCoroutine);
+                autoCloseCoroutine = null;
+
+            }
+            else
+                autoCloseCoroutine = StartCoroutine(HandleAutoClose(animator.GetCurrentAnimatorStateInfo(0).length));
+
+        }
 
     }
 
@@ -131,7 +174,8 @@ public class OpenableInteractable : Interactable {
 
         while (time < autoCloseTimer + additionalWait) {
 
-            time += Time.deltaTime;
+            if (!heldOpen)
+                time += Time.deltaTime;
 
             yield return new WaitForEndOfFrame();
 
@@ -145,4 +189,7 @@ public class OpenableInteractable : Interactable {
         autoCloseCoroutine = null;
 
     }
+
+    public void SetHeldOpen(bool held) => this.heldOpen = held;
+
 }

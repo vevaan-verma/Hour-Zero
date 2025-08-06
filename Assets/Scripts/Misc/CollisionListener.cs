@@ -1,6 +1,5 @@
 using UnityEngine;
 
-[RequireComponent(typeof(Rigidbody))]
 public class CollisionListener : MonoBehaviour {
 
     /// This script is placed on the intact version of a breakable breakableProp (the defaultObject) 
@@ -26,21 +25,19 @@ public class CollisionListener : MonoBehaviour {
     [Header("Collision Sound")]
     [SerializeField] private SFXLib.Sounds colSound;
 
-    [Header("Breakable Prop")]
+    [Header("Breakable Prop Reporter")]
     [SerializeField] private bool linkedToBreakableProp;
     [SerializeField] private BreakableProp breakableProp;
 
     [Header("Misc")]
     [SerializeField] private bool ignorePlayerCollisions;
 
-    private Rigidbody rb;
     private AudioPlayer audioPlayer;
 
     #region
 
     void Start() {
 
-        rb = GetComponent<Rigidbody>();
         audioPlayer = GetComponent<AudioPlayer>();
 
         cooldown = initialCollisionRegisterDelay;

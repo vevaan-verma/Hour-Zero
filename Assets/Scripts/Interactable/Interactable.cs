@@ -64,13 +64,18 @@ public abstract class Interactable : MonoBehaviour {
 
         // the indicator is set active (shown) by the player, then set inactive (hidden) by the interactable itself
 
-        if (isIndicatorVisible && !player.IsLookingAt(gameObject)) {
+        if (canInteract && isIndicatorVisible && !player.IsLookingAt(gameObject)) {
 
             // go from current size to hidden
             if (indicatorLerpCoroutine != null) StopCoroutine(indicatorLerpCoroutine);
             indicatorLerpCoroutine = StartCoroutine(LerpIndicatorSize(indicator.transform.localScale, Vector3.zero));
 
             isIndicatorVisible = false;
+
+        }
+        else if (!canInteract && indicator.gameObject.activeSelf) {
+
+            indicator.gameObject.SetActive(false);
 
         }
     }
@@ -117,7 +122,7 @@ public abstract class Interactable : MonoBehaviour {
     public void ShowInteractIndicator() {
 
         // if the indicator is inactive, it is not currently being displayed
-        if (!isIndicatorVisible) {
+        if (!isIndicatorVisible && canInteract) {
 
             // go from hidden to normal size
             if (indicatorLerpCoroutine != null) StopCoroutine(indicatorLerpCoroutine);
