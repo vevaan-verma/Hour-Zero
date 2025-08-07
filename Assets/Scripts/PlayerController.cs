@@ -5,7 +5,7 @@ public class PlayerController : MonoBehaviour {
 
     [Header("References")]
     [SerializeField] private Transform dropPoint;
-    [SerializeField] private LayerMask nonPlayerMask; // mask for raycasts that should not hit the player
+    [SerializeField] private LayerMask grabIgnoreMask; // mask for raycasts that should not hit the player
     private UIManager uiManager;
     private Rigidbody rb;
     private new Collider collider;
@@ -193,7 +193,7 @@ public class PlayerController : MonoBehaviour {
 
         #region GRABBING
         // check if player is looking at a rigidbody within grab range and right mouse button is pressed; also make sure the rigidbody is not kinematic (so it can be grabbed); use the nonPlayerMask to prevent the player from grabbing themselves
-        if (Physics.Raycast(cameraPos.position, cameraPos.forward, out RaycastHit hit, grabRange, nonPlayerMask) && hit.rigidbody) {
+        if (Physics.Raycast(cameraPos.position, cameraPos.forward, out RaycastHit hit, grabRange, grabIgnoreMask) && hit.rigidbody) {
 
             RigidbodyGrabTrigger rbTrigger = hit.rigidbody.gameObject.GetComponent<RigidbodyGrabTrigger>();
 
@@ -210,56 +210,63 @@ public class PlayerController : MonoBehaviour {
 
         if (currGrabbedObject) {
 
-            if (Input.GetMouseButtonDown(2)) { // check if the middle mouse button is pressed and cycle the rotation axis
+            if (currGrabbedObject.gameObject.activeInHierarchy) {
 
-                // cycle through the grab rotate axes and loop around
-                grabRotateAxis++;
+                if (Input.GetMouseButtonDown(2)) { // check if the middle mouse button is pressed and cycle the rotation axis
 
-                // reset to first axis if it exceeds the last axis
-                if (grabRotateAxis > grabRotateAxes[^1])
-                    grabRotateAxis = grabRotateAxes[0];
+                    // cycle through the grab rotate axes and loop around
+                    grabRotateAxis++;
 
-            }
-
-            // check if the scroll wheel is used to rotate the grabbed object
-            if (Input.mouseScrollDelta.y != 0f) {
-
-                float rotationAmount = Input.mouseScrollDelta.y * grabRotationMultiplier; // calculate the rotation amount based on the scroll wheel input and the grab rotation multiplier
-                Vector3 axis = Vector3.zero;
-
-                // determine the axis of rotation based on the current grab rotate axis and whether it is relative to the player or world
-                switch (grabRotateAxis) {
-
-                    case GrabRotateAxis.X:
-                        axis = axesRelativeToPlayer ? transform.right : Vector3.right;
-                        break;
-
-                    case GrabRotateAxis.Y:
-                        axis = axesRelativeToPlayer ? transform.up : Vector3.up;
-                        break;
-
-                    case GrabRotateAxis.Z:
-                        axis = axesRelativeToPlayer ? transform.forward : Vector3.forward;
-                        break;
+                    // reset to first axis if it exceeds the last axis
+                    if (grabRotateAxis > grabRotateAxes[^1])
+                        grabRotateAxis = grabRotateAxes[0];
 
                 }
 
-                currGrabbedObject.MoveRotation(Quaternion.AngleAxis(rotationAmount, axis) * currGrabbedObject.rotation); // rotate the grabbed object around the specified axis by the specified amount; use MoveRotation to ensure the rotation is applied smoothly and physics interactions are preserved
+                // check if the scroll wheel is used to rotate the grabbed object
+                if (Input.mouseScrollDelta.y != 0f) {
+
+                    float rotationAmount = Input.mouseScrollDelta.y * grabRotationMultiplier; // calculate the rotation amount based on the scroll wheel input and the grab rotation multiplier
+                    Vector3 axis = Vector3.zero;
+
+                    // determine the axis of rotation based on the current grab rotate axis and whether it is relative to the player or world
+                    switch (grabRotateAxis) {
+
+                        case GrabRotateAxis.X:
+                            axis = axesRelativeToPlayer ? transform.right : Vector3.right;
+                            break;
+
+                        case GrabRotateAxis.Y:
+                            axis = axesRelativeToPlayer ? transform.up : Vector3.up;
+                            break;
+
+                        case GrabRotateAxis.Z:
+                            axis = axesRelativeToPlayer ? transform.forward : Vector3.forward;
+                            break;
+
+                    }
+
+                    currGrabbedObject.MoveRotation(Quaternion.AngleAxis(rotationAmount, axis) * currGrabbedObject.rotation); // rotate the grabbed object around the specified axis by the specified amount; use MoveRotation to ensure the rotation is applied smoothly and physics interactions are preserved
+
+                }
+
+                if (Input.GetMouseButtonUp(1)) // check if there is a currently grabbed object and the right mouse button is released and drop the grabbed object if so
+                    DropGrabbedItem();
+                else if (Vector3.Distance(cameraPos.position, currGrabbedObject.position) > grabRange) // check if the grabbed object is still within grab range and if not, drop it (use else if here because if the other condition is true, the currGrabbedObject will be dropped anyway)
+                    DropGrabbedItem();
+
+            } else {
+
+                DropGrabbedItem(); // if the grabbed object is not active in the hierarchy, drop it
 
             }
-
-            if (Input.GetMouseButtonUp(1)) // check if there is a currently grabbed object and the right mouse button is released and drop the grabbed object if so
-                DropGrabbedItem();
-            else if (Vector3.Distance(cameraPos.position, currGrabbedObject.position) > grabRange) // check if the grabbed object is still within grab range and if not, drop it (use else if here because if the other condition is true, the currGrabbedObject will be dropped anyway)
-                DropGrabbedItem();
-
         }
 
         UpdateGrabLine();
         #endregion
 
         #region INTERACTING
-        if (Physics.Raycast(cameraPos.position, cameraPos.forward, out hit, interactRange, nonPlayerMask) && hit.collider.CompareTag("Interactable")) { // check if player is looking at interactable object within interact distance and is tagged as interactable; use the nonPlayerMask to prevent the player from interacting with themselves
+        if (Physics.Raycast(cameraPos.position, cameraPos.forward, out hit, interactRange, grabIgnoreMask) && hit.collider.CompareTag("Interactable")) { // check if player is looking at interactable object within interact distance and is tagged as interactable; use the nonPlayerMask to prevent the player from interacting with themselves
 
             Interactable interactable = hit.collider.GetComponentInParent<Interactable>(); // make sure to check parent for interactable component since that is how some interactables are set up; use hit.collider not hit.transform to ensure the object is the one with the collider
 
@@ -480,9 +487,9 @@ public class PlayerController : MonoBehaviour {
 
         if (currGrabbedObject)
             uiManager.SetCrosshairType(CrosshairType.Grabbing);
-        else if (Physics.Raycast(cameraPos.position, cameraPos.forward, out RaycastHit hit, interactRange, nonPlayerMask) && hit.collider.CompareTag("Interactable"))
+        else if (Physics.Raycast(cameraPos.position, cameraPos.forward, out RaycastHit hit, interactRange, grabIgnoreMask) && hit.collider.CompareTag("Interactable"))
             uiManager.SetCrosshairType(CrosshairType.Interact);
-        else if (Physics.Raycast(cameraPos.position, cameraPos.forward, out hit, interactRange, nonPlayerMask) && hit.rigidbody && !hit.rigidbody.isKinematic)
+        else if (Physics.Raycast(cameraPos.position, cameraPos.forward, out hit, interactRange, grabIgnoreMask) && hit.rigidbody && !hit.rigidbody.isKinematic)
             uiManager.SetCrosshairType(CrosshairType.Grabbable);
         else
             uiManager.SetCrosshairType(CrosshairType.Default);
