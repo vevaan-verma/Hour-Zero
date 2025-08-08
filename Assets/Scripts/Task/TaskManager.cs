@@ -8,9 +8,9 @@ public class TaskManager : MonoBehaviour {
     private Backpack backpack;
     private Hotbar hotbar;
     private TaskDatabase taskDatabase;
-    private List<Item> dropoffItems;
+    private List<Item> dropoffItems = new List<Item>(); // list of all items that can be dropped off in the DoomsdayDropoff task
     private BaseTask activeTask;
-    private List<BaseTask> completedTasks;
+    private List<BaseTask> completedTasks = new List<BaseTask>(); // list of all completed tasks
 
     [Header("Task Specifics")]
     private ItemStack dropoffItemStack; // the item stack that needs to be dropped off in the DoomsdayDropoff task
@@ -25,11 +25,8 @@ public class TaskManager : MonoBehaviour {
         hotbar = FindFirstObjectByType<Hotbar>();
         taskDatabase = FindFirstObjectByType<TaskDatabase>();
 
-        completedTasks = new List<BaseTask>();
-
         // initialize the dropoff items by looking in the Resources/Items folder but only storing all the items that are marked as dropoff items
         Item[] allItems = Resources.LoadAll<Item>("Items");
-        dropoffItems = new List<Item>();
 
         foreach (Item item in allItems)
             if (item.IsDropoffItem())

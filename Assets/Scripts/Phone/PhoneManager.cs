@@ -25,14 +25,14 @@ public class PhoneManager : MonoBehaviour {
 
     [Header("Tray Notifications")]
     [SerializeField] private NotificationTrayView notificationTrayView;
-    private List<NotificationData> trayNotifications;
+    private List<NotificationData> trayNotifications = new List<NotificationData>(); // list of notifications in the tray; used to display notifications in the notification tray view
 
     [Header("Banner Notifications")]
     [SerializeField] private Transform bannerNotificationSection;
     [SerializeField] private BannerNotification bannerNotificationPrefab;
     [SerializeField] private float notificationDisplayDuration;
     private BannerNotification currBannerNotification; // reference to the currently displayed banner notification; null signifies no notification is being displayed
-    private Queue<NotificationData> notificationQueue;
+    private Queue<NotificationData> notificationQueue = new Queue<NotificationData>(); // queue of notifications to be displayed; used to display notifications in the banner notification section
 
     [Header("State")]
     [SerializeField] private KeyCode phoneCycleKey;
@@ -53,9 +53,6 @@ public class PhoneManager : MonoBehaviour {
         animator = GetComponent<Animator>();
 
         phoneStateOrder = (PhoneState[]) Enum.GetValues(typeof(PhoneState)); // get all phone states in order (order is defined by the enum declaration)
-
-        trayNotifications = new List<NotificationData>(); // initialize the list of tray notifications
-        notificationQueue = new Queue<NotificationData>(); // initialize the notification queue
 
         // duplicate phoneAppViews array to phoneViews for easy access by view type
         phoneViews = new PhoneView[phoneAppViews.Length + 1]; // create a new array with one extra slot for the notification tray view

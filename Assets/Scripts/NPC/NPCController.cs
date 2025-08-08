@@ -1,6 +1,8 @@
 using Pathfinding;
 using System;
 using System.Collections;
+using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 public class NPCController : Interactable {
@@ -36,10 +38,7 @@ public class NPCController : Interactable {
 
     [Header("Shelf Pickup")]
     [SerializeField, Range(0f, 100f)] private float shelfPickupChance;
-    private Vector3 shelfHalfExtents;
-    private Vector3 shelfWorldCenter;
-    private Quaternion shelfRotation;
-    private bool inShelfPickupArea; // whether the NPC is currently in a shelf pickup area (for drawing gizmos)
+    private List<(Vector3 center, Vector3 halfExtents, Quaternion rotation)> currShelfPickupAreas = new List<(Vector3, Vector3, Quaternion)>(); // list of current shelf pickup areas the NPC is in
 
     [Header("Ground Check")]
     [SerializeField] private float raycastDistance; // distance to raycast down from the foot position
@@ -92,7 +91,7 @@ public class NPCController : Interactable {
     private void OnTriggerEnter(Collider other) {
 
         if (other.CompareTag("NPCShelfPickupArea")) { // make sure the trigger is for the NPC pickup area
-            
+
             MeshCollider shelfCollider = other.transform.parent.GetComponent<MeshCollider>(); // get the MeshCollider from the parent of the trigger collider
 
             // make sure the shelf collider is not null
@@ -107,14 +106,15 @@ public class NPCController : Interactable {
             Bounds localBounds = shelfCollider.sharedMesh.bounds; // get the local bounds of the shelf mesh collider
 
             Vector3 worldSize = Vector3.Scale(localBounds.size, shelfTransform.lossyScale); // calculate the world size of the shelf by scaling the local bounds with the shelf's lossy scale
-            shelfHalfExtents = worldSize / 2f; // calculate the half extents of the shelf by dividing the world size by 2
-            shelfWorldCenter = shelfTransform.TransformPoint(localBounds.center); // calculate the world center of the shelf by transforming the local bounds center to world space
-            shelfRotation = shelfTransform.rotation; // get the rotation of the shelf transform
-            inShelfPickupArea = true; // set the flag to true to indicate the NPC is in a shelf pickup area
+            Vector3 halfExtents = worldSize / 2f; // calculate the half extents of the shelf by dividing the world size by 2
+            Vector3 worldCenter = shelfTransform.TransformPoint(localBounds.center); // calculate the world center of the shelf by transforming the local bounds center to world space
+            Quaternion rotation = shelfTransform.rotation; // get the rotation of the shelf transform
+
+            currShelfPickupAreas.Add((worldCenter, halfExtents, rotation)); // add the shelf pickup area to the current shelf pickup areas list
 
             if (UnityEngine.Random.Range(0f, 100f) <= shelfPickupChance) { // check if the NPC should pick up an item from the shelf based on the shelf pickup chance
 
-                Collider[] hits = Physics.OverlapBox(shelfWorldCenter, shelfHalfExtents, shelfRotation); // use OverlapBox to check for items in the shelf area
+                Collider[] hits = Physics.OverlapBox(worldCenter, halfExtents, rotation); // use OverlapBox to check for items in the shelf area
 
                 // remove all colliders that are not ItemInteractable components from the hits array
                 hits = Array.FindAll(hits, hit => hit.GetComponent<ItemInteractable>() != null);
@@ -135,9 +135,28 @@ public class NPCController : Interactable {
 
     private void OnTriggerExit(Collider other) {
 
-        if (other.CompareTag("NPCShelfPickupArea")) // make sure the trigger is for the NPC pickup area
-            inShelfPickupArea = false; // set the flag to false to indicate the NPC is no longer in a shelf pickup area
+        if (other.CompareTag("NPCShelfPickupArea")) { // make sure the trigger is for the NPC pickup area
 
+            MeshCollider shelfCollider = other.transform.parent.GetComponent<MeshCollider>();
+
+            if (shelfCollider != null) {
+
+                Transform shelfTransform = shelfCollider.transform;
+                Bounds localBounds = shelfCollider.sharedMesh.bounds; // get the local bounds of the shelf mesh collider
+
+                Vector3 worldSize = Vector3.Scale(localBounds.size, shelfTransform.lossyScale); // calculate the world size of the shelf by scaling the local bounds with the shelf's lossy scale
+                Vector3 halfExtents = worldSize / 2f; // calculate the half extents of the shelf by dividing the world size by 2
+                Vector3 worldCenter = shelfTransform.TransformPoint(localBounds.center); // calculate the world center of the shelf by transforming the local bounds center to world space
+                Quaternion rotation = shelfTransform.rotation; // get the rotation of the shelf transform
+
+                // remove this specific shelf pickup area from the list
+                currShelfPickupAreas.RemoveAll(area =>
+                    area.center == worldCenter &&
+                    area.halfExtents == halfExtents &&
+                    area.rotation == rotation
+                );
+            }
+        }
     }
 
     private void OnAnimatorIK(int layerIndex) {
@@ -320,16 +339,19 @@ public class NPCController : Interactable {
 
     private void OnDrawGizmos() {
 
-        if (!inShelfPickupArea) return; // only draw shelf gizmos if the NPC is in a shelf pickup area
+        if (currShelfPickupAreas.Count == 0) return; // only draw shelf gizmos if the NPC is in a shelf pickup area
 
-        Gizmos.color = new Color(0f, 1f, 0f, 0.3f);
-        Matrix4x4 rotationMatrix = Matrix4x4.TRS(shelfWorldCenter, shelfRotation, Vector3.one); // create a matrix for the shelf's world position and rotation
-        Gizmos.matrix = rotationMatrix; // set the gizmo matrix to the shelf's world position and rotation
+        foreach ((Vector3 center, Vector3 halfExtents, Quaternion rotation) in currShelfPickupAreas) {
 
-        Gizmos.DrawCube(Vector3.zero, shelfHalfExtents * 2f); // draw a cube at the shelf's world center with the half extents scaled by 2 to represent the full size of the shelf
-        Gizmos.color = Color.green;
-        Gizmos.DrawWireCube(Vector3.zero, shelfHalfExtents * 2f); // draw a wireframe cube at the shelf's world center with the half extents scaled by 2 to represent the full size of the shelf
+            Gizmos.color = new Color(0f, 1f, 0f, 0.3f);
+            Matrix4x4 rotationMatrix = Matrix4x4.TRS(center, rotation, Vector3.one); // create a matrix for the shelf's world position and rotation
+            Gizmos.matrix = rotationMatrix; // set the gizmo matrix to the shelf's world position and rotation
 
+            Gizmos.DrawCube(Vector3.zero, halfExtents * 2f); // draw a cube at the shelf's world center with the half extents scaled by 2 to represent the full size of the shelf
+            Gizmos.color = Color.green;
+            Gizmos.DrawWireCube(Vector3.zero, halfExtents * 2f); // draw a wireframe cube at the shelf's world center with the half extents scaled by 2 to represent the full size of the shelf
+
+        }
     }
 
     private Vector3 GetRandomPoint() {
