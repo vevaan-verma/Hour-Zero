@@ -145,7 +145,7 @@ public class PopupPlayer : MonoBehaviour {
 
         }
 
-        Debug.Log(logs.Pop() + " <i>(This peak occured " + totalWait + "s ago)</i>");
+        Debug.Log(logs.Pop() + " This peak occured " + totalWait + "s ago.");
         logs.Clear();
 
         logWaitCoroutine = null;
