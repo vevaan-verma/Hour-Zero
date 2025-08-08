@@ -162,7 +162,7 @@ public class SFXLib : MonoBehaviour {
         int totalErrors = duplicateKeyLog.Count + duplicateSoundLog.Count + missingRefLog.Count;
         hasErrors = totalErrors > 0;
 
-        if (!hasErrors)
+        if (!hasErrors && printSuccessMessage)
             Debug.Log("SFXLib has no errors: good to go!");
         else if (hasErrors) {
 

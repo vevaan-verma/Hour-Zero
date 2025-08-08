@@ -12,12 +12,22 @@ public class OpenableInteractable : Interactable {
     [SerializeField, Tooltip("Whether the item lock is intact by default, which requires the specified items to open or close the interactable when intact")] private bool itemLockIntact;
     [SerializeField, Tooltip("Whether the item lock should be broken when the interactable is interacted with")] private bool breakItemLockOnInteract;
     [SerializeField, Tooltip("Whether to wait for the animation to finish before allowing further interactions")] private bool waitForAnimation;
+    private bool isOpen;
+
+    [Header("Auto Close")]
     [SerializeField, Tooltip("Whether to automatically flip the state of the door after a duration")] private bool autoClose;
     [SerializeField, Tooltip("Time to wait for autoClose")] private float autoCloseTimer;
-    private bool isOpen;
     private Coroutine autoCloseCoroutine;
+    private float currAutoCloseTimer;
     private bool heldOpen;
-    bool autoMode = false;
+    private bool autoMode = false;
+
+    [Header("Animation")]
+    [SerializeField, Tooltip("Instead of using an Animator, the script lerps the object to allow for a more dynamic openable. \n\nNOT IMPLEMENTED!!")] private bool useLerpAnimation;
+    [SerializeField, Tooltip("When the openable is opened, its position will be displaced by this vector")] private Vector3 lerpPositionalDisplacement;
+    [SerializeField, Tooltip("When the openable is opened, its rotation will be displaced by this vector")] private Vector3 lerpAngularDisplacement;
+    private Vector3 initialPos;
+    private Vector3 initialRot;
 
     [Header("Sounds")]
     [SerializeField] private SFXLib.Sounds openSound;
@@ -37,11 +47,18 @@ public class OpenableInteractable : Interactable {
         if (!itemLockIntact && breakItemLockOnInteract)
             Debug.LogWarning($"Interactable {name} has item lock intact set to false but break item lock on interact is true. This will have no effect since the item lock is already broken.");
 
+        initialPos = transform.position;
+        initialRot = transform.rotation.eulerAngles;
+
+        if (!autoClose)
+            autoCloseTimer = 0;
+
         // set the initial state of the interactable based on the isInitiallyOpen variable
         if (isInitiallyOpen)
             Open();
         else
             Close();
+
 
     }
 
@@ -55,7 +72,6 @@ public class OpenableInteractable : Interactable {
     public override bool Interact() {
 
         if (!canInteract || autoMode) return false;
-        print("Hey there lil bro");
 
         // if the item lock is still intact, check if the player has the required item to open or close the interactable
         if (itemLockIntact)
@@ -91,8 +107,14 @@ public class OpenableInteractable : Interactable {
                 autoCloseCoroutine = null;
 
             }
-            else
-                autoCloseCoroutine = StartCoroutine(HandleAutoClose(animator.GetCurrentAnimatorStateInfo(0).length));
+            else {
+
+                float animClipLength = animator.GetCurrentAnimatorStateInfo(0).length;
+                currAutoCloseTimer = autoCloseTimer + animClipLength;
+
+                autoCloseCoroutine = StartCoroutine(HandleAutoClose(animClipLength));
+
+            }
 
         }
 
@@ -103,12 +125,23 @@ public class OpenableInteractable : Interactable {
     // only for OpenableSensor 
     public void SensorInteract() {
 
+        if (!autoMode) {
 
-        if (isOpen)
+            Debug.LogError("The Interactable GameObject \"" + gameObject.name + "\" cannot have SensorInteract called on it because it does not have an OpenableSensor component.");
+            return;
+
+        }
+
+        if (!canInteract) return;
+
+        if (isOpen && autoCloseCoroutine == null)
             Close();
-        else
+        else if (autoCloseCoroutine == null)
             Open();
 
+        if (interactCooldownCoroutine != null) StopCoroutine(interactCooldownCoroutine); // stop any existing interact cooldown coroutine
+
+        // check if the animation should be waited for before allowing further interactions
         if (waitForAnimation) {
 
             canInteract = false; // set canInteract to false to prevent further interactions until the animation is done
@@ -127,8 +160,15 @@ public class OpenableInteractable : Interactable {
                 autoCloseCoroutine = null;
 
             }
-            else
-                autoCloseCoroutine = StartCoroutine(HandleAutoClose(animator.GetCurrentAnimatorStateInfo(0).length));
+            else {
+
+                float animClipLength = animator.GetCurrentAnimatorStateInfo(0).length;
+                currAutoCloseTimer = autoCloseTimer + animClipLength;
+
+                autoCloseCoroutine = StartCoroutine(HandleAutoClose(animClipLength));
+
+            }
+
 
         }
 
@@ -136,7 +176,11 @@ public class OpenableInteractable : Interactable {
 
     private void Open() {
 
-        animator.SetTrigger("open"); // trigger the open animation
+
+        // do open animation
+        if (!useLerpAnimation)
+            animator.SetTrigger("open");
+
         isOpen = true; // set the interactable as open
 
         audioPlayer.Play(openSound);
@@ -147,7 +191,10 @@ public class OpenableInteractable : Interactable {
 
     private void Close() {
 
-        animator.SetTrigger("close"); // trigger the close animation
+        // do close animation
+        if (!useLerpAnimation)
+            animator.SetTrigger("close");
+
         isOpen = false; // set the interactable as closed
 
         audioPlayer.Play(closeSound);
@@ -190,6 +237,71 @@ public class OpenableInteractable : Interactable {
 
     }
 
-    public void SetHeldOpen(bool held) => this.heldOpen = held;
+    public void SetHeldOpen(bool held) {
+
+
+        heldOpen = held;
+
+        if (!held) { // if ending held open (object/player leaves the sensor region), begin auto close coroutine
+
+            if (autoCloseCoroutine != null) {
+
+                StopCoroutine(autoCloseCoroutine);
+                autoCloseCoroutine = null;
+
+            }
+
+            autoCloseCoroutine = StartCoroutine(HandleAutoClose(currAutoCloseTimer));
+
+        }
+
+
+    }
+
+    public bool IsOpened {
+
+        get { return isOpen; }
+
+    }
+
+
+#if UNITY_EDITOR
+    // using UnityEditor prefix to avoid needing to hide the import in the final build
+    [UnityEditor.CustomEditor(typeof(OpenableInteractable), true)]
+    public class InteractableEditor : UnityEditor.Editor {
+
+        public override void OnInspectorGUI() {
+
+            serializedObject.Update();
+
+            DrawPropertiesExcluding(serializedObject, "lerpPositionalDisplacement", "lerpAngularDisplacement", "openSound", "closeSound", "openedText", "closedText");
+
+            UnityEditor.SerializedProperty _useLerpAnimation = serializedObject.FindProperty("useLerpAnimation");
+            UnityEditor.SerializedProperty _lerpPositionalDisplacement = serializedObject.FindProperty("lerpPositionalDisplacement");
+            UnityEditor.SerializedProperty _lerpAngularDisplacement = serializedObject.FindProperty("lerpAngularDisplacement");
+            UnityEditor.SerializedProperty _openSound = serializedObject.FindProperty("openSound");
+            UnityEditor.SerializedProperty _closeSound = serializedObject.FindProperty("closeSound");
+            UnityEditor.SerializedProperty _openedText = serializedObject.FindProperty("openedText");
+            UnityEditor.SerializedProperty _closedText = serializedObject.FindProperty("closedText");
+
+
+            if (_useLerpAnimation.boolValue) {
+
+                UnityEditor.EditorGUILayout.PropertyField(_lerpPositionalDisplacement);
+                UnityEditor.EditorGUILayout.PropertyField(_lerpAngularDisplacement);
+
+            }
+
+            UnityEditor.EditorGUILayout.PropertyField(_openSound);
+            UnityEditor.EditorGUILayout.PropertyField(_closeSound);
+            UnityEditor.EditorGUILayout.PropertyField(_openedText);
+            UnityEditor.EditorGUILayout.PropertyField(_closedText);
+
+            serializedObject.ApplyModifiedProperties();
+
+        }
+    }
+
+#endif
 
 }

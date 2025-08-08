@@ -121,6 +121,8 @@ public class BreakableProp : MonoBehaviour {
 
             audioPlayer.Play(breakSound, false, brokenObject);
 
+            gameObject.layer = 13;
+
             this.enabled = false;
 
         }
@@ -209,6 +211,11 @@ public class BreakableProp : MonoBehaviour {
 
         durability -= damage;
 
+    }
+
+    public bool IsBroken {
+
+        get { return broken; }
     }
 
 }
