@@ -418,9 +418,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   dropPoint: {fileID: 6844621675373777242}
-  grabIgnoreMask:
-    serializedVersion: 2
-    m_Bits: 8127
   cameraHolder: {fileID: 0}
   cameraPos: {fileID: 4336792574799851453}
   walkSpeed: 4500
@@ -433,11 +430,17 @@ MonoBehaviour:
   jumpHeight: 12
   fallMultiplier: 2
   interactRange: 4
+  interactMask:
+    serializedVersion: 2
+    m_Bits: 32703
   heldItemMask:
     serializedVersion: 2
-    m_Bits: 64
+    m_Bits: 128
   grabRange: 5
   grabStrength: 60
+  grabMask:
+    serializedVersion: 2
+    m_Bits: 8127
   grabLine: {fileID: 4510350839201481505}
   grabRotationMultiplier: 10
   axesRelativeToPlayer: 1

@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 5575217323457196242}
   - component: {fileID: 7391298455547839229}
   m_Layer: 0
-  m_Name: ItemSpawnPoint (3)
+  m_Name: ItemSpawnPoint
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -45,6 +45,59 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   groupOwner: {fileID: 4364679279276961397}
+--- !u!1 &2088600714834725133
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 7806781756821083738}
+  - component: {fileID: 3695496699734899822}
+  m_Layer: 3
+  m_Name: NPCPickupArea2
+  m_TagString: NPCShelfPickupArea
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &7806781756821083738
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2088600714834725133}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0.000000059604645, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 1.555, z: -1.23}
+  m_LocalScale: {x: 2.6, y: 3.11, z: 1.272}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 4398803456374675974}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!65 &3695496699734899822
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2088600714834725133}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 1
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 1, y: 1, z: 1}
+  m_Center: {x: 0, y: 0, z: 0}
 --- !u!1 &2103803069960246703
 GameObject:
   m_ObjectHideFlags: 0
@@ -56,7 +109,7 @@ GameObject:
   - component: {fileID: 5783126563950146347}
   - component: {fileID: 4273053735179395920}
   m_Layer: 0
-  m_Name: ItemSpawnPoint (8)
+  m_Name: ItemSpawnPoint
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -135,6 +188,59 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   groupOwner: {fileID: 4364679279276961397}
+--- !u!1 &3871076362070539882
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 6620171587390959055}
+  - component: {fileID: 4125874189734459035}
+  m_Layer: 3
+  m_Name: NPCPickupArea1
+  m_TagString: NPCShelfPickupArea
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &6620171587390959055
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3871076362070539882}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0.000000059604645, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 1.555, z: 1.23}
+  m_LocalScale: {x: 2.6, y: 3.11, z: 1.272}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 4398803456374675974}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!65 &4125874189734459035
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3871076362070539882}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 1
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 1, y: 1, z: 1}
+  m_Center: {x: 0, y: 0, z: 0}
 --- !u!1 &4708233654735383607
 GameObject:
   m_ObjectHideFlags: 0
@@ -146,7 +252,7 @@ GameObject:
   - component: {fileID: 4692323171148749210}
   - component: {fileID: 5910137781659984796}
   m_Layer: 0
-  m_Name: ItemSpawnPoint (1)
+  m_Name: ItemSpawnPoint
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -191,7 +297,7 @@ GameObject:
   - component: {fileID: 2478255147971035462}
   - component: {fileID: 4256385102729151185}
   m_Layer: 0
-  m_Name: ItemSpawnPoint (7)
+  m_Name: ItemSpawnPoint
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -236,7 +342,7 @@ GameObject:
   - component: {fileID: 5705811548791192393}
   - component: {fileID: 5843771831182781261}
   m_Layer: 0
-  m_Name: ItemSpawnPoint (9)
+  m_Name: ItemSpawnPoint
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -281,7 +387,7 @@ GameObject:
   - component: {fileID: 6571852897384222101}
   - component: {fileID: 1321863987296323372}
   m_Layer: 0
-  m_Name: ItemSpawnPoint (4)
+  m_Name: ItemSpawnPoint
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -326,7 +432,7 @@ GameObject:
   - component: {fileID: 3248517022755276009}
   - component: {fileID: 834957179277923481}
   m_Layer: 0
-  m_Name: ItemSpawnPoint (10)
+  m_Name: ItemSpawnPoint
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -371,7 +477,7 @@ GameObject:
   - component: {fileID: 1612020003189431876}
   - component: {fileID: 6360640495317224257}
   m_Layer: 0
-  m_Name: ItemSpawnPoint (5)
+  m_Name: ItemSpawnPoint
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -433,7 +539,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 8824913415471441168}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0.7071068, z: 0, w: 0.7071068}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
@@ -450,8 +556,10 @@ Transform:
   - {fileID: 5783126563950146347}
   - {fileID: 5705811548791192393}
   - {fileID: 3248517022755276009}
+  - {fileID: 6620171587390959055}
+  - {fileID: 7806781756821083738}
   m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 0, y: 90, z: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &4364679279276961397
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -572,7 +680,7 @@ GameObject:
   - component: {fileID: 1492920620365386733}
   - component: {fileID: 573850426073151938}
   m_Layer: 0
-  m_Name: ItemSpawnPoint (2)
+  m_Name: ItemSpawnPoint
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -617,7 +725,7 @@ GameObject:
   - component: {fileID: 1531851289881356363}
   - component: {fileID: 1908991498501329222}
   m_Layer: 0
-  m_Name: ItemSpawnPoint (6)
+  m_Name: ItemSpawnPoint
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

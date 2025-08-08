@@ -45,6 +45,59 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   groupOwner: {fileID: 8459622356702854203}
+--- !u!1 &726199763677592001
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1734288244009202718}
+  - component: {fileID: 4007499755952471880}
+  m_Layer: 3
+  m_Name: NPCPickupArea1
+  m_TagString: NPCShelfPickupArea
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1734288244009202718
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 726199763677592001}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0.7071068, z: 0, w: 0.7071068}
+  m_LocalPosition: {x: 0.63, y: 1.3, z: 0}
+  m_LocalScale: {x: 8.1, y: 2.6, z: 1.3}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1158294370221810737}
+  m_LocalEulerAnglesHint: {x: 0, y: 90, z: 0}
+--- !u!65 &4007499755952471880
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 726199763677592001}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 1
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 1, y: 1, z: 1}
+  m_Center: {x: 0, y: 0, z: 0}
 --- !u!1 &837520085102687001
 GameObject:
   m_ObjectHideFlags: 0
@@ -703,6 +756,9 @@ MonoBehaviour:
   waitForAnimation: 1
   autoClose: 0
   autoCloseTimer: 0
+  useLerpAnimation: 0
+  lerpPositionalDisplacement: {x: 0, y: 0, z: 0}
+  lerpAngularDisplacement: {x: 0, y: 0, z: 0}
   openSound: 10
   closeSound: 11
   openedText: Open
@@ -1016,6 +1072,9 @@ MonoBehaviour:
   waitForAnimation: 1
   autoClose: 0
   autoCloseTimer: 0
+  useLerpAnimation: 0
+  lerpPositionalDisplacement: {x: 0, y: 0, z: 0}
+  lerpAngularDisplacement: {x: 0, y: 0, z: 0}
   openSound: 10
   closeSound: 11
   openedText: Open
@@ -1079,8 +1138,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 4591506014700435849}
   serializedVersion: 2
-  m_LocalRotation: {x: -0, y: -1, z: -0, w: 0.0000001490116}
-  m_LocalPosition: {x: 232.53, y: 131.425, z: 49.21545}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -1113,8 +1172,9 @@ Transform:
   - {fileID: 2531530449767288980}
   - {fileID: 9004986309874275441}
   - {fileID: 7824743259571955991}
+  - {fileID: 1734288244009202718}
   m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 0, y: -180, z: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &8459622356702854203
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1295,6 +1355,9 @@ MonoBehaviour:
   waitForAnimation: 1
   autoClose: 0
   autoCloseTimer: 0
+  useLerpAnimation: 0
+  lerpPositionalDisplacement: {x: 0, y: 0, z: 0}
+  lerpAngularDisplacement: {x: 0, y: 0, z: 0}
   openSound: 10
   closeSound: 11
   openedText: Open
@@ -1608,6 +1671,9 @@ MonoBehaviour:
   waitForAnimation: 1
   autoClose: 0
   autoCloseTimer: 0
+  useLerpAnimation: 0
+  lerpPositionalDisplacement: {x: 0, y: 0, z: 0}
+  lerpAngularDisplacement: {x: 0, y: 0, z: 0}
   openSound: 10
   closeSound: 11
   openedText: Open

@@ -56,7 +56,7 @@ GameObject:
   - component: {fileID: 6769319320826410638}
   - component: {fileID: 3675971989574477485}
   m_Layer: 3
-  m_Name: ItemSpawnPoint (15)
+  m_Name: ItemSpawnPoint
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -90,6 +90,59 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   groupOwner: {fileID: 5377934186452402596}
+--- !u!1 &127549175267330904
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 5012410977366660815}
+  - component: {fileID: 3959507397972548685}
+  m_Layer: 3
+  m_Name: NPCPickupArea2
+  m_TagString: NPCShelfPickupArea
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &5012410977366660815
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 127549175267330904}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 1.55, z: -1.24}
+  m_LocalScale: {x: 7.85, y: 3.1, z: 1.3}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 345304805968304750}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!65 &3959507397972548685
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 127549175267330904}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 1
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 1, y: 1, z: 1}
+  m_Center: {x: 0, y: 0, z: 0}
 --- !u!1 &1338996180008233104
 GameObject:
   m_ObjectHideFlags: 0
@@ -101,7 +154,7 @@ GameObject:
   - component: {fileID: 9141468895702098978}
   - component: {fileID: 6321719199912069649}
   m_Layer: 3
-  m_Name: ItemSpawnPoint (12)
+  m_Name: ItemSpawnPoint
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -146,7 +199,7 @@ GameObject:
   - component: {fileID: 4819941194901408670}
   - component: {fileID: 724113235161219699}
   m_Layer: 3
-  m_Name: ItemSpawnPoint (8)
+  m_Name: ItemSpawnPoint
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -208,8 +261,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2085730827472503244}
   serializedVersion: 2
-  m_LocalRotation: {x: -0, y: -0.70710665, z: -0, w: 0.70710695}
-  m_LocalPosition: {x: 220.43892, y: 131.42462, z: 53.908245}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -245,8 +298,10 @@ Transform:
   - {fileID: 4147271069124349556}
   - {fileID: 5212928626279138918}
   - {fileID: 3696648451775903199}
+  - {fileID: 3452347488282363233}
+  - {fileID: 5012410977366660815}
   m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 0, y: -90, z: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!33 &3895120046853997287
 MeshFilter:
   m_ObjectHideFlags: 0
@@ -386,7 +441,7 @@ GameObject:
   - component: {fileID: 1307151033917188042}
   - component: {fileID: 7767858033618502088}
   m_Layer: 3
-  m_Name: ItemSpawnPoint (26)
+  m_Name: ItemSpawnPoint
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -431,7 +486,7 @@ GameObject:
   - component: {fileID: 2820182058200813534}
   - component: {fileID: 4936005690502480061}
   m_Layer: 3
-  m_Name: ItemSpawnPoint (28)
+  m_Name: ItemSpawnPoint
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -476,7 +531,7 @@ GameObject:
   - component: {fileID: 5684791185845065695}
   - component: {fileID: 8977777269463252360}
   m_Layer: 3
-  m_Name: ItemSpawnPoint (1)
+  m_Name: ItemSpawnPoint
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -521,7 +576,7 @@ GameObject:
   - component: {fileID: 4938667367754781661}
   - component: {fileID: 4289560514815974779}
   m_Layer: 3
-  m_Name: ItemSpawnPoint (25)
+  m_Name: ItemSpawnPoint
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -566,7 +621,7 @@ GameObject:
   - component: {fileID: 6519517578308852531}
   - component: {fileID: 1188860278821772535}
   m_Layer: 3
-  m_Name: ItemSpawnPoint (10)
+  m_Name: ItemSpawnPoint
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -611,7 +666,7 @@ GameObject:
   - component: {fileID: 3696648451775903199}
   - component: {fileID: 443197708780491130}
   m_Layer: 3
-  m_Name: ItemSpawnPoint (31)
+  m_Name: ItemSpawnPoint
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -656,7 +711,7 @@ GameObject:
   - component: {fileID: 4120994461172437663}
   - component: {fileID: 6495515302577794085}
   m_Layer: 3
-  m_Name: ItemSpawnPoint (22)
+  m_Name: ItemSpawnPoint
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -701,7 +756,7 @@ GameObject:
   - component: {fileID: 1328159178918624152}
   - component: {fileID: 1041399764084783110}
   m_Layer: 3
-  m_Name: ItemSpawnPoint (9)
+  m_Name: ItemSpawnPoint
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -746,7 +801,7 @@ GameObject:
   - component: {fileID: 4147271069124349556}
   - component: {fileID: 6663090941884244202}
   m_Layer: 3
-  m_Name: ItemSpawnPoint (29)
+  m_Name: ItemSpawnPoint
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -780,6 +835,59 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   groupOwner: {fileID: 5377934186452402596}
+--- !u!1 &4814083355186795328
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 3452347488282363233}
+  - component: {fileID: 7658253902593627842}
+  m_Layer: 3
+  m_Name: NPCPickupArea1
+  m_TagString: NPCShelfPickupArea
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &3452347488282363233
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4814083355186795328}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 1.55, z: 1.24}
+  m_LocalScale: {x: 7.85, y: 3.1, z: 1.3}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 345304805968304750}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!65 &7658253902593627842
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4814083355186795328}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 1
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 1, y: 1, z: 1}
+  m_Center: {x: 0, y: 0, z: 0}
 --- !u!1 &5107438987777135224
 GameObject:
   m_ObjectHideFlags: 0
@@ -791,7 +899,7 @@ GameObject:
   - component: {fileID: 9208125768850939507}
   - component: {fileID: 6301412717119142398}
   m_Layer: 3
-  m_Name: ItemSpawnPoint (13)
+  m_Name: ItemSpawnPoint
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -836,7 +944,7 @@ GameObject:
   - component: {fileID: 1983281714913624748}
   - component: {fileID: 8847183005604100626}
   m_Layer: 3
-  m_Name: ItemSpawnPoint (7)
+  m_Name: ItemSpawnPoint
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -881,7 +989,7 @@ GameObject:
   - component: {fileID: 1120733953684661197}
   - component: {fileID: 6262991341923501567}
   m_Layer: 3
-  m_Name: ItemSpawnPoint (24)
+  m_Name: ItemSpawnPoint
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -926,7 +1034,7 @@ GameObject:
   - component: {fileID: 842991438541297664}
   - component: {fileID: 5709454697853137587}
   m_Layer: 3
-  m_Name: ItemSpawnPoint (27)
+  m_Name: ItemSpawnPoint
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -971,7 +1079,7 @@ GameObject:
   - component: {fileID: 3325723410803310280}
   - component: {fileID: 4757460616009016336}
   m_Layer: 3
-  m_Name: ItemSpawnPoint (18)
+  m_Name: ItemSpawnPoint
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1016,7 +1124,7 @@ GameObject:
   - component: {fileID: 7574152883866057428}
   - component: {fileID: 5154841267800040661}
   m_Layer: 3
-  m_Name: ItemSpawnPoint (20)
+  m_Name: ItemSpawnPoint
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1061,7 +1169,7 @@ GameObject:
   - component: {fileID: 423254098952630451}
   - component: {fileID: 970302946613139052}
   m_Layer: 3
-  m_Name: ItemSpawnPoint (4)
+  m_Name: ItemSpawnPoint
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1106,7 +1214,7 @@ GameObject:
   - component: {fileID: 611738713049213977}
   - component: {fileID: 1400244913855968104}
   m_Layer: 3
-  m_Name: ItemSpawnPoint (16)
+  m_Name: ItemSpawnPoint
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1151,7 +1259,7 @@ GameObject:
   - component: {fileID: 8193142418460916017}
   - component: {fileID: 1748886168635775049}
   m_Layer: 3
-  m_Name: ItemSpawnPoint (21)
+  m_Name: ItemSpawnPoint
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1196,7 +1304,7 @@ GameObject:
   - component: {fileID: 4426483017066144944}
   - component: {fileID: 6361358547045096176}
   m_Layer: 3
-  m_Name: ItemSpawnPoint (6)
+  m_Name: ItemSpawnPoint
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1241,7 +1349,7 @@ GameObject:
   - component: {fileID: 3317626515481009600}
   - component: {fileID: 1038432852967532599}
   m_Layer: 3
-  m_Name: ItemSpawnPoint (2)
+  m_Name: ItemSpawnPoint
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1286,7 +1394,7 @@ GameObject:
   - component: {fileID: 8778789003785287734}
   - component: {fileID: 7588591783076251846}
   m_Layer: 3
-  m_Name: ItemSpawnPoint (5)
+  m_Name: ItemSpawnPoint
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1331,7 +1439,7 @@ GameObject:
   - component: {fileID: 7371206359267872799}
   - component: {fileID: 8399874142564689681}
   m_Layer: 3
-  m_Name: ItemSpawnPoint (14)
+  m_Name: ItemSpawnPoint
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1376,7 +1484,7 @@ GameObject:
   - component: {fileID: 5212928626279138918}
   - component: {fileID: 9018455967602076957}
   m_Layer: 3
-  m_Name: ItemSpawnPoint (30)
+  m_Name: ItemSpawnPoint
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1421,7 +1529,7 @@ GameObject:
   - component: {fileID: 7150523901832546662}
   - component: {fileID: 4197548214024445504}
   m_Layer: 3
-  m_Name: ItemSpawnPoint (17)
+  m_Name: ItemSpawnPoint
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1466,7 +1574,7 @@ GameObject:
   - component: {fileID: 9150135417381763158}
   - component: {fileID: 7775945508140310824}
   m_Layer: 3
-  m_Name: ItemSpawnPoint (3)
+  m_Name: ItemSpawnPoint
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1511,7 +1619,7 @@ GameObject:
   - component: {fileID: 5506939804136896874}
   - component: {fileID: 3606641906414549718}
   m_Layer: 3
-  m_Name: ItemSpawnPoint (19)
+  m_Name: ItemSpawnPoint
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1556,7 +1664,7 @@ GameObject:
   - component: {fileID: 1743181518755641422}
   - component: {fileID: 4867203173468209319}
   m_Layer: 3
-  m_Name: ItemSpawnPoint (11)
+  m_Name: ItemSpawnPoint
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1601,7 +1709,7 @@ GameObject:
   - component: {fileID: 3148459435778371643}
   - component: {fileID: 6820333947523022772}
   m_Layer: 3
-  m_Name: ItemSpawnPoint (23)
+  m_Name: ItemSpawnPoint
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

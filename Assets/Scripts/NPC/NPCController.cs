@@ -34,6 +34,13 @@ public class NPCController : Interactable {
     private Marker taskMarker;
     private bool generalTrackedBeforeTask; // whether the general marker was active before a task was assigned; is also modified if the player general tracks/untracks the NPC while a task is assigned
 
+    [Header("Shelf Pickup")]
+    [SerializeField, Range(0f, 100f)] private float shelfPickupChance;
+    private Vector3 shelfHalfExtents;
+    private Vector3 shelfWorldCenter;
+    private Quaternion shelfRotation;
+    private bool inShelfPickupArea; // whether the NPC is currently in a shelf pickup area (for drawing gizmos)
+
     [Header("Ground Check")]
     [SerializeField] private float raycastDistance; // distance to raycast down from the foot position
 
@@ -79,6 +86,57 @@ public class NPCController : Interactable {
 
         base.Update();
         animator.SetFloat("speed", aiPath.canMove ? aiPath.velocity.magnitude : 0f); // update the animator speed based on the NPC's velocity
+
+    }
+
+    private void OnTriggerEnter(Collider other) {
+
+        if (other.CompareTag("NPCShelfPickupArea")) { // make sure the trigger is for the NPC pickup area
+            
+            MeshCollider shelfCollider = other.transform.parent.GetComponent<MeshCollider>(); // get the MeshCollider from the parent of the trigger collider
+
+            // make sure the shelf collider is not null
+            if (shelfCollider == null) {
+
+                Debug.LogWarning("Shelf parent has no MeshCollider!");
+                return;
+
+            }
+
+            Transform shelfTransform = shelfCollider.transform;
+            Bounds localBounds = shelfCollider.sharedMesh.bounds; // get the local bounds of the shelf mesh collider
+
+            Vector3 worldSize = Vector3.Scale(localBounds.size, shelfTransform.lossyScale); // calculate the world size of the shelf by scaling the local bounds with the shelf's lossy scale
+            shelfHalfExtents = worldSize / 2f; // calculate the half extents of the shelf by dividing the world size by 2
+            shelfWorldCenter = shelfTransform.TransformPoint(localBounds.center); // calculate the world center of the shelf by transforming the local bounds center to world space
+            shelfRotation = shelfTransform.rotation; // get the rotation of the shelf transform
+            inShelfPickupArea = true; // set the flag to true to indicate the NPC is in a shelf pickup area
+
+            if (UnityEngine.Random.Range(0f, 100f) <= shelfPickupChance) { // check if the NPC should pick up an item from the shelf based on the shelf pickup chance
+
+                Collider[] hits = Physics.OverlapBox(shelfWorldCenter, shelfHalfExtents, shelfRotation); // use OverlapBox to check for items in the shelf area
+
+                // remove all colliders that are not ItemInteractable components from the hits array
+                hits = Array.FindAll(hits, hit => hit.GetComponent<ItemInteractable>() != null);
+
+                // now we know every collider in the hits array is an ItemInteractable component, we can safely pick a random item from it
+
+                // pick a random item from the hits array if there are still any items left after filtering
+                if (hits.Length > 0) {
+
+                    ItemInteractable item = hits[UnityEngine.Random.Range(0, hits.Length)].GetComponent<ItemInteractable>(); // get a random item interactable from the hits array
+                    Debug.Log("NPC took item: " + item.name); // log the item taken by the NPC
+                    Destroy(item.gameObject); // destroy the item after taking it
+
+                }
+            }
+        }
+    }
+
+    private void OnTriggerExit(Collider other) {
+
+        if (other.CompareTag("NPCShelfPickupArea")) // make sure the trigger is for the NPC pickup area
+            inShelfPickupArea = false; // set the flag to false to indicate the NPC is no longer in a shelf pickup area
 
     }
 
@@ -258,6 +316,20 @@ public class NPCController : Interactable {
             yield return null; // wait for the next frame before checking again
 
         }
+    }
+
+    private void OnDrawGizmos() {
+
+        if (!inShelfPickupArea) return; // only draw shelf gizmos if the NPC is in a shelf pickup area
+
+        Gizmos.color = new Color(0f, 1f, 0f, 0.3f);
+        Matrix4x4 rotationMatrix = Matrix4x4.TRS(shelfWorldCenter, shelfRotation, Vector3.one); // create a matrix for the shelf's world position and rotation
+        Gizmos.matrix = rotationMatrix; // set the gizmo matrix to the shelf's world position and rotation
+
+        Gizmos.DrawCube(Vector3.zero, shelfHalfExtents * 2f); // draw a cube at the shelf's world center with the half extents scaled by 2 to represent the full size of the shelf
+        Gizmos.color = Color.green;
+        Gizmos.DrawWireCube(Vector3.zero, shelfHalfExtents * 2f); // draw a wireframe cube at the shelf's world center with the half extents scaled by 2 to represent the full size of the shelf
+
     }
 
     private Vector3 GetRandomPoint() {

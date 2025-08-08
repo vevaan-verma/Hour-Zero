@@ -5,7 +5,6 @@ public class PlayerController : MonoBehaviour {
 
     [Header("References")]
     [SerializeField] private Transform dropPoint;
-    [SerializeField] private LayerMask grabIgnoreMask; // mask for raycasts that should not hit the player
     private UIManager uiManager;
     private Rigidbody rb;
     private new Collider collider;
@@ -41,6 +40,7 @@ public class PlayerController : MonoBehaviour {
 
     [Header("Interacting")]
     [SerializeField] private float interactRange;
+    [SerializeField] private LayerMask interactMask;
 
     [Header("Holding")]
     [SerializeField] private LayerMask heldItemMask;
@@ -50,6 +50,7 @@ public class PlayerController : MonoBehaviour {
     [Header("Grabbing")]
     [SerializeField] private float grabRange;
     [SerializeField] private float grabStrength;
+    [SerializeField] private LayerMask grabMask;
     [SerializeField] private LineRenderer grabLine;
     [SerializeField] private float grabRotationMultiplier;
     [SerializeField, Tooltip("If true, the grab rotation axes will be relative to the player, otherwise they will be relative to the world")] private bool axesRelativeToPlayer;
@@ -192,8 +193,8 @@ public class PlayerController : MonoBehaviour {
         #endregion
 
         #region GRABBING
-        // check if player is looking at a rigidbody within grab range and right mouse button is pressed; also make sure the rigidbody is not kinematic (so it can be grabbed); use the nonPlayerMask to prevent the player from grabbing themselves
-        if (Physics.Raycast(cameraPos.position, cameraPos.forward, out RaycastHit hit, grabRange, grabIgnoreMask) && hit.rigidbody) {
+        // check if player is looking at a rigidbody within grab range and right mouse button is pressed; also make sure the rigidbody is not kinematic (so it can be grabbed)
+        if (Physics.Raycast(cameraPos.position, cameraPos.forward, out RaycastHit hit, grabRange, grabMask) && hit.rigidbody) {
 
             RigidbodyGrabTrigger rbTrigger = hit.rigidbody.gameObject.GetComponent<RigidbodyGrabTrigger>();
 
@@ -266,7 +267,7 @@ public class PlayerController : MonoBehaviour {
         #endregion
 
         #region INTERACTING
-        if (Physics.Raycast(cameraPos.position, cameraPos.forward, out hit, interactRange, grabIgnoreMask) && hit.collider.CompareTag("Interactable")) { // check if player is looking at interactable object within interact distance and is tagged as interactable; use the nonPlayerMask to prevent the player from interacting with themselves
+        if (Physics.Raycast(cameraPos.position, cameraPos.forward, out hit, interactRange, interactMask) && hit.collider.CompareTag("Interactable")) { // check if player is looking at interactable object within interact distance and is tagged as interactable
 
             Interactable interactable = hit.collider.GetComponentInParent<Interactable>(); // make sure to check parent for interactable component since that is how some interactables are set up; use hit.collider not hit.transform to ensure the object is the one with the collider
 
@@ -487,9 +488,9 @@ public class PlayerController : MonoBehaviour {
 
         if (currGrabbedObject)
             uiManager.SetCrosshairType(CrosshairType.Grabbing);
-        else if (Physics.Raycast(cameraPos.position, cameraPos.forward, out RaycastHit hit, interactRange, grabIgnoreMask) && hit.collider.CompareTag("Interactable"))
+        else if (Physics.Raycast(cameraPos.position, cameraPos.forward, out RaycastHit hit, interactRange, interactMask) && hit.collider.CompareTag("Interactable"))
             uiManager.SetCrosshairType(CrosshairType.Interact);
-        else if (Physics.Raycast(cameraPos.position, cameraPos.forward, out hit, interactRange, grabIgnoreMask) && hit.rigidbody && !hit.rigidbody.isKinematic)
+        else if (Physics.Raycast(cameraPos.position, cameraPos.forward, out hit, interactRange, grabMask) && hit.rigidbody && !hit.rigidbody.isKinematic)
             uiManager.SetCrosshairType(CrosshairType.Grabbable);
         else
             uiManager.SetCrosshairType(CrosshairType.Default);
