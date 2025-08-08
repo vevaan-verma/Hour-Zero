@@ -28,8 +28,11 @@ public class PopupPlayer : MonoBehaviour {
 
     [Header("Debug")]
     [SerializeField] private bool logMetrics;
-    int trackedMaxSize;
-    float timeSinceLastMax;
+    private int trackedMaxSize;
+    private float timeSinceLastMax;
+    private Stack<String> logs;
+    private Coroutine logWaitCoroutine;
+    private const float logWaitDuration = 0.5f;
 
     private Dictionary<Type, Queue<GameObject>> pool;
 
@@ -37,8 +40,8 @@ public class PopupPlayer : MonoBehaviour {
 
     private void Awake() {
 
-        pool = new(); // sus little shortcut
-
+        pool = new Dictionary<Type, Queue<GameObject>>();
+        logs = new Stack<String>();
         trackedMaxSize = 0;
         timeSinceLastMax = 0;
 
@@ -102,6 +105,7 @@ public class PopupPlayer : MonoBehaviour {
             }
 
             // if pool does not have inf size, the pool has surpassed the max pool size, and the Queue is not empty or missing for the most pool-hogging Type
+            // TODO: instead of removing from most pool-hogging type, find the type with the greatest % of popups not in use
             if (!infinitePool && poolSize > maxPoolSize && maxPoolStackType != null && pool[maxPoolStackType].Count == 0)
                 StartCoroutine(QueueForDestruction(pool[maxPoolStackType].Dequeue()));
 
@@ -109,7 +113,10 @@ public class PopupPlayer : MonoBehaviour {
 
                 trackedMaxSize = poolSize;
 
-                Debug.Log("New max pool size reached: " + trackedMaxSize + ". Last max occured " + timeSinceLastMax + "s ago");
+                logs.Push("<b>New max Popup pool size reached:</b> " + trackedMaxSize + ". Previous peak occured " + ("" + timeSinceLastMax).Substring(0, 4) + "s ago.");
+
+                if (logWaitCoroutine == null)
+                    logWaitCoroutine = StartCoroutine(WaitToLogMetrics());
 
                 timeSinceLastMax = 0;
 
@@ -117,6 +124,31 @@ public class PopupPlayer : MonoBehaviour {
 
             timeSinceLastMax += Time.deltaTime;
         }
+
+    }
+
+    private IEnumerator WaitToLogMetrics() {
+
+        int prevLogCount = logs.Count;
+        float totalWait = 0f;
+
+        // wait until no new logs are being added
+        while (true) {
+
+            yield return new WaitForSeconds(logWaitDuration);
+            totalWait += logWaitDuration;
+
+            if (prevLogCount == logs.Count)
+                break;
+
+            prevLogCount = logs.Count;
+
+        }
+
+        Debug.Log(logs.Pop() + " <i>(This peak occured " + totalWait + "s ago)</i>");
+        logs.Clear();
+
+        logWaitCoroutine = null;
 
     }
 
