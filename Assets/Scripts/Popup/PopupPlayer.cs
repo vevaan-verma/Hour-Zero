@@ -107,7 +107,7 @@ public class PopupPlayer : MonoBehaviour {
 
             if (logMetrics && poolSize > trackedMaxSize) {
 
-                trackedMaxSize = pool.Count;
+                trackedMaxSize = poolSize;
 
                 Debug.Log("New max pool size reached: " + trackedMaxSize + ". Last max occured " + timeSinceLastMax + "s ago");
 
