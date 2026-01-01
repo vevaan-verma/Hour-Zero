@@ -10,8 +10,8 @@ public class PlayerController : MonoBehaviour {
     private new Collider collider;
 
     [Header("Camera")]
-    [SerializeField] private Transform cameraHolder;
     [SerializeField] private Transform cameraPos;
+    private CameraFollow cameraFollow;
 
     [Header("Movement")]
     [SerializeField] private float walkSpeed;
@@ -92,6 +92,14 @@ public class PlayerController : MonoBehaviour {
     [SerializeField] private float verticalFlightForce;
     [SerializeField] private bool noClipFlight;
     private bool flightModeActive;
+
+    private void OnEnable() {
+
+        // set the camera follow target to the player camera position; done in onEnable because when a player enters a car, the player object is disabled and re-enabled when they exit the car
+        cameraFollow = FindFirstObjectByType<CameraFollow>();
+        cameraFollow.SetFollowTarget(cameraPos, false);
+
+    }
 
     private void Start() {
 
@@ -365,8 +373,6 @@ public class PlayerController : MonoBehaviour {
         itemHolder.HandleSway(mouseX, mouseY, true, !menuOpen, !menuOpen); // handle the sway effect for the held item based on mouse movement; use LateUpdate to calculate sway to ensure the sway happens after all other updates, preventing jittering; the breathe effect is always enabled, headbob is enabled when not in a menu, and sway is enabled when not in a menu
         phoneHolder.HandleSway(mouseX, mouseY, !menuOpen && !phoneInPocket, !menuOpen && !phoneInPocket, !menuOpen && !phoneInPocket); // handle the sway effect for the phone holder based on mouse movement; use LateUpdate to calculate sway to ensure the sway happens after all other updates, preventing jittering; the breathe effect is enabled when not in a menu and the phone is not in the pocket, headbob is enabled when not in a menu and the phone is not in the pocket, and sway is enabled when not in a menu and the phone is not in the pocket
 
-        cameraHolder.SetPositionAndRotation(cameraPos.position, cameraPos.rotation);
-
     }
 
     private void Jump() => rb.linearVelocity = new Vector3(rb.linearVelocity.x, jumpHeight, rb.linearVelocity.z);
@@ -494,6 +500,14 @@ public class PlayerController : MonoBehaviour {
             uiManager.SetCrosshairType(CrosshairType.Grabbable);
         else
             uiManager.SetCrosshairType(CrosshairType.Default);
+
+    }
+
+    public void ResetCameraPos() {
+
+        yRotation = transform.eulerAngles.y; // reset yRotation to the player's current y rotation
+        rb.MoveRotation(Quaternion.Euler(0f, yRotation, 0f));
+        cameraPos.rotation = Quaternion.Euler(0f, yRotation, 0f);
 
     }
 

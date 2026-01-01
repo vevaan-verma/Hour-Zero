@@ -72,8 +72,7 @@ public abstract class Interactable : MonoBehaviour {
 
             isIndicatorVisible = false;
 
-        }
-        else if (!canInteract && indicator.gameObject.activeSelf) {
+        } else if (!canInteract && indicator.gameObject.activeSelf) {
 
             indicator.gameObject.SetActive(false);
 

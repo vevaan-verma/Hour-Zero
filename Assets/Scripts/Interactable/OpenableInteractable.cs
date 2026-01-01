@@ -20,14 +20,12 @@ public class OpenableInteractable : Interactable {
     private Coroutine autoCloseCoroutine;
     private float currAutoCloseTimer;
     private bool heldOpen;
-    private bool autoMode = false;
+    private bool autoMode; // whether the openable is in auto mode, which prevents manual interaction
 
     [Header("Animation")]
     [SerializeField, Tooltip("Instead of using an Animator, the script lerps the object to allow for a more dynamic openable. \n\nNOT IMPLEMENTED!!")] private bool useLerpAnimation;
     [SerializeField, Tooltip("When the openable is opened, its position will be displaced by this vector")] private Vector3 lerpPositionalDisplacement;
     [SerializeField, Tooltip("When the openable is opened, its rotation will be displaced by this vector")] private Vector3 lerpAngularDisplacement;
-    private Vector3 initialPos;
-    private Vector3 initialRot;
 
     [Header("Sounds")]
     [SerializeField] private SFXLib.Sounds openSound;
@@ -47,9 +45,6 @@ public class OpenableInteractable : Interactable {
         if (!itemLockIntact && breakItemLockOnInteract)
             Debug.LogWarning($"Interactable {name} has item lock intact set to false but break item lock on interact is true. This will have no effect since the item lock is already broken.");
 
-        initialPos = transform.position;
-        initialRot = transform.rotation.eulerAngles;
-
         if (!autoClose)
             autoCloseTimer = 0;
 
@@ -59,19 +54,14 @@ public class OpenableInteractable : Interactable {
         else
             Close();
 
-
     }
 
     // tell this OpenableInteractable it cannot be manually opened
-    public void SetAutoOpenable() {
-
-        autoMode = true;
-
-    }
+    public void SetAutoOpenable() => autoMode = true;
 
     public override bool Interact() {
 
-        if (!canInteract || autoMode) return false;
+        if (!base.Interact() || autoMode) return false; // if the base interaction fails or the interactable is in auto mode, do not proceed
 
         // if the item lock is still intact, check if the player has the required item to open or close the interactable
         if (itemLockIntact)
@@ -106,8 +96,7 @@ public class OpenableInteractable : Interactable {
                 StopCoroutine(autoCloseCoroutine);
                 autoCloseCoroutine = null;
 
-            }
-            else {
+            } else {
 
                 float animClipLength = animator.GetCurrentAnimatorStateInfo(0).length;
                 currAutoCloseTimer = autoCloseTimer + animClipLength;
@@ -115,7 +104,6 @@ public class OpenableInteractable : Interactable {
                 autoCloseCoroutine = StartCoroutine(HandleAutoClose(animClipLength));
 
             }
-
         }
 
         return true;
@@ -159,8 +147,7 @@ public class OpenableInteractable : Interactable {
                 StopCoroutine(autoCloseCoroutine);
                 autoCloseCoroutine = null;
 
-            }
-            else {
+            } else {
 
                 float animClipLength = animator.GetCurrentAnimatorStateInfo(0).length;
                 currAutoCloseTimer = autoCloseTimer + animClipLength;
@@ -168,14 +155,10 @@ public class OpenableInteractable : Interactable {
                 autoCloseCoroutine = StartCoroutine(HandleAutoClose(animClipLength));
 
             }
-
-
         }
-
     }
 
     private void Open() {
-
 
         // do open animation
         if (!useLerpAnimation)
@@ -239,7 +222,6 @@ public class OpenableInteractable : Interactable {
 
     public void SetHeldOpen(bool held) {
 
-
         heldOpen = held;
 
         if (!held) { // if ending held open (object/player leaves the sensor region), begin auto close coroutine
@@ -254,16 +236,7 @@ public class OpenableInteractable : Interactable {
             autoCloseCoroutine = StartCoroutine(HandleAutoClose(currAutoCloseTimer));
 
         }
-
-
     }
-
-    public bool IsOpened {
-
-        get { return isOpen; }
-
-    }
-
 
 #if UNITY_EDITOR
     // using UnityEditor prefix to avoid needing to hide the import in the final build
@@ -276,32 +249,30 @@ public class OpenableInteractable : Interactable {
 
             DrawPropertiesExcluding(serializedObject, "lerpPositionalDisplacement", "lerpAngularDisplacement", "openSound", "closeSound", "openedText", "closedText");
 
-            UnityEditor.SerializedProperty _useLerpAnimation = serializedObject.FindProperty("useLerpAnimation");
-            UnityEditor.SerializedProperty _lerpPositionalDisplacement = serializedObject.FindProperty("lerpPositionalDisplacement");
-            UnityEditor.SerializedProperty _lerpAngularDisplacement = serializedObject.FindProperty("lerpAngularDisplacement");
-            UnityEditor.SerializedProperty _openSound = serializedObject.FindProperty("openSound");
-            UnityEditor.SerializedProperty _closeSound = serializedObject.FindProperty("closeSound");
-            UnityEditor.SerializedProperty _openedText = serializedObject.FindProperty("openedText");
-            UnityEditor.SerializedProperty _closedText = serializedObject.FindProperty("closedText");
+            UnityEditor.SerializedProperty useLerpAnimation = serializedObject.FindProperty("useLerpAnimation");
+            UnityEditor.SerializedProperty lerpPositionalDisplacement = serializedObject.FindProperty("lerpPositionalDisplacement");
+            UnityEditor.SerializedProperty lerpAngularDisplacement = serializedObject.FindProperty("lerpAngularDisplacement");
+            UnityEditor.SerializedProperty openSound = serializedObject.FindProperty("openSound");
+            UnityEditor.SerializedProperty closeSound = serializedObject.FindProperty("closeSound");
+            UnityEditor.SerializedProperty openedText = serializedObject.FindProperty("openedText");
+            UnityEditor.SerializedProperty closedText = serializedObject.FindProperty("closedText");
 
 
-            if (_useLerpAnimation.boolValue) {
+            if (useLerpAnimation.boolValue) {
 
-                UnityEditor.EditorGUILayout.PropertyField(_lerpPositionalDisplacement);
-                UnityEditor.EditorGUILayout.PropertyField(_lerpAngularDisplacement);
+                UnityEditor.EditorGUILayout.PropertyField(lerpPositionalDisplacement);
+                UnityEditor.EditorGUILayout.PropertyField(lerpAngularDisplacement);
 
             }
 
-            UnityEditor.EditorGUILayout.PropertyField(_openSound);
-            UnityEditor.EditorGUILayout.PropertyField(_closeSound);
-            UnityEditor.EditorGUILayout.PropertyField(_openedText);
-            UnityEditor.EditorGUILayout.PropertyField(_closedText);
+            UnityEditor.EditorGUILayout.PropertyField(openSound);
+            UnityEditor.EditorGUILayout.PropertyField(closeSound);
+            UnityEditor.EditorGUILayout.PropertyField(openedText);
+            UnityEditor.EditorGUILayout.PropertyField(closedText);
 
             serializedObject.ApplyModifiedProperties();
 
         }
     }
-
 #endif
-
 }
