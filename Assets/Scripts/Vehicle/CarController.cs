@@ -19,6 +19,7 @@ public class CarController : MonoBehaviour {
     [SerializeField] private float maxSteerAngle;
     [SerializeField] private float driveTorque;
     [SerializeField] private float brakeTorque;
+    [SerializeField] private float exitBrakeTorque;
     [SerializeField] private float maxSpeed;
     [SerializeField] private float exitHoldTime;
     private float throttleInput;
@@ -68,7 +69,7 @@ public class CarController : MonoBehaviour {
         foreach (Wheel wheel in wheels) {
 
             wheel.GetCollider().motorTorque = 0f;
-            wheel.GetCollider().brakeTorque = brakeTorque;
+            wheel.GetCollider().brakeTorque = exitBrakeTorque;
 
         }
 
@@ -97,8 +98,8 @@ public class CarController : MonoBehaviour {
         // loop through each wheel and update its model position and rotation based on the collider
         foreach (Wheel wheel in wheels) {
 
-            wheel.GetCollider().GetWorldPose(out Vector3 position, out Quaternion rotation);
-            wheel.GetModel().transform.SetPositionAndRotation(position, rotation);
+            float rotationAngle = (Vector3.Dot(rb.linearVelocity, transform.forward) / wheel.GetCollider().radius) * Mathf.Rad2Deg * Time.fixedDeltaTime; // calculate the rotation angle based on the car's forward velocity and wheel radius
+            wheel.GetModel().transform.Rotate(rotationAngle, 0f, 0f); // rotate the wheel model around its local X axis according to the calculated rotation angle (spins the wheels at the correct speed)
 
         }
     }
