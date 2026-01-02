@@ -32,7 +32,7 @@ public class BunkerSystemUI : MonoBehaviour {
     public void UpdateSystemStatus(int durability) {
 
         if (sliderLerpCoroutine != null) StopCoroutine(sliderLerpCoroutine); // stop any existing lerp coroutine
-        sliderLerpCoroutine = StartCoroutine(HandleSliderLerp(durability));
+        sliderLerpCoroutine = StartCoroutine(HandleSliderLerp(durabilitySlider, durabilityText, durability, sliderLerpDuration));
 
         BunkerSystemStatusProperties systemStatusProperties = bunkerPanelManager.GetSystemStatusFromDurability(durability);
         statusText.text = systemStatusProperties.GetStatus().ToString(); // update the status text based on the status
@@ -40,22 +40,22 @@ public class BunkerSystemUI : MonoBehaviour {
 
     }
 
-    private IEnumerator HandleSliderLerp(float targetValue) {
+    private IEnumerator HandleSliderLerp(Slider slider, TMP_Text sliderText, float targetValue, float lerpDuration) {
 
         float currentTime = 0f;
-        float startValue = durabilitySlider.value;
+        float startValue = slider.value;
 
-        while (currentTime < sliderLerpDuration) {
+        while (currentTime < lerpDuration) {
 
-            durabilitySlider.value = Mathf.Lerp(startValue, targetValue, currentTime / sliderLerpDuration);
-            durabilityText.text = Mathf.Round(durabilitySlider.value).ToString(); // update the text to match the slider value
+            slider.value = Mathf.Lerp(startValue, targetValue, currentTime / lerpDuration);
+            sliderText.text = Mathf.Round(slider.value).ToString(); // update the text to match the slider value
             currentTime += Time.deltaTime;
             yield return null;
 
         }
 
-        durabilitySlider.value = targetValue; // ensure the slider ends at the target value
-        durabilityText.text = Mathf.Round(targetValue).ToString(); // update the text to match the final slider value
+        slider.value = targetValue; // ensure the slider ends at the target value
+        sliderText.text = Mathf.Round(targetValue).ToString(); // update the text to match the final slider value
 
         sliderLerpCoroutine = null; // reset the coroutine reference
 

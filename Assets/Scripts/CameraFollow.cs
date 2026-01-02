@@ -18,12 +18,21 @@ public class CameraFollow : MonoBehaviour {
 
     [Header("Zooming")]
     [SerializeField] private float zoomSpeed;
+    [SerializeField] private float defaultDistance;
     [SerializeField] private float minDistance;
     [SerializeField] private float maxDistance;
     [SerializeField] private float zoomSmoothTime; // lower = snappier, higher = slower
     private float targetDistance;
     private float distance;
     private float distanceVelocity;
+
+    private void Start() {
+
+        // output a warning if defaultDistance isn't within min/max bounds
+        if (defaultDistance < minDistance || defaultDistance > maxDistance)
+            Debug.LogWarning($"[CameraFollow] Default Distance ({defaultDistance}) is out of bounds! It should be between Min Distance ({minDistance}) and Max Distance ({maxDistance}). Clamping to valid range.");
+
+    }
 
     private void LateUpdate() {
 
@@ -70,8 +79,7 @@ public class CameraFollow : MonoBehaviour {
         if (freecam) {
 
             Vector3 offset = transform.position - targetPivot.position; // get the offset from pivot to camera
-            distance = Mathf.Clamp(offset.magnitude, minDistance, maxDistance); // clamp current distance between min and max
-            targetDistance = distance; // set target distance to current distance
+            targetDistance = distance = defaultDistance; // set target distance and current distance to the default distance
 
             // convert offset to spherical angles (degrees)
             // yaw: angle around Y, pitch: angle above/below horizontal

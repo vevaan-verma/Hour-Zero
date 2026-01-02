@@ -6,7 +6,7 @@ public abstract class Interactable : MonoBehaviour {
     [Header("References")]
     protected Hotbar hotbar;
     protected Backpack backpack;
-    protected PlayerController player;
+    protected PlayerController playerController;
 
     [Header("Settings")]
     [SerializeField, Tooltip("Whether to require an item stack to be held to interact with this object")] protected bool requireHeldItem;
@@ -43,7 +43,7 @@ public abstract class Interactable : MonoBehaviour {
 
         hotbar = FindFirstObjectByType<Hotbar>();
         backpack = FindFirstObjectByType<Backpack>();
-        player = FindFirstObjectByType<PlayerController>();
+        playerController = FindFirstObjectByType<PlayerController>();
         indicator = GetComponentInChildren<InteractIndicator>(true); // find the interact indicator in the children of this object, even if inactive
 
         indicatorDefaultSize = indicator.transform.localScale;
@@ -60,11 +60,11 @@ public abstract class Interactable : MonoBehaviour {
 
     protected void Update() {
 
-        indicator.transform.LookAt(player.GetCameraTransform());
+        indicator.transform.LookAt(playerController.GetCameraTransform());
 
         // the indicator is set active (shown) by the player, then set inactive (hidden) by the interactable itself
 
-        if (canInteract && isIndicatorVisible && !player.IsLookingAt(gameObject)) {
+        if (canInteract && isIndicatorVisible && !playerController.IsLookingAt(gameObject)) {
 
             // go from current size to hidden
             if (indicatorLerpCoroutine != null) StopCoroutine(indicatorLerpCoroutine);

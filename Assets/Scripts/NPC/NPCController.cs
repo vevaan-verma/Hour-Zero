@@ -220,7 +220,7 @@ public class NPCController : Interactable {
 
         while (isInteracting) {
 
-            Vector3 direction = player.transform.position - transform.position;
+            Vector3 direction = playerController.transform.position - transform.position;
             direction.y = 0; // keep rotation on horizontal plane
 
             if (direction.sqrMagnitude > 0.01f) {

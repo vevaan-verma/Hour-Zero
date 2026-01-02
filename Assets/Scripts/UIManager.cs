@@ -25,6 +25,9 @@ public class UIManager : MonoBehaviour {
     [Header("Phone")]
     private PhoneManager phoneManager;
 
+    [Header("Driving HUD")]
+    private VehicleHUD vehicleHUD;
+
     [Header("Crosshair")]
     [SerializeField] private Image crosshair;
     [SerializeField] private Sprite defaultCrosshair;
@@ -62,6 +65,7 @@ public class UIManager : MonoBehaviour {
         npcMenu = FindFirstObjectByType<NPCMenu>();
         tradeMenu = FindFirstObjectByType<TradeMenu>();
         phoneManager = FindFirstObjectByType<PhoneManager>();
+        vehicleHUD = FindFirstObjectByType<VehicleHUD>();
 
         crosshair.sprite = defaultCrosshair; // set the crosshair to the default crosshair at the start
 
@@ -203,6 +207,22 @@ public class UIManager : MonoBehaviour {
         }
     }
 
+    public void ShowDrivingHUD(float maxSpeedMPH) {
+
+        hotbarUI.CloseInventory(); // close the hotbar UI if it is open (this is done to ensure the hotbar is not visible when the driving HUD is open)
+        vehicleHUD.ShowHUD(maxSpeedMPH); // open the driving HUD
+
+    }
+
+    public void HideDrivingHUD() {
+
+        hotbarUI.OpenInventory(); // re-open the hotbar UI
+        vehicleHUD.HideHUD(); // close the driving HUD
+
+    }
+
+    public void UpdateVehicleHUD(float speedInMPH) => vehicleHUD.UpdateDrivingHUD(speedInMPH);
+
     public void SetCrosshairType(CrosshairType type) {
 
         switch (type) {
@@ -231,7 +251,7 @@ public class UIManager : MonoBehaviour {
         }
     }
 
-    public bool IsMenuOpen() => primaryBackpackUI.IsInventoryOpen() || systemRepairMenu.IsMenuOpen() || npcMenu.IsMenuOpen() || tradeMenu.IsMenuOpen() || phoneManager.GetPhoneState() == PhoneState.Face;
+    public bool IsMenuOpen() => primaryBackpackUI.IsInventoryOpen() || systemRepairMenu.IsMenuOpen() || npcMenu.IsMenuOpen() || tradeMenu.IsMenuOpen() || phoneManager.GetPhoneState() == PhoneState.Face; // do not include the driving HUD here because it isn't a menu that blocks other menus
 
 }
 

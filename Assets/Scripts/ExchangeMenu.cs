@@ -36,6 +36,7 @@ public abstract class ExchangeMenu : Menu {
 
         exchangeButton.onClick.AddListener(ProcessExchange); // add listener to exchange button
 
+        menuPanel.alpha = 0f; // set initial alpha to 0
         menuPanel.gameObject.SetActive(false); // make sure the menu is hidden by default
 
     }
