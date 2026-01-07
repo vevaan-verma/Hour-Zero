@@ -6,7 +6,6 @@ public class BunkaAppManager : ViewManager {
 
     [Header("References")]
     private BunkerPanelManager bunkerPanelManager;
-    private BunkerSystem[] bunkerSystems; // array of bunker systems managed by the panel
     private RectTransform rectTransform;
 
     [Header("UI References")]
@@ -22,12 +21,11 @@ public class BunkaAppManager : ViewManager {
         #region VALIDATION
         // make sure each bunker system type has a corresponding UI
         BunkerSystemType[] systemTypes = (BunkerSystemType[]) Enum.GetValues(typeof(BunkerSystemType));
-        bunkerSystems = bunkerPanelManager.GetBunkerSystems();
 
         foreach (BunkerSystemUI systemUI in bunkerSystemUIs) {
 
             BunkerSystemType type = systemUI.GetSystemType();
-            systemUI.Initialize(bunkerPanelManager, Array.Find(bunkerSystems, s => s.GetSystemType() == type)); // initialize the UI with the corresponding system
+            systemUI.Initialize(bunkerPanelManager, bunkerPanelManager.GetBunkerSystemByType(type)); // initialize the UI with the corresponding system
 
         }
 
@@ -77,7 +75,7 @@ public class BunkaAppManager : ViewManager {
 
         foreach (BunkerSystemUI slider in bunkerSystemUIs) {
 
-            BunkerSystem system = Array.Find(bunkerSystems, s => s.GetSystemType() == slider.GetSystemType());
+            BunkerSystem system = bunkerPanelManager.GetBunkerSystemByType(slider.GetSystemType());
             slider.UpdateSystemStatus(system.GetCurrentDurability());
 
         }

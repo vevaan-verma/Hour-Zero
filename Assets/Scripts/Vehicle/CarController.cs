@@ -1,4 +1,5 @@
 using System;
+using Unity.VisualScripting;
 using UnityEngine;
 
 public class CarController : MonoBehaviour {
@@ -30,15 +31,13 @@ public class CarController : MonoBehaviour {
     private float steerInput;
     private float brakeInput;
     private float initialDrag;
+    private bool inVehicle;
 
-    private void OnEnable() => EnterVehicle();
-
-    private void Awake() {
-
-        enabled = false;
+    private void Start() {
 
         playerController = FindFirstObjectByType<PlayerController>();
         uiManager = FindFirstObjectByType<UIManager>();
+        cameraFollow = FindFirstObjectByType<CameraFollow>();
         player = playerController.transform;
         rb = GetComponent<Rigidbody>();
         rb.centerOfMass = centerOfMass;
@@ -48,6 +47,8 @@ public class CarController : MonoBehaviour {
     }
 
     private void Update() {
+
+        if (!inVehicle) return; // do not process input if not in vehicle
 
         // get player input
         throttleInput = Input.GetAxisRaw("Vertical");
@@ -60,8 +61,9 @@ public class CarController : MonoBehaviour {
         else if (Input.GetKeyUp(KeyCode.E))
             CancelInvoke(nameof(ExitVehicle));
 
-        float speedInMPS = Vector3.Dot(rb.linearVelocity, transform.forward); // get the car's forward speed in m/s
+        float speedInMPS = Mathf.Abs(Vector3.Dot(rb.linearVelocity, transform.forward)); // get the car's forward speed in m/s
         float speedInMPH = speedInMPS * MPS_TO_MPH;
+
         uiManager.UpdateVehicleHUD(Mathf.Min(speedInMPH, maxSpeed)); // update the vehicle HUD with the minimum of current speed and max speed to avoid displaying speeds higher than max speed (avoiding little jitters at max speed)
 
     }
@@ -77,21 +79,24 @@ public class CarController : MonoBehaviour {
         else
             rb.linearDamping = initialDrag;
 
-        // limit the car's maximum speed (assuming maximum speed is in miles per hour)
-        float currentSpeedMPS = Vector3.Dot(rb.linearVelocity, transform.forward); // get the car's forward speed in m/s
-        float maxSpeedMPS = maxSpeed * MPH_TO_MPS; // convert max speed from mph to m/s
+        // do not limit speed if not in vehicle
+        if (!inVehicle)
+            return;
 
+        // limit the car's maximum speed (assuming maximum speed is in miles per hour)
+        float currentSpeedMPS = Mathf.Abs(Vector3.Dot(rb.linearVelocity, transform.forward)); // get the car's forward speed in m/s
+        float maxSpeedMPS = maxSpeed * MPH_TO_MPS; // convert max speed from mph to m/s
+        
         // clamp the car's speed if it exceeds the maximum speed
-        if (Mathf.Abs(currentSpeedMPS) > maxSpeedMPS)
+        if (currentSpeedMPS > maxSpeedMPS)
             rb.linearVelocity = rb.linearVelocity.normalized * maxSpeedMPS;
 
     }
 
     public void EnterVehicle() {
-
-        cameraFollow = FindFirstObjectByType<CameraFollow>();
-        cameraFollow.SetFollowTarget(cameraPivot, true);
-
+        
+        inVehicle = true; // set the inVehicle flag to true
+        cameraFollow.SetFollowTarget(cameraPivot, true); // set the camera to follow the vehicle's camera pivot in freecam mode
         uiManager.ShowDrivingHUD(maxSpeed); // show the driving HUD
 
     }
@@ -112,7 +117,7 @@ public class CarController : MonoBehaviour {
 
         }
 
-        enabled = false; // disable the car controller
+        inVehicle = false; // set the inVehicle flag to false
 
     }
 

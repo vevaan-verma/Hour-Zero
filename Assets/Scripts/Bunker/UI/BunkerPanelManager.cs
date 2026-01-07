@@ -181,7 +181,7 @@ public class BunkerPanelManager : MonoBehaviour {
 
     }
 
-    public BunkerSystem[] GetBunkerSystems() => bunkerSystems;
+    public BunkerSystem GetBunkerSystemByType(BunkerSystemType bunkerSystemType) => Array.Find(bunkerSystems, s => s.GetSystemType() == bunkerSystemType);
 
     public string GetRefreshText() => refreshText.text;
 
