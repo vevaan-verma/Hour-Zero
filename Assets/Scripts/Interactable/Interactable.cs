@@ -15,7 +15,7 @@ public abstract class Interactable : MonoBehaviour {
     [SerializeField, Tooltip("Whether to require specific item stacks in the backpack to interact with this object")] protected bool requireBackpackItems;
     [SerializeField, Tooltip("The item stacks that must be in the backpack to interact with this object")] protected ItemStack[] requiredBackpackItems;
     [SerializeField, Tooltip("Whether to consume the backpack item stacks after interaction")] protected bool consumeBackpackItems;
-    protected bool canInteract;
+    protected bool isInteractable;
 
     [Header("Indicator")]
     protected InteractIndicator indicator;
@@ -48,13 +48,13 @@ public abstract class Interactable : MonoBehaviour {
 
         indicatorDefaultSize = indicator.transform.localScale;
         indicator.transform.localScale = Vector3.zero;
-        indicator.gameObject.SetActive(true); // ensure the indicator is active so it can be shown when needed
+        indicator.gameObject.SetActive(false); // start with the indicator hidden
 
         // ensure the object and all its children are tagged as Interactable
         foreach (Transform child in GetComponentsInChildren<Transform>())
             child.gameObject.tag = "Interactable";
 
-        canInteract = true;
+        isInteractable = true;
 
     }
 
@@ -64,7 +64,7 @@ public abstract class Interactable : MonoBehaviour {
 
         // the indicator is set active (shown) by the player, then set inactive (hidden) by the interactable itself
 
-        if (canInteract && isIndicatorVisible && !playerController.IsLookingAt(gameObject)) {
+        if (isInteractable && isIndicatorVisible && !playerController.IsLookingAt(gameObject)) {
 
             // go from current size to hidden
             if (indicatorLerpCoroutine != null) StopCoroutine(indicatorLerpCoroutine);
@@ -72,16 +72,17 @@ public abstract class Interactable : MonoBehaviour {
 
             isIndicatorVisible = false;
 
-        } else if (!canInteract && indicator.gameObject.activeSelf) {
+        } else if (!isInteractable && indicator.gameObject.activeSelf) {
 
             indicator.gameObject.SetActive(false);
+            isIndicatorVisible = false;
 
         }
     }
 
     public virtual bool Interact() {
 
-        if (!canInteract) return false; // if the interactable is not allowed to be interacted with, return false
+        if (!isInteractable) return false; // if the interactable is not allowed to be interacted with, return false
 
         // if the interactable requires a held item, check if the player is holding the required item and enough of it
         if (requireHeldItem) {
@@ -120,8 +121,8 @@ public abstract class Interactable : MonoBehaviour {
 
     public void ShowInteractIndicator() {
 
-        // if the indicator is inactive, it is not currently being displayed
-        if (!isIndicatorVisible && canInteract) {
+        // check if the indicator is not already visible and the interactable can be interacted with
+        if (!isIndicatorVisible && isInteractable) {
 
             // go from hidden to normal size
             if (indicatorLerpCoroutine != null) StopCoroutine(indicatorLerpCoroutine);
@@ -137,6 +138,8 @@ public abstract class Interactable : MonoBehaviour {
         float currentTime = 0f;
         indicator.transform.localScale = start;
 
+        indicator.gameObject.SetActive(true); // ensure the indicator is active before starting the lerp
+
         while (currentTime < interactIndicatorLerpDuration) {
 
             indicator.transform.localScale = Vector3.Lerp(start, end, currentTime / interactIndicatorLerpDuration);
@@ -147,7 +150,14 @@ public abstract class Interactable : MonoBehaviour {
 
         indicator.transform.localScale = end;
 
+        // if the end size is zero, deactivate the indicator game object
+        if (end == Vector3.zero)
+            indicator.gameObject.SetActive(false);
+
     }
+
+    public void SetInteractable(bool value) => isInteractable = value;
+
 }
 
 #if UNITY_EDITOR

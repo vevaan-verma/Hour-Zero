@@ -16,6 +16,9 @@ public class TimeManager : MonoBehaviour {
     [SerializeField] private Light sunLight;
     [SerializeField] private float sunSmoothing;
 
+    [Header("Actions")]
+    public Action onDayEnd;
+
     private void Start() {
 
         day = 1; // start at day 1
@@ -60,9 +63,12 @@ public class TimeManager : MonoBehaviour {
 
                 isAM = !isAM;
 
-                if (isAM)
-                    day++; // increment day when switching from PM to AM
+                if (isAM) {
 
+                    day++; // increment day when switching from PM to AM
+                    onDayEnd?.Invoke(); // invoke day end event
+
+                }
             }
         }
     }

@@ -1,6 +1,5 @@
 using UnityEngine;
 
-[RequireComponent(typeof(CarController))]
 public class VehicleInteractable : Interactable {
 
     [Header("References")]

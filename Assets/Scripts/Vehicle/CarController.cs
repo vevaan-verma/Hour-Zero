@@ -1,7 +1,7 @@
 using System;
-using Unity.VisualScripting;
 using UnityEngine;
 
+[RequireComponent(typeof(VehicleInteractable))]
 public class CarController : MonoBehaviour {
 
     [Header("References")]
@@ -9,6 +9,7 @@ public class CarController : MonoBehaviour {
     [SerializeField] private Wheel[] wheels;
     [SerializeField] private Transform cameraPivot;
     [SerializeField] private Transform exitPosition;
+    private VehicleInteractable vehicleInteractable;
     private PlayerController playerController;
     private UIManager uiManager;
     private Transform player;
@@ -35,6 +36,7 @@ public class CarController : MonoBehaviour {
 
     private void Start() {
 
+        vehicleInteractable = GetComponent<VehicleInteractable>();
         playerController = FindFirstObjectByType<PlayerController>();
         uiManager = FindFirstObjectByType<UIManager>();
         cameraFollow = FindFirstObjectByType<CameraFollow>();
@@ -86,7 +88,7 @@ public class CarController : MonoBehaviour {
         // limit the car's maximum speed (assuming maximum speed is in miles per hour)
         float currentSpeedMPS = Mathf.Abs(Vector3.Dot(rb.linearVelocity, transform.forward)); // get the car's forward speed in m/s
         float maxSpeedMPS = maxSpeed * MPH_TO_MPS; // convert max speed from mph to m/s
-        
+
         // clamp the car's speed if it exceeds the maximum speed
         if (currentSpeedMPS > maxSpeedMPS)
             rb.linearVelocity = rb.linearVelocity.normalized * maxSpeedMPS;
@@ -94,8 +96,10 @@ public class CarController : MonoBehaviour {
     }
 
     public void EnterVehicle() {
-        
+
         inVehicle = true; // set the inVehicle flag to true
+        vehicleInteractable.SetInteractable(false); // disable interaction while in vehicle
+
         cameraFollow.SetFollowTarget(cameraPivot, true); // set the camera to follow the vehicle's camera pivot in freecam mode
         uiManager.ShowDrivingHUD(maxSpeed); // show the driving HUD
 
@@ -118,6 +122,7 @@ public class CarController : MonoBehaviour {
         }
 
         inVehicle = false; // set the inVehicle flag to false
+        vehicleInteractable.SetInteractable(true); // re-enable interaction
 
     }
 

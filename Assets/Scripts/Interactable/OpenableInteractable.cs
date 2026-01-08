@@ -81,7 +81,7 @@ public class OpenableInteractable : Interactable {
         // check if the animation should be waited for before allowing further interactions
         if (waitForAnimation) {
 
-            canInteract = false; // set canInteract to false to prevent further interactions until the animation is done
+            isInteractable = false; // set canInteract to false to prevent further interactions until the animation is done
             interactCooldownCoroutine = StartCoroutine(HandleInteractCooldown()); // start the interact cooldown coroutine
 
         }
@@ -120,7 +120,7 @@ public class OpenableInteractable : Interactable {
 
         }
 
-        if (!canInteract) return;
+        if (!isInteractable) return;
 
         if (isOpen && autoCloseCoroutine == null)
             Close();
@@ -132,7 +132,7 @@ public class OpenableInteractable : Interactable {
         // check if the animation should be waited for before allowing further interactions
         if (waitForAnimation) {
 
-            canInteract = false; // set canInteract to false to prevent further interactions until the animation is done
+            isInteractable = false; // set canInteract to false to prevent further interactions until the animation is done
             interactCooldownCoroutine = StartCoroutine(HandleInteractCooldown()); // start the interact cooldown coroutine
 
         }
@@ -191,7 +191,7 @@ public class OpenableInteractable : Interactable {
         yield return null; // wait for the animation to start
         yield return new WaitForSeconds(animator.GetCurrentAnimatorStateInfo(0).length); // wait for the interact animation to finish
 
-        canInteract = true;
+        isInteractable = true;
 
     }
 
