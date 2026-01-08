@@ -5707,6 +5707,8 @@ MonoBehaviour:
   phoneCycleKey: 112
   timeText: {fileID: 395614088011175353}
   dayText: {fileID: 7291602119096568674}
+  flashlight: {fileID: 6240938763409996386}
+  flashlightKey: 108
 --- !u!95 &5375787592395272851
 Animator:
   serializedVersion: 7
@@ -6329,12 +6331,12 @@ GameObject:
   - component: {fileID: 8380214208443511597}
   - component: {fileID: 6496007883040256212}
   m_Layer: 10
-  m_Name: Spot Light
+  m_Name: Flashlight
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &4048515633330097525
 Transform:
   m_ObjectHideFlags: 0
@@ -6343,7 +6345,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 6240938763409996386}
   serializedVersion: 2
-  m_LocalRotation: {x: 0.0065284045, y: -0.9509592, z: -0.13417041, w: 0.27862585}
+  m_LocalRotation: {x: 0.0065284027, y: -0.9509592, z: -0.13417041, w: 0.27862585}
   m_LocalPosition: {x: -0.18015057, y: -0.23477495, z: 3.303599}
   m_LocalScale: {x: 2.4999993, y: 2.5, z: 2.4999993}
   m_ConstrainProportionsScale: 0
@@ -6398,7 +6400,7 @@ Light:
   m_RenderMode: 0
   m_CullingMask:
     serializedVersion: 2
-    m_Bits: 4294967295
+    m_Bits: 31743
   m_RenderingLayerMask: 1
   m_Lightmapping: 4
   m_LightShadowCasterMode: 0

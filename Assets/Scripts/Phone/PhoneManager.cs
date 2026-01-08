@@ -46,6 +46,10 @@ public class PhoneManager : MonoBehaviour {
     [Header("Actions")]
     public Action onSendNotification; // action to notify when a notification is sent
 
+    [Header("Flashlight")]
+    [SerializeField] private GameObject flashlight;
+    [SerializeField] private KeyCode flashlightKey;
+
     private void Start() {
 
         timeManager = FindFirstObjectByType<TimeManager>();
@@ -117,6 +121,8 @@ public class PhoneManager : MonoBehaviour {
 
         UpdateTimeHUD(timeManager.GetDay(), timeManager.GetHour(), timeManager.GetMinute(), timeManager.IsAM());
 
+        flashlight.SetActive(false); // ensure flashlight is off by default
+
     }
 
     private void Update() {
@@ -133,6 +139,7 @@ public class PhoneManager : MonoBehaviour {
             switch (phoneState) {
 
                 case PhoneState.Pocket:
+                    flashlight.SetActive(false); // turn off flashlight when phone is put away
                     // it is not necessarily required to lock or hide the cursor here, but it is done for consistency
                     Cursor.lockState = CursorLockMode.Locked; // lock cursor when phone is put away
                     Cursor.visible = false; // hide cursor when phone is put away
@@ -158,6 +165,10 @@ public class PhoneManager : MonoBehaviour {
         }
 
         UpdateTimeHUD(timeManager.GetDay(), timeManager.GetHour(), timeManager.GetMinute(), timeManager.IsAM());
+
+        // toggle flashlight state when flashlight key is pressed and phone is not in pocket
+        if (phoneState != PhoneState.Pocket && Input.GetKeyDown(flashlightKey))
+            flashlight.SetActive(!flashlight.activeSelf);
 
     }
 
